@@ -24,7 +24,6 @@
                 android:id="@+id/tv_resTitle"
                 android:text="@string/resTitle"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
-
             <include layout="@layout/setting_resolution" />
 
 

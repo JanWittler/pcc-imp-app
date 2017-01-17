@@ -5,13 +5,13 @@
     android:id="@+id/content_camera"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.pcc.privacycrashcam.CameraActivity"
-    tools:showIn="@layout/app_bar_camera">
+    tools:context="de.pcc.privacycrashcam.gui.CameraActivity"
+    tools:showIn="@layout/container_notoolbar_simple">
 
-    <de.pcc.privacycrashcam.CameraView
+    <de.pcc.privacycrashcam.applicationlogic.CameraView
         android:id="@+id/sv_camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </de.pcc.privacycrashcam.CameraView>
+    </de.pcc.privacycrashcam.applicationlogic.CameraView>
 
 </RelativeLayout>

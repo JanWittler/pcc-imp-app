@@ -5,15 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="de.pcc.privacycrashcam.CameraActivity">
+    tools:context="de.pcc.privacycrashcam.gui.CameraActivity">
 
-    <include layout="@layout/toolbar" />
-    <include layout="@layout/content_settings" />
-    <!--<ViewStub android:inflatedId="@layout/content_settings"
+    <include layout="@layout/notoolbar" />
+    <FrameLayout
+        android:id="@+id/content_container"
         android:layout_height="match_parent"
-        android:layout_width="match_parent" />-->
-
-
-
+        android:layout_width="match_parent" />
 
 </android.support.design.widget.CoordinatorLayout>

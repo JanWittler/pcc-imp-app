@@ -1,4 +1,4 @@
-package de.pcc.privacycrashcam;
+package de.pcc.privacycrashcam.applicationlogic;
 
 import android.content.Context;
 import android.hardware.Camera;
