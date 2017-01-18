@@ -10,6 +10,7 @@
     <include layout="@layout/toolbar" />
     <FrameLayout
         android:id="@+id/content_container"
+        android:layout_marginTop="@dimen/toolbar_normal"
         android:layout_height="match_parent"
         android:layout_width="match_parent" />
 
