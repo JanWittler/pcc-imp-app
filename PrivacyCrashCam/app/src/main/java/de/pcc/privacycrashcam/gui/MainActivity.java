@@ -15,13 +15,22 @@ import android.view.MenuItem;
 import de.pcc.privacycrashcam.R;
 
 /**
- * Created by Giorgio on 17.01.17.
+ * Base class for all activities. Handles navigation through the application's views.
+ *
+ * @author Giorgio
  */
-
 public abstract class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private @Nullable DrawerLayout drawer;
 
+    /**
+     * Get the base layout resource for this activity. The layout must contain a toolbar with an id
+     * named <b>toolbar</b>.
+     * <p>If there is a navigation drawer in the layout it will be displayed. Navigation is handled
+     * by the {@link MainActivity MainActivity} class.</p>
+     *
+     * @return resource id for this activity
+     */
     public abstract @LayoutRes int getLayoutRes();
 
     @Override
@@ -33,7 +42,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar == null)
             throw new IllegalArgumentException("You passed a layout file without a toolbar, " +
-                    "but a toolbar was expected.");
+                    "but a toolbar with id \"toolbar\" was expected.");
         setSupportActionBar(toolbar);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer != null) {
