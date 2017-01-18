@@ -9,18 +9,20 @@ import android.view.SurfaceView;
 
 import java.io.IOException;
 
-/**
- * Created by Giorgio on 08.12.16.
- */
+import de.pcc.privacycrashcam.applicationlogic.camera.CameraHandler;
 
+/**
+ * Surface view optimized to be used as camera preview.
+ *
+ * @author Giorgio Gross
+ */
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    private final static String TAG = "CAM_VIEW";
     private SurfaceHolder mHolder;
-    private Camera mCamera;
-    private static String TAG = "CAM_VIEW";
+    private CameraHandler cameraHandler;
 
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.mCamera = getCameraInstance();
 
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
@@ -30,40 +32,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     }
 
-    /** A safe way to get an instance of the Camera object. */
-    private Camera getCameraInstance(){
-        if(mCamera != null) return mCamera;
 
-        // todo apply camera settings
-        Camera c = null;
-        try {
-            c = Camera.open(0); // attempt to get a Camera instance
-
-            Camera.Parameters p = c.getParameters();
-            // p.setPreviewSize(240, 160);
-            c.setParameters(p);
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-            Log.d(TAG, "error opening camera: ");
-            e.printStackTrace();
-        }
-        return c; // returns null if camera is unavailable
-    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, now tell the camera where to draw the preview.
-        try {
-            // todo make this cleaner
-            mCamera = getCameraInstance();
-            Log.d(TAG, "surface created, holder is "+holder +" camera is "+mCamera);
-            mCamera.setPreviewDisplay(holder);
-            mCamera.setPreviewCallback(this);
-            mCamera.startPreview();
-        } catch (IOException e) {
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-        }
+        // The Surface has been created, now tell the camera handler about it
+        cameraHandler.resumeHandler();
     }
 
     @Override
@@ -76,25 +50,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
             return;
         }
 
-        // stop preview before making changes
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e){
-            // ignore: tried to stop a non-existent preview
-        }
+        // pause camera handler before making changes
+        cameraHandler.pauseHandler();
 
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
+        // ... do changes to surface here.
+        // this will be necessary if we support landscape and portrait mode views
 
-        // start preview with new settings
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.setPreviewCallback(this);
-            mCamera.startPreview();
-
-        } catch (Exception e){
-            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-        }
+        // resume camera handler. This will invalidate the camera.
+        cameraHandler.resumeHandler();
     }
 
     @Override
@@ -108,12 +71,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 
     }
 
-    public void acquireCamera() {
-        mCamera = getCameraInstance();
-    }
-
-    public void releaseCamera() {
-        if(mCamera == null) return;
-        mCamera.release();
+    public void setCameraHandler(CameraHandler cameraHandler) {
+        this.cameraHandler = cameraHandler;
     }
 }
