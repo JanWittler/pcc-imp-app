@@ -20,12 +20,14 @@ public interface CameraHandler {
     void setMetadata(Metadata metadata);
 
     /**
-     * Resumes the camera handler. Called when UI becomes visible to the user.
+     * Resumes the camera handler. Called when UI becomes visible to the user. Makes camera and
+     * recorder available and starts buffering video chunks.
      */
     void resumeHandler();
 
     /**
-     * Pauses the handler. Called when the UI becomes invisible to the user.
+     * Pauses the handler. Called when the UI becomes invisible to the user. Releases camera and
+     * recorder and stops buffering video chunks.
      */
     void pauseHandler();
 

@@ -55,6 +55,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 
         // ... do changes to surface here.
         // this will be necessary if we support landscape and portrait mode views
+        // requestLayout();
 
         // resume camera handler. This will invalidate the camera.
         cameraHandler.resumeHandler();

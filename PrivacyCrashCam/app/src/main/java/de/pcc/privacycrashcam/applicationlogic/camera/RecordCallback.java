@@ -15,4 +15,10 @@ public interface RecordCallback {
      */
     void onRecordingStopped();
 
+    /**
+     * Called when an error occurs.
+     *
+     * @param errorMessage User readable error message to be displayed (or ignored..)
+     */
+    void onError(String errorMessage);
 }

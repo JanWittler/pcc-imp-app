@@ -33,7 +33,7 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
                                          RecordCallback recordCallback) {
         super(context, previewView, recordCallback);
 
-        // set up sensor
+        // todo set up sensor
     }
 
     /**
@@ -67,7 +67,7 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        // todo schedule persisting
     }
 
     /**
@@ -77,6 +77,6 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
      */
     @Override
     public void onClick(View v) {
-        Log.d(TAG, "Click received");
+        // schedulePersisting();
     }
 }
