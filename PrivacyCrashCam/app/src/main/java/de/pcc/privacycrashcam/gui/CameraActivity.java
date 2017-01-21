@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.CameraView;
@@ -56,6 +57,11 @@ public class CameraActivity extends MainActivity {
 
                 // show "ready" icon
 
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
             }
         };
 
