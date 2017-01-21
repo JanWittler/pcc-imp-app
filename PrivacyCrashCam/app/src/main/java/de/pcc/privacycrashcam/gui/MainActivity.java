@@ -66,7 +66,6 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
 
                 @Override
                 public void onDrawerSlide(View drawerView, float slideOffset) {
-                    // applyDrawerOffsetToUI((float)(navigationView.getWidth()) * slideOffset);
                     redrawNavigationView();
 
                     // make sure that we will redraw the nav view next time we move the drawer
@@ -123,15 +122,6 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    /**
-     * Called whenever the drawer is opened or closed. Can be used to move certain UI elements
-     * accordingly. Override this method in subclasses if desired.
-     * @param offset the offset to apply to other UI components in pixel
-     */
-    protected void applyDrawerOffsetToUI(float offset){
-        // intentionally left blank
     }
 
     /**

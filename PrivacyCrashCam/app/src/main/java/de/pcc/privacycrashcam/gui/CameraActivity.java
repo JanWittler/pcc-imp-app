@@ -88,10 +88,6 @@ public class CameraActivity extends MainActivity {
         removeDrawerShadow();
     }
 
-    @Override
-    public void applyDrawerOffsetToUI(float offset) {
-        cameraPreview.setX(offset);
-    }
 
     @Override
     protected void onResume() {
