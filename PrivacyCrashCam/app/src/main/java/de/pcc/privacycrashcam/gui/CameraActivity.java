@@ -38,6 +38,11 @@ public class CameraActivity extends MainActivity {
     }
 
     @Override
+    public int getMenuEntryId() {
+        return R.id.nav_camera;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -79,6 +84,8 @@ public class CameraActivity extends MainActivity {
 
         // don't show title
         setTitle("");
+        // remove drawer shadow
+        removeDrawerShadow();
     }
 
     @Override
@@ -131,7 +138,8 @@ public class CameraActivity extends MainActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) hideSystemUI();
+
         // showing System Ui will happen after user the user swipes in from the edges of the screen
-        // automatically
+        // automatically..
     }
 }

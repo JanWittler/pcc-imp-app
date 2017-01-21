@@ -142,7 +142,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // choose best video preview size
         List<Camera.Size> mSupportedPreviewSizes = cameraParameters.getSupportedPreviewSizes();
         List<Camera.Size> mSupportedVideoSizes = cameraParameters.getSupportedVideoSizes();
-for (Camera.Size s : mSupportedPreviewSizes) Log.d(TAG, "size width: "+ s.width+"    size height: "+s.height);
+
+            // todo
             /*camcorderProfile.videoFrameWidth = optimalSize.width;
             camcorderProfile.videoFrameHeight = optimalSize.height;*/
 
@@ -154,7 +155,6 @@ for (Camera.Size s : mSupportedPreviewSizes) Log.d(TAG, "size width: "+ s.width+
             case Surface.ROTATION_0:
                 Camera.Size optimalSize0 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
                         mSupportedPreviewSizes, previewView.getWidth(), previewView.getHeight());
-                Log.d(TAG, "CHOOSEN size width: "+ optimalSize0.width+"    size height: "+optimalSize0.height);
                 cameraParameters.setPreviewSize(optimalSize0.width, optimalSize0.height);
                 deviceAngle = 0;
                 break;

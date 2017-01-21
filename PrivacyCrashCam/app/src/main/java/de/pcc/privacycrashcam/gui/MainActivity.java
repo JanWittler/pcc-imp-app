@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,6 +26,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
     public static final String TAG = "MAIN_ACT";
 
     private @Nullable DrawerLayout drawer;
+    private @Nullable NavigationView navigationView;
 
     /**
      * Get the base layout resource for this activity. The layout must contain a toolbar with an id
@@ -36,6 +38,13 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
      */
     public abstract @LayoutRes int getLayoutRes();
 
+    /**
+     * Get the menu entry which will be highlighted in the drawer. Pass -1 if you don't want to
+     * highlight any navigation menu entry.
+     * @return R.id.[menu_entry_id]
+     */
+    public abstract int getMenuEntryId();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,22 +52,25 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
 
         // set toolbar and nav nav_drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (toolbar == null)
-            throw new IllegalArgumentException("You passed a layout file without a toolbar, " +
-                    "but a toolbar with id \"toolbar\" was expected.");
+        if (toolbar == null) throw new IllegalArgumentException("You passed a layout file " +
+                "without a toolbar, but a toolbar with id \"toolbar\" was expected.");
         setSupportActionBar(toolbar);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer != null) {
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.setDrawerListener(toggle);
+            drawer.addDrawerListener(toggle);
             toggle.syncState();
             drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+                private boolean hasRequestedLayout = false;
 
                 @Override
                 public void onDrawerSlide(View drawerView, float slideOffset) {
-                    Log.d(TAG, "drawer slide: "+((float)(drawer.getWidth()) * slideOffset)+"    dw: "+ drawer.getWidth());
-                    applyDrawerOffsetToUI((float)(drawer.getWidth()) * slideOffset);
+                    // applyDrawerOffsetToUI((float)(navigationView.getWidth()) * slideOffset);
+                    redrawNavigationView();
+
+                    // make sure that we will redraw the nav view next time we move the drawer
+                    if(slideOffset == 1f) hasRequestedLayout = false;
                 }
 
                 @Override
@@ -75,10 +87,25 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
                 public void onDrawerStateChanged(int newState) {
 
                 }
+
+                /*
+                redraw navigation view as any surface views in the layout will prevent it from
+                rendering right.
+                 */
+                private void redrawNavigationView() {
+                    if(!hasRequestedLayout) {
+                        assert navigationView != null;
+                        navigationView.requestLayout();
+                        hasRequestedLayout = true;
+                    }
+                }
+
             });
 
-            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView = (NavigationView) findViewById(R.id.nav_view);
+            assert navigationView != null;
             navigationView.setNavigationItemSelectedListener(this);
+            navigationView.setCheckedItem(getMenuEntryId());
         }
     }
 
@@ -87,7 +114,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
         if (drawer == null)
             return false;
 
-        // Handle navigation view item clicks here.
+        // Handle navigation view item clicks
         int id = item.getItemId();
         if (id == R.id.nav_camera) {
             // show camera view
@@ -100,11 +127,19 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
 
     /**
      * Called whenever the drawer is opened or closed. Can be used to move certain UI elements
-     * accordingly
+     * accordingly. Override this method in subclasses if desired.
      * @param offset the offset to apply to other UI components in pixel
      */
-    public void applyDrawerOffsetToUI(float offset){
+    protected void applyDrawerOffsetToUI(float offset){
         // intentionally left blank
+    }
+
+    /**
+     * Removes the drawer shadow by setting it transparent. Can be called by subclasses.
+     */
+    protected void removeDrawerShadow() {
+        if(drawer != null) drawer.setScrimColor(ContextCompat.getColor(getApplicationContext(),
+                android.R.color.transparent));
     }
 
     @Override
