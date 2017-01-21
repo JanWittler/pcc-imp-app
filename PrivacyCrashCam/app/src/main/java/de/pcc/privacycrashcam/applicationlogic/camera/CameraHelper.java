@@ -208,4 +208,14 @@ public class CameraHelper {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
+    /**
+     * @return the default rear/back facing camera info on the device. Returns null if camera is not
+     * available.
+     */
+    public static Camera.CameraInfo getDefaultBackFacingCameraInfo() {
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+        return info;
+    }
+
 }

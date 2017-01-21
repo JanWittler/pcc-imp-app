@@ -2,6 +2,7 @@ package de.pcc.privacycrashcam.gui;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ public class CameraActivity extends MainActivity {
     private ImageView statusSymbol;
     private CameraView cameraPreview;
     private CameraHandler mCamHandler;
+    private View decorView;
 
     private RecordCallback recordCallback;
 
@@ -32,12 +34,16 @@ public class CameraActivity extends MainActivity {
      */
     @Override
     public int getLayoutRes() {
-        return R.layout.activity_main_drawer_toolbar;
+        return R.layout.activity_main_drawer_transparenttoolbar;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        decorView = getWindow().getDecorView();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
+                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         FrameLayout container = (FrameLayout) findViewById(R.id.content_container);
         getLayoutInflater().inflate(R.layout.content_camera, container, true);
@@ -70,6 +76,14 @@ public class CameraActivity extends MainActivity {
                 cameraPreview, recordCallback);
         cameraPreview.setOnClickListener((View.OnClickListener) mCamHandler);
         cameraPreview.setCameraHandler(mCamHandler);
+
+        // don't show title
+        setTitle("");
+    }
+
+    @Override
+    public void applyDrawerOffsetToUI(float offset) {
+        cameraPreview.setX(offset);
     }
 
     @Override
@@ -87,5 +101,37 @@ public class CameraActivity extends MainActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    /**
+     * Set Flags to hide system bars
+     */
+    private void hideSystemUI() {
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
+    /**
+     * Removes all the flags except for the ones that make the content appear under the system bars
+     */
+    private void showSystemUI() {
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) hideSystemUI();
+        // showing System Ui will happen after user the user swipes in from the edges of the screen
+        // automatically
     }
 }

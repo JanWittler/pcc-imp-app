@@ -4,14 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="de.pcc.privacycrashcam.gui.CameraActivity">
 
     <FrameLayout
         android:id="@+id/content_container"
-        android:layout_marginTop="@dimen/toolbar_normal"
         android:layout_height="match_parent"
         android:layout_width="match_parent" />
-    <include layout="@layout/toolbar" />
+    <include layout="@layout/transparenttoolbar" />
 
 </android.support.design.widget.CoordinatorLayout>

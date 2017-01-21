@@ -51,7 +51,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
         }
 
         // pause camera handler before making changes
-        cameraHandler.pauseHandler();
+        cameraHandler.pauseHandler(); // TODO THIS CAUSES SEVERAL EXCEPTIONS TO BE THROWN BY COMPATCAMERAHANDLER
 
         // ... do changes to surface here.
         // this will be necessary if we support landscape and portrait mode views

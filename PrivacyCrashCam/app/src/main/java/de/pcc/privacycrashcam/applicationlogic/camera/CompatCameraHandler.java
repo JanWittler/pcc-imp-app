@@ -6,7 +6,10 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +24,8 @@ import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
 import de.pcc.privacycrashcam.utils.dataprocessing.PersistCallback;
 import de.pcc.privacycrashcam.utils.datastructures.RingBuffer;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 /**
  * Camera handler which uses the old Camera API. Handles access to the camera, displaying the
@@ -115,7 +120,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Sets up the camera with respect to the user's settings
      */
     private boolean prepareCamera() {
-        if(!CameraHelper.hasCameraHardware(context)) {
+        Log.d(TAG, "preparing camera");
+        if (!CameraHelper.hasCameraHardware(context)) {
             recordCallback.onError(context.getResources().getString(R.string.error_no_camera));
             return false;
         }
@@ -123,7 +129,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         Log.d(TAG, "cam");
         // set up camera
         camera = getCameraInstance();
-        Log.d(TAG, "cam instance"+camera);
+        Log.d(TAG, "cam instance" + camera);
         if (camera == null) {
             // camera was not available
             recordCallback.onError(context.getResources().
@@ -131,23 +137,49 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             return false;
         }
 
-        if (cameraParameters == null) {
-            // Set up camera parameters only once
-            cameraParameters = camera.getParameters();
-
-            // choose best video preview size
-            List<Camera.Size> mSupportedPreviewSizes = cameraParameters.getSupportedPreviewSizes();
-            List<Camera.Size> mSupportedVideoSizes = cameraParameters.getSupportedVideoSizes();
-            Camera.Size optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
-                    mSupportedPreviewSizes, previewView.getWidth(), previewView.getHeight());
-
+        // set up camera parameters
+        cameraParameters = camera.getParameters();
+        // choose best video preview size
+        List<Camera.Size> mSupportedPreviewSizes = cameraParameters.getSupportedPreviewSizes();
+        List<Camera.Size> mSupportedVideoSizes = cameraParameters.getSupportedVideoSizes();
+for (Camera.Size s : mSupportedPreviewSizes) Log.d(TAG, "size width: "+ s.width+"    size height: "+s.height);
             /*camcorderProfile.videoFrameWidth = optimalSize.width;
             camcorderProfile.videoFrameHeight = optimalSize.height;*/
 
-            cameraParameters.setPreviewSize(optimalSize.width, optimalSize.height);
-
-            camera.setParameters(cameraParameters);
+        // pay attention to screen orientation
+        Camera.CameraInfo info = CameraHelper.getDefaultBackFacingCameraInfo();
+        Display display = ((WindowManager)context.getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+        int deviceAngle = 0;
+        switch (display.getRotation()) {
+            case Surface.ROTATION_0:
+                Camera.Size optimalSize0 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                        mSupportedPreviewSizes, previewView.getWidth(), previewView.getHeight());
+                Log.d(TAG, "CHOOSEN size width: "+ optimalSize0.width+"    size height: "+optimalSize0.height);
+                cameraParameters.setPreviewSize(optimalSize0.width, optimalSize0.height);
+                deviceAngle = 0;
+                break;
+            case Surface.ROTATION_90:
+                Camera.Size optimalSize90 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                        mSupportedPreviewSizes, previewView.getHeight(), previewView.getWidth());
+                cameraParameters.setPreviewSize(optimalSize90.width, optimalSize90.height);
+                deviceAngle = 90;
+                break;
+            case Surface.ROTATION_180:
+                Camera.Size optimalSize180 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                        mSupportedPreviewSizes, previewView.getWidth(), previewView.getHeight());
+                //noinspection SuspiciousNameCombination
+                cameraParameters.setPreviewSize(optimalSize180.height, optimalSize180.width);
+                deviceAngle = 180;
+                break;
+            case Surface.ROTATION_270:
+                Camera.Size optimalSize270 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                        mSupportedPreviewSizes, previewView.getHeight(), previewView.getWidth());
+                cameraParameters.setPreviewSize(optimalSize270.width, optimalSize270.height);
+                deviceAngle = 270;
+                break;
         }
+        camera.setDisplayOrientation((info.orientation - deviceAngle + 360) % 360);
+        camera.setParameters(cameraParameters);
 
         try {
             camera.setPreviewDisplay(previewView.getHolder());
@@ -167,7 +199,9 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      *
      * @return the camera or null if the camera is unavailable
      */
-    private @Nullable Camera getCameraInstance() {
+    private
+    @Nullable
+    Camera getCameraInstance() {
         if (camera != null) return camera;
         // returns null if camera is unavailable
         return CameraHelper.getDefaultBackFacingCameraInstance();
@@ -177,6 +211,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Stops the preview and releases the camera so that other applications can use it.
      */
     private void releaseCamera() {
+        Log.d(TAG, "releasing camera");
         if (camera == null) return;
 
         camera.stopPreview();
@@ -227,7 +262,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             mediaRecorder = null;
         }
         if (camera != null) {
-            Log.d(TAG, "UNLOCKING CAMERA");
+            Log.d(TAG, "LOCKING CAMERA");
             camera.lock();
         }
     }
@@ -243,7 +278,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Stops recording and writing into buffer
      */
     private void stopRecordingChunk() throws IllegalStateException {
-        if(mediaRecorder != null) mediaRecorder.stop();
+        if (mediaRecorder != null) mediaRecorder.stop();
     }
 
     @Override
@@ -266,7 +301,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     public void resumeHandler() {
         try {
             // take care of setting up camera, media recorder and recording itself
-            if (!prepareCamera() || !prepareMediaRecorder()) {
+            if (!prepareCamera() /*|| !prepareMediaRecorder()*/) {
                 pauseHandler();
                 return;
             }
@@ -280,7 +315,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         }
 
         // all set ups were successful. Start recording and buffering
-        startRecordingChunk();
+        // startRecordingChunk();
 
         isHandlerRunning = true;
     }
@@ -292,7 +327,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // take care of stopping preview and recording
         try {
             stopRecordingChunk();
-            ringBuffer.offer(currentOutputFile);// todo delete too old files
+            // ringBuffer.offer(currentOutputFile);// todo delete too old files
         } catch (RuntimeException re) {
             // No valid data was recorded as MediaRecorder.stop() was called before or right after
             // MediaRecorder.start(). Delete the incomplete file; a new one will be allocated as
@@ -300,7 +335,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             // todo delete currentOutputFile from storage
             re.printStackTrace();
         }
-        releaseMediaRecorder();
+        // releaseMediaRecorder(); // TODO THIS IS NOT CALLED IN TIME, BUT WHEN APP RESTARTS....
         releaseCamera();
     }
 
@@ -310,7 +345,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // ringBuffer.offer()
         // todo insert current file into buffer, delete too old files
 
-        if(!isHandlerRunning) return;
+        if (!isHandlerRunning) return;
         // record new chunk
         // todo lock camera??
         prepareMediaRecorder();

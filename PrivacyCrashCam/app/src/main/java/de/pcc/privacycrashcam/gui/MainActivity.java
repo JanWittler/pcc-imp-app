@@ -10,7 +10,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.ViewStubCompat;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import de.pcc.privacycrashcam.R;
 
@@ -20,6 +22,7 @@ import de.pcc.privacycrashcam.R;
  * @author Giorgio
  */
 public abstract class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    public static final String TAG = "MAIN_ACT";
 
     private @Nullable DrawerLayout drawer;
 
@@ -50,11 +53,33 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.setDrawerListener(toggle);
             toggle.syncState();
+            drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+
+                @Override
+                public void onDrawerSlide(View drawerView, float slideOffset) {
+                    Log.d(TAG, "drawer slide: "+((float)(drawer.getWidth()) * slideOffset)+"    dw: "+ drawer.getWidth());
+                    applyDrawerOffsetToUI((float)(drawer.getWidth()) * slideOffset);
+                }
+
+                @Override
+                public void onDrawerOpened(View drawerView) {
+
+                }
+
+                @Override
+                public void onDrawerClosed(View drawerView) {
+
+                }
+
+                @Override
+                public void onDrawerStateChanged(int newState) {
+
+                }
+            });
 
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
         }
-
     }
 
     @Override
@@ -73,9 +98,17 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
         return true;
     }
 
+    /**
+     * Called whenever the drawer is opened or closed. Can be used to move certain UI elements
+     * accordingly
+     * @param offset the offset to apply to other UI components in pixel
+     */
+    public void applyDrawerOffsetToUI(float offset){
+        // intentionally left blank
+    }
+
     @Override
     public void onBackPressed() {
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
