@@ -218,4 +218,13 @@ public class CameraHelper {
         return info;
     }
 
+    public static Camera.Size getDefaultVideoSize(List<Camera.Size> supportedVideoSizes,
+                                                  List<Camera.Size> previewSizes) {
+        if(supportedVideoSizes != null && supportedVideoSizes.size() > 0) {
+            return supportedVideoSizes.get(0);
+        }
+        // if previewSizes is empty or null something went terribly wrong...
+        return previewSizes.get(0);
+    }
+
 }

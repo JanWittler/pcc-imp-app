@@ -113,7 +113,6 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // mediaRecorder by MediaRecorder.setProfile(..);
         camcorderProfile.fileFormat = MediaRecorder.OutputFormat.MPEG_4;
         camcorderProfile.videoFrameRate = settings.getFps();
-        // see also prepare camera for frame width and height set up
     }
 
     /**
@@ -143,38 +142,35 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         List<Camera.Size> mSupportedPreviewSizes = cameraParameters.getSupportedPreviewSizes();
         List<Camera.Size> mSupportedVideoSizes = cameraParameters.getSupportedVideoSizes();
 
-            // todo
-            /*camcorderProfile.videoFrameWidth = optimalSize.width;
-            camcorderProfile.videoFrameHeight = optimalSize.height;*/
-
         // pay attention to screen orientation
         Camera.CameraInfo info = CameraHelper.getDefaultBackFacingCameraInfo();
-        Display display = ((WindowManager)context.getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+        Display display = ((WindowManager)context.getSystemService(WINDOW_SERVICE))
+                .getDefaultDisplay();
+        Camera.Size optimalSize;
         int deviceAngle = 0;
         switch (display.getRotation()) {
             case Surface.ROTATION_0:
-                Camera.Size optimalSize0 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
                         mSupportedPreviewSizes, previewView.getWidth(), previewView.getHeight());
-                cameraParameters.setPreviewSize(optimalSize0.width, optimalSize0.height);
+                cameraParameters.setPreviewSize(optimalSize.width, optimalSize.height);
                 deviceAngle = 0;
                 break;
             case Surface.ROTATION_90:
-                Camera.Size optimalSize90 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
                         mSupportedPreviewSizes, previewView.getHeight(), previewView.getWidth());
-                cameraParameters.setPreviewSize(optimalSize90.width, optimalSize90.height);
+                cameraParameters.setPreviewSize(optimalSize.width, optimalSize.height);
                 deviceAngle = 90;
                 break;
             case Surface.ROTATION_180:
-                Camera.Size optimalSize180 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
                         mSupportedPreviewSizes, previewView.getWidth(), previewView.getHeight());
-                //noinspection SuspiciousNameCombination
-                cameraParameters.setPreviewSize(optimalSize180.height, optimalSize180.width);
+                cameraParameters.setPreviewSize(optimalSize.width, optimalSize.height);
                 deviceAngle = 180;
                 break;
             case Surface.ROTATION_270:
-                Camera.Size optimalSize270 = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
+                optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
                         mSupportedPreviewSizes, previewView.getHeight(), previewView.getWidth());
-                cameraParameters.setPreviewSize(optimalSize270.width, optimalSize270.height);
+                cameraParameters.setPreviewSize(optimalSize.width, optimalSize.height);
                 deviceAngle = 270;
                 break;
         }
@@ -232,10 +228,11 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         Log.d(TAG, "set sources");
         mediaRecorder.setProfile(camcorderProfile);
         Log.d(TAG, "set profile");
-        currentOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO); // todo = memoryManager.getTempVideoFile();
+        currentOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO); // = memoryManager.getTempVideoFile();
         Log.d(TAG, "set file");
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
-        // mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
+        mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
+        mediaRecorder.setOrientationHint(90);
         mediaRecorder.setOnInfoListener(this);
 
         Log.d(TAG, "Settings set up");
@@ -301,7 +298,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     public void resumeHandler() {
         try {
             // take care of setting up camera, media recorder and recording itself
-            if (!prepareCamera() /*|| !prepareMediaRecorder()*/) {
+            if (!prepareCamera() || !prepareMediaRecorder()) {
                 pauseHandler();
                 return;
             }
@@ -315,7 +312,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         }
 
         // all set ups were successful. Start recording and buffering
-        // startRecordingChunk();
+        startRecordingChunk();
 
         isHandlerRunning = true;
     }
@@ -335,20 +332,22 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             // todo delete currentOutputFile from storage
             re.printStackTrace();
         }
-        // releaseMediaRecorder(); // TODO THIS IS NOT CALLED IN TIME, BUT WHEN APP RESTARTS....
+        releaseMediaRecorder(); // TODO THIS IS NOT CALLED IN TIME, BUT WHEN APP RESTARTS....
         releaseCamera();
     }
 
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
-        stopRecordingChunk();
-        // ringBuffer.offer()
-        // todo insert current file into buffer, delete too old files
+        // video is saved automatically, don't call stopRecordingChunk()
 
-        if (!isHandlerRunning) return;
+        // todo insert current file into buffer, delete too old files
+        // ringBuffer.offer()
+
+        // todo start recording again
+        /*if (!isHandlerRunning) return;
         // record new chunk
-        // todo lock camera??
+        // todo (re-)lock camera??
         prepareMediaRecorder();
-        startRecordingChunk();
+        startRecordingChunk();*/
     }
 }
