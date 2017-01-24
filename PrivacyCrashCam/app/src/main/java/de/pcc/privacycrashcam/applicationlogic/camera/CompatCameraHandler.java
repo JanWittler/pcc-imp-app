@@ -345,6 +345,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         fileRingBuffer.put(currentOutputFile);
 
         if (!isHandlerRunning) return;
+        // todo ensure that this section will never be called after pauseHandler was called. onInfo will be called asynchronously...
         releaseMediaRecorder();
         // start recording new chunk
         prepareMediaRecorder(); // will allocate also a new output file

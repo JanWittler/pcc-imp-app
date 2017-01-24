@@ -23,6 +23,8 @@ import de.pcc.privacycrashcam.R;
 public abstract class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MAIN_ACT";
 
+    private int activeMenuItemId = R.id.nav_legal; // default is legal info
+
     private @Nullable DrawerLayout drawer;
     private @Nullable NavigationView navigationView;
 
@@ -102,21 +104,26 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
             navigationView = (NavigationView) findViewById(R.id.nav_view);
             assert navigationView != null;
             navigationView.setNavigationItemSelectedListener(this);
-            navigationView.setCheckedItem(getMenuEntryId());
+            activeMenuItemId = getMenuEntryId();
+            navigationView.setCheckedItem(activeMenuItemId);
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        if (drawer == null)
+        if (drawer == null || item.getItemId() == activeMenuItemId)
             return false;
 
         // Handle navigation view item clicks
         int id = item.getItemId();
         if (id == R.id.nav_camera) {
-            // show camera view
+            // show camera
+            CameraActivity.Launch(this);
         } else if (id == R.id.nav_recorded) {
             // show recorded videos
+        } else if (id == R.id.nav_settings) {
+            // show settings
+            SettingsActivity.Launch(this);
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

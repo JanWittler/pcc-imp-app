@@ -1,5 +1,7 @@
 package de.pcc.privacycrashcam.gui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,6 +25,15 @@ public class CameraActivity extends MainActivity {
 
     private RecordCallback recordCallback;
 
+    /**
+     * Starts a new intent with the {@link CameraActivity CameraActivity}
+     *
+     * @param calling the activity which is doing this call
+     */
+    public static void Launch(Activity calling){
+        Intent intent = new Intent(calling, CameraActivity.class);
+        calling.startActivity(intent);
+    }
 
     /**
      * Get the base layout resource for this activity. The layout must contain a toolbar with an id
