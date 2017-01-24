@@ -32,6 +32,7 @@ public class CameraActivity extends MainActivity {
      */
     public static void Launch(Activity calling){
         Intent intent = new Intent(calling, CameraActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
     }
 

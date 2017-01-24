@@ -26,6 +26,7 @@ public class SettingsActivity extends ContainerActivity {
      */
     public static void Launch(Activity calling){
         Intent intent = new Intent(calling, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
     }
 
