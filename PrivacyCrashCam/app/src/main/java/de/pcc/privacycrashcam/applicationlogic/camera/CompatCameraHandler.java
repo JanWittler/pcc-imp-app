@@ -14,8 +14,6 @@ import android.view.WindowManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
@@ -23,7 +21,7 @@ import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
 import de.pcc.privacycrashcam.utils.dataprocessing.PersistCallback;
-import de.pcc.privacycrashcam.utils.datastructures.RingBuffer;
+import de.pcc.privacycrashcam.utils.datastructures.FileRingBuffer;
 
 import static android.content.Context.WINDOW_SERVICE;
 
@@ -52,7 +50,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private RecordCallback recordCallback;
     private File currentOutputFile;
     private AsyncPersistor mPersistor;
-    private Queue<File> ringBuffer;
+    private FileRingBuffer fileRingBuffer;
 
     private PersistCallback persistCallback;
 
@@ -99,7 +97,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     private void setUpBuffer() {
         int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH;
-        this.ringBuffer = new ArrayBlockingQueue<>(bufferCapacity);
+        this.fileRingBuffer = new FileRingBuffer(bufferCapacity);
     }
 
     /**
@@ -220,10 +218,10 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      */
     private boolean prepareMediaRecorder() {
         mediaRecorder = new MutedMediaRecorder();
-        Log.d(TAG, "mr");
+
         camera.unlock();
-        // todo this might be too expensive to run on UI thread. Maybe use async task?
         mediaRecorder.setCamera(camera);
+
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         Log.d(TAG, "set sources");
         mediaRecorder.setProfile(camcorderProfile);
@@ -237,6 +235,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
         Log.d(TAG, "Settings set up");
         try {
+            // maybe put this in an async task if performance turns out to be poor
             mediaRecorder.prepare();
             Log.d(TAG, "prepared media recorder");
         } catch (IOException e) {
@@ -284,7 +283,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         /*recordCallback.onRecordingStarted();
 
         // create async task to persist the buffer
-        AsyncPersistor mPersistor = new AsyncPersistor(memoryManager, ringBuffer, persistCallback);
+        AsyncPersistor mPersistor = new AsyncPersistor(memoryManager, fileRingBuffer, persistCallback);
         mPersistor.execute(metadata);*/
     }
 
@@ -296,8 +295,10 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void resumeHandler() {
+        if(isHandlerRunning) return;
+
         try {
-            // take care of setting up camera, media recorder and recording itself
+            // take care of setting up camera, media recorder and recording
             if (!prepareCamera() || !prepareMediaRecorder()) {
                 pauseHandler();
                 return;
@@ -313,41 +314,40 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
         // all set ups were successful. Start recording and buffering
         startRecordingChunk();
-
         isHandlerRunning = true;
     }
 
     @Override
     public void pauseHandler() {
-        isHandlerRunning = false;
+        if(!isHandlerRunning) return;
 
+        isHandlerRunning = false;
         // take care of stopping preview and recording
         try {
             stopRecordingChunk();
-            // ringBuffer.offer(currentOutputFile);// todo delete too old files
+            fileRingBuffer.put(currentOutputFile);
         } catch (RuntimeException re) {
             // No valid data was recorded as MediaRecorder.stop() was called before or right after
             // MediaRecorder.start(). Delete the incomplete file; a new one will be allocated as
             // soon as the Handler is resumed
-            // todo delete currentOutputFile from storage
+            currentOutputFile.delete();
             re.printStackTrace();
         }
-        releaseMediaRecorder(); // TODO THIS IS NOT CALLED IN TIME, BUT WHEN APP RESTARTS....
+        releaseMediaRecorder();
         releaseCamera();
     }
 
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
-        // video is saved automatically, don't call stopRecordingChunk()
+        // Video is saved automatically, no need to call stopRecordingChunk() here..
 
-        // todo insert current file into buffer, delete too old files
-        // ringBuffer.offer()
+        // Insert output file into ring buffer
+        fileRingBuffer.put(currentOutputFile);
 
-        // todo start recording again
-        /*if (!isHandlerRunning) return;
-        // record new chunk
-        // todo (re-)lock camera??
-        prepareMediaRecorder();
-        startRecordingChunk();*/
+        if (!isHandlerRunning) return;
+        releaseMediaRecorder();
+        // start recording new chunk
+        prepareMediaRecorder(); // will allocate also a new output file
+        startRecordingChunk();
     }
 }

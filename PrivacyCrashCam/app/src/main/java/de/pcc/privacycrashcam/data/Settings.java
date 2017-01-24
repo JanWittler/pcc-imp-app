@@ -20,7 +20,7 @@ public class Settings {
 
     // default values
     public static final int FPS_DEFAULT = 10;
-    public static final int BUFFER_SIZE_SEC_DEFAULT = 60;
+    public static final int BUFFER_SIZE_SEC_DEFAULT = 10;
     public static final int QUALITY_DEFAULT = CamcorderProfile.QUALITY_480P;
     // Language=JSON
     public static final String JSON_DEFAULT =

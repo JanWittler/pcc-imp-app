@@ -16,7 +16,7 @@ import de.pcc.privacycrashcam.applicationlogic.camera.CameraHandler;
  *
  * @author Giorgio Gross
  */
-public class CameraView extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
+public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private final static String TAG = "CAM_VIEW";
     private SurfaceHolder mHolder;
     private CameraHandler cameraHandler;
@@ -36,22 +36,18 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, now tell the camera handler about it
-        cameraHandler.resumeHandler();
+        // The Surface has been created. Wait for surfaceChanged to be called.
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        // If your preview can change or rotate, take care of those events here.
-        // Make sure to stop the preview before resizing or reformatting it.
-
         if (mHolder.getSurface() == null){
             // preview surface does not exist
             return;
         }
 
         // pause camera handler before making changes
-        cameraHandler.pauseHandler(); // TODO THIS CAUSES SEVERAL EXCEPTIONS TO BE THROWN BY COMPATCAMERAHANDLER
+        cameraHandler.pauseHandler();
 
         // ... do changes to surface here.
         // this will be necessary if we support landscape and portrait mode views
@@ -63,13 +59,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
-    }
-
-    @Override
-    public void onPreviewFrame(byte[] data, Camera camera) {
-        Log.d(TAG, "Received preview frame");
-
+        // Surface has been destroyed. Pause the camera handler
+        cameraHandler.pauseHandler();
     }
 
     public void setCameraHandler(CameraHandler cameraHandler) {
