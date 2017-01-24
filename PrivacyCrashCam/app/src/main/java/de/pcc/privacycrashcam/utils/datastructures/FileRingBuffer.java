@@ -5,7 +5,7 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Buffer who stores files in a fifo-like queue.
+ * Buffer which stores files in a fifo-like queue.
  *
  * @author Giorgio
  */
@@ -14,7 +14,7 @@ public class FileRingBuffer {
     private Queue<File> queue;
 
     /**
-     * Creates a new buffer with the passed capacity.
+     * Creates a new queue with the passed capacity.
      *
      * @param capacity max number of elements
      */
@@ -23,8 +23,8 @@ public class FileRingBuffer {
     }
 
     /**
-     * Add new file to the buffer. Will remove the oldest file from the buffer if the buffer
-     * is filled and deletes that file.
+     * Add new file to the buffer. Will remove and delete the oldest file from the buffer if the buffer
+     * is filled.
      *
      * @param file element to be added
      */
@@ -49,6 +49,7 @@ public class FileRingBuffer {
      * @return the queue head or null
      */
     public File pop() {
+        // todo
         return null;
     }
 
