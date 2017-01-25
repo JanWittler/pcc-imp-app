@@ -4,26 +4,25 @@ import java.io.File;
 
 /**
  * @author David Laubenstein
- * Created by David Laubenstein on 01/23/2017
+ * Created by David Laubenstein on 1/24/17.
  */
-public class Metadata {
+
+public class Video {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-    long date;
-    String triggerType;
-    float[] force = new float[3];
+    String name;
+    File encVideoFile;
+    File encMetaFile;
+    Metadata readableMetadata;
     /* #############################################################################################
-     *                                  constructor
+     *                                  constructors
      * ###########################################################################################*/
-    public Metadata(long date, String triggerType, float[] force) {
-        this.date = date;
-        this.triggerType = triggerType;
-        this.force = force;
-    }
-
-    public Metadata(String json) {
-
+    public Video(String name, File encVideoFile, File encMetaFile, Metadata readableMetadata) {
+        this.name = name;
+        this.encVideoFile = encVideoFile;
+        this.encMetaFile =  encMetaFile;
+        this.readableMetadata = readableMetadata;
     }
     /* #############################################################################################
      *                                  methods

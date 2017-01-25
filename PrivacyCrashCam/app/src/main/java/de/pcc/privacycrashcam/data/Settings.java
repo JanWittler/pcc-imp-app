@@ -9,9 +9,13 @@ import org.json.JSONObject;
 /**
  * Class to store user settings.
  *
- * @author Giorgio
+ * @author Giorgio Gross, David Laubenstein
+ * Created by Giorgio Gross at 01/20/2017
  */
 public class Settings {
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
     // JSON keys
     public static final String SETTINGS_MAIN_KEY = "SETTINGS";
     public static final String JSON_KEY_FPS = "fps";
@@ -32,6 +36,9 @@ public class Settings {
     private int bufferSizeSec;
     private int quality;
 
+    /* #############################################################################################
+     *                                  constructors
+     * ###########################################################################################*/
     /**
      * Creates a settings instance with the passed parameters
      *
@@ -58,6 +65,9 @@ public class Settings {
         this.quality = mJsonSettings.getInt(JSON_KEY_QUALITY);
     }
 
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
     /**
      * Returns the Settings object as JSON string
      *
@@ -76,6 +86,9 @@ public class Settings {
         return mJsonSettings.toString();
     }
 
+    /* #############################################################################################
+     *                                  getter/ setter
+     * ###########################################################################################*/
     public int getFps() {
         return fps;
     }
