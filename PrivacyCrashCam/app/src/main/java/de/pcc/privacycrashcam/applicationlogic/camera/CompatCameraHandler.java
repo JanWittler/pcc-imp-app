@@ -92,7 +92,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         setUpCamcorderProfile();
 
         // avoid NPE's if a client forgets to set the metadata
-        this.metadata = new Metadata();
+        //this.metadata = new Metadata();
     }
 
     private void setUpBuffer() {
