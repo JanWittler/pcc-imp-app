@@ -31,4 +31,20 @@ public class Video {
     /* #############################################################################################
      *                                  getter/ setter
      * ###########################################################################################*/
+
+    public String getName() {
+        return name;
+    }
+
+    public File getEncVideoFile() {
+        return encVideoFile;
+    }
+
+    public File getEncMetaFile() {
+        return encMetaFile;
+    }
+
+    public Metadata getReadableMetadata() {
+        return readableMetadata;
+    }
 }
