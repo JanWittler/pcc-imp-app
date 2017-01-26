@@ -23,10 +23,16 @@ import de.pcc.privacycrashcam.data.Video;
  * Created by Giorgio Gross
  */
 public class MemoryManager {
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
     private Context context;
 
     private SharedPreferences appPreferences;
 
+    /* #############################################################################################
+     *                                  constructors
+     * ###########################################################################################*/
     public MemoryManager(Context context) {
         this.context = context;
 
@@ -47,6 +53,7 @@ public class MemoryManager {
 
     /* #############################################################################################
 
+                                  methods
                                   User Data saved in Shared Preferences
 
     ############################################################################################# */
@@ -83,10 +90,14 @@ public class MemoryManager {
 
     /* #############################################################################################
 
+                                  methods
                                   Saving, creating and loading files
 
     ############################################################################################# */
 
+    /**
+     * @return temporary video files as File
+     */
     public File getTempVideoFile() {
         String fileName = "vid_" + System.currentTimeMillis();
         return new File(context.getFilesDir(), fileName);
@@ -109,18 +120,11 @@ public class MemoryManager {
     }
 
     /**
-     * saves the account data from parameter transfer
-     * @param account is an Account object
+     * saves the encrypted symmetric key from a vodeo and returns the key as File
+     * @param videoName
+     * @param key
      */
-    public void saveAccountData(Account account) {
-
-    }
-
-    /**
-     * Gibt eine Instanz der Klasse Account, in der sich die Accountdaten befin- den.
-     * @return the Account object, which includes all account data
-     */
-    public Account getAccountData() {
+    public File saveEncryptedSymmetricKey(String videoName, String key) {
         return null;
     }
 
@@ -132,12 +136,24 @@ public class MemoryManager {
     }
 
     /**
-     * saves the encrypted symmetric key from a vodeo and returns the key as File
-     * @param videoName
-     * @param key
+     * saves the account data from parameter transfer
+     * @param account is an Account object
      */
-    public File saveEncryptedSymmetricKey(String videoName, String key) {
-       return null;
+    public void saveAccountData(Account account) {
+
+    }
+
+    /**
+     * @return the Account object, which includes all account data
+     */
+    public Account getAccountData() {
+        return null;
+    }
+
+    /**
+     * deletes the account data of a user
+     */
+    public void deleteAccountData() {
     }
 
     /**
@@ -164,10 +180,10 @@ public class MemoryManager {
      * @param metadata are the metadata as a Metadata object
      * @return a File as a File
      */
+
     public File saveReadableMetadata(String videoName, Metadata metadata) {
         return null;
     }
-
 
     /**
      * deletes the encrypted symmetric key
