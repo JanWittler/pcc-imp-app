@@ -3,11 +3,15 @@ package de.pcc.privacycrashcam.applicationlogic;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import de.pcc.privacycrashcam.R;
 
@@ -16,7 +20,24 @@ import de.pcc.privacycrashcam.R;
  * Created by David Laubenstein on 1/27/17.
  */
 public class LegalFragment extends Fragment {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private LinearLayout base;
+
+    private TextView legal;
+    private TextView privacy;
+    private TextView licences;
+    private TextView website;
+    private AlertDialog.Builder dialogBuilder;
+    private WebView content;
+    private ProgressBar loading;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     @Nullable
     @Override

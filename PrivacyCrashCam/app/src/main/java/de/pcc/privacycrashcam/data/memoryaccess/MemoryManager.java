@@ -46,6 +46,7 @@ public class MemoryManager {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
+
     private Context context;
     private String tempDirName = "temp_0"; // default dir name
     private SharedPreferences appPreferences;
@@ -53,6 +54,7 @@ public class MemoryManager {
     /* #############################################################################################
      *                                  constructors
      * ###########################################################################################*/
+
     public MemoryManager(Context context) {
         this.context = context;
 

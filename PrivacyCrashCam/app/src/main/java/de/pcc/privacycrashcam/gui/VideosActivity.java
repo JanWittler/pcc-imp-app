@@ -14,7 +14,16 @@ import de.pcc.privacycrashcam.applicationlogic.VideosFragment;
  */
 
 public class VideosActivity extends ContainerActivity{
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private Fragment videosFragment;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     /**
      * Starts a new intent with the {@link VideosActivity VideosActivity}
