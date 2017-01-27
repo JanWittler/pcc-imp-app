@@ -121,9 +121,13 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
             CameraActivity.Launch(this);
         } else if (id == R.id.nav_recorded) {
             // show recorded videos
+            VideosActivity.Launch(this);
         } else if (id == R.id.nav_settings) {
             // show settings
             SettingsActivity.Launch(this);
+        } else if (id == R.id.nav_legal){
+            // show legal information
+            LegalActivity.Launch(this);
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

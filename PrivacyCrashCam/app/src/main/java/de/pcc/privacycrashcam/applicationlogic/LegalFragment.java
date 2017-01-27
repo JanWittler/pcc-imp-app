@@ -1,32 +1,31 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import de.pcc.privacycrashcam.R;
 
 /**
- * Shows the settings view along with its view components and handles user input.
- *
- * @author Giorgio
+ * @author David Laubenstein
+ * Created by David Laubenstein on 1/27/17.
  */
-public class SettingsFragment extends Fragment {
-    private RelativeLayout base;
+public class LegalFragment extends Fragment {
+    private LinearLayout base;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // get the main layout describing the content
-        base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
+        base = (LinearLayout) inflater.inflate(R.layout.content_legal, container, false);
 
         // init view components
-
         return base;
     }
 }
