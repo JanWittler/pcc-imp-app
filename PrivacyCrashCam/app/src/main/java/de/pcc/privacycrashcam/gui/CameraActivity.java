@@ -16,6 +16,11 @@ import de.pcc.privacycrashcam.applicationlogic.camera.RecordCallback;
 import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
 
 public class CameraActivity extends MainActivity {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private final static String TAG = "CAM_ACTIVITY";
 
     private ImageView statusSymbol;
@@ -24,6 +29,10 @@ public class CameraActivity extends MainActivity {
     private View decorView;
 
     private RecordCallback recordCallback;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     /**
      * Starts a new intent with the {@link CameraActivity CameraActivity}

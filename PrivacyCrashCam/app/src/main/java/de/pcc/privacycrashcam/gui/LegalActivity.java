@@ -14,7 +14,16 @@ import de.pcc.privacycrashcam.applicationlogic.LegalFragment;
  */
 
 public class LegalActivity extends ContainerActivity {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private Fragment legalFragment;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     /**
      * Starts a new intent with the {@link LegalActivity LegalActivity}

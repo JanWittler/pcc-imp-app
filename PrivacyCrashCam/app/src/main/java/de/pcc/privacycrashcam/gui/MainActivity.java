@@ -21,12 +21,21 @@ import de.pcc.privacycrashcam.R;
  * @author Giorgio
  */
 public abstract class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private static final String TAG = "MAIN_ACT";
 
     private int activeMenuItemId = R.id.nav_legal; // default is legal info
 
     private @Nullable DrawerLayout drawer;
     private @Nullable NavigationView navigationView;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     /**
      * Get the base layout resource for this activity. The layout must contain a toolbar with an id

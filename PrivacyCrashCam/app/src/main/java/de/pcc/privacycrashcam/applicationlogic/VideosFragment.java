@@ -7,9 +7,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
+
 import de.pcc.privacycrashcam.R;
+import de.pcc.privacycrashcam.data.Video;
 
 /**
  * @author David Laubenstein
@@ -17,8 +21,26 @@ import de.pcc.privacycrashcam.R;
  */
 
 public class VideosFragment extends Fragment {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private RelativeLayout base;
 
+    private ArrayList<Video> videosList;
+    private ListView videos;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
+
+    /**
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -28,5 +50,26 @@ public class VideosFragment extends Fragment {
 
         // init view components
         return base;
+    }
+
+    /**
+     * @param index
+     */
+    private void delete(int index) {
+
+    }
+
+    /**
+     * @param index
+     */
+    private void upload(int index) {
+
+    }
+
+    /**
+     * @param index
+     */
+    private void info(int index) {
+
     }
 }

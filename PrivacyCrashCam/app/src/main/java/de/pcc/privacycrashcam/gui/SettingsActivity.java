@@ -17,7 +17,16 @@ import de.pcc.privacycrashcam.applicationlogic.SettingsFragment;
  * @author Giorgio
  */
 public class SettingsActivity extends ContainerActivity {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private Fragment settingsFragment;
+
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     /**
      * Starts a new intent with the {@link SettingsActivity SettingsActivity}

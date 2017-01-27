@@ -17,9 +17,18 @@ import de.pcc.privacycrashcam.applicationlogic.camera.CameraHandler;
  * @author Giorgio Gross
  */
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     private final static String TAG = "CAM_VIEW";
     private SurfaceHolder mHolder;
     private CameraHandler cameraHandler;
+
+    /* #############################################################################################
+     *                                  constructor
+     * ###########################################################################################*/
 
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -32,7 +41,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     }
 
-
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
