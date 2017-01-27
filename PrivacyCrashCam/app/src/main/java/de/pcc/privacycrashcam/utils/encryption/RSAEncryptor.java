@@ -41,6 +41,10 @@ public class RSAEncryptor implements IKeyEncryptor {
 
     @Override
     public boolean encrypt(SecretKey input, InputStream publicKey, File output) {
+        if (input == null || publicKey == null || output == null) {
+            return false;
+        }
+
         // encode key as string
         String encodedKey = Base64.encodeToString(input.getEncoded(), Base64.DEFAULT);
 

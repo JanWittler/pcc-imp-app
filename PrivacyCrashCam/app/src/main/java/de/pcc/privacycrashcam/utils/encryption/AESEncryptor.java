@@ -9,6 +9,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Security;
+import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -39,6 +42,10 @@ public class AESEncryptor implements IFileEncryptor {
 
     @Override
     public boolean encrypt(File input, SecretKey key, File output) {
+        if (input == null || key == null || output == null) {
+            return false;
+        }
+
         // open files
         FileInputStream fis;
         FileOutputStream fos;
