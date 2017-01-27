@@ -1,8 +1,12 @@
 package de.pcc.privacycrashcam.utils.datastructures;
 
+import android.os.FileObserver;
+import android.util.Log;
+
 import java.io.File;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Buffer which stores files in a fifo-like queue.
@@ -12,6 +16,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class FileRingBuffer {
 
     private Queue<File> queue;
+    private AtomicInteger activeSaves = new AtomicInteger(0);
 
     /**
      * Creates a new queue with the passed capacity.
@@ -30,17 +35,26 @@ public class FileRingBuffer {
      */
     public void put(File file) {
         if (!queue.offer(file)) {
+
             // Queue reached its capacity. Remove head and retry.
             queue.poll().delete();
             put(file);
         }
+
+        FinishWritingObserver observer = new FinishWritingObserver(file.getAbsolutePath(),
+                FileObserver.CLOSE_WRITE);
+        observer.startWatching();
+        activeSaves.incrementAndGet();
     }
 
     /**
      * Removes all files from the buffer and deletes them.
      */
     public void flushAll() {
-        // todo see javadoc
+        for (File file : queue) {
+            if (file.exists())
+                file.delete();
+        }
     }
 
     /**
@@ -54,29 +68,34 @@ public class FileRingBuffer {
     }
 
     /**
-     * Gets the whole queue. Note that some of the files in the queue might not have been completely
-     * written to memory yet.
-     *
-     * @return Queue
+     * Demands the FileRingBuffer to provide the data.
+     * As writing to the buffer happens asynchronous to demanding the data
+     * so demand data waits until all writing has finished.
      */
-    public Queue<File> getData() {
+    public Queue<File> demandData() {
+
+        try {
+            while (!activeSaves.compareAndSet(0, 0)) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            Log.w("WEE", "Error while waiting for writing videos to finish");
+        }
+
         return queue;
     }
 
-    /*
-    pseudo code for checking if file was written completely:
-
-        while (file not complete)
-        sleep for 1 sec
-        read the fourth byte of the file
-        if it is not 0 (contains 'f' of the 'ftyp' header) then
-            file is complete, break
-
-
-        --
-
-    If this does not work we can add a file observer along with each file added to the queue.
-
+    /**
+     * Observer used to notify that writing all video snippets has finished.
      */
+    private class FinishWritingObserver extends FileObserver {
+        private FinishWritingObserver(String path, int mask) {
+            super(path, mask);
+        }
 
+        public void onEvent(int event, String path) {
+            activeSaves.decrementAndGet();
+            this.stopWatching();
+        }
+    }
 }
