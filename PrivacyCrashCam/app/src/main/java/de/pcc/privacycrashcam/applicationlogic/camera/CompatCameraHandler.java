@@ -28,6 +28,8 @@ import static android.content.Context.WINDOW_SERVICE;
 /**
  * Camera handler which uses the old Camera API. Handles access to the camera, displaying the
  * preview and writing the buffer. Also manages persisting the buffer's content.
+ *
+ * @author Giorgio Gross
  */
 @SuppressWarnings("deprecation")
 public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoListener {
@@ -344,8 +346,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // Insert output file into ring buffer
         fileRingBuffer.put(currentOutputFile);
 
-        if (!isHandlerRunning) return;
         // todo ensure that this section will never be called after pauseHandler was called. onInfo will be called asynchronously...
+        if (!isHandlerRunning) return;
         releaseMediaRecorder();
         // start recording new chunk
         prepareMediaRecorder(); // will allocate also a new output file

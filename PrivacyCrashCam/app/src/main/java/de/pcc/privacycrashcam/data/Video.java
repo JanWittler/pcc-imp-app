@@ -8,6 +8,8 @@ import java.io.File;
  */
 
 public class Video {
+    public static final String PREFIX = "VIDEO_";
+
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
@@ -34,6 +36,11 @@ public class Video {
 
     public String getName() {
         return name;
+    }
+
+    public String extractTagFromName() {
+        if(!name.startsWith(PREFIX)) return name;
+        return name.replaceFirst(PREFIX, "");
     }
 
     public File getEncVideoFile() {

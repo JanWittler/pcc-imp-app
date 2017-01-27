@@ -18,16 +18,36 @@ import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
 
 /**
- * Handles access to device storage.
+ * Handles access to the device storage.
+ *
+ * <p>User related data like settings and account are saved in shared preferences.</p>
+ *
+ * <p>Videos, Metadata and Keys are organized in files. There are three directories on the external
+ * storage for those files, respectively.
+ * On the internal storage we have one directory for temporary data. This temporary directory is
+ * created uniquely for each instance of this class. Callers must remember to call
+ * {@link #deleteTempData()} in order to delete that directory as soon as they stop using this
+ * class.</p>
+ *
+ * <p>For file organisation, we use prefixes and tags:
+ *      <ul>
+ *      <li>A prefix indicates the type of file, like META_* or VIDEO_*</li>
+ *      <li>A tag marks a certain video and probably consists of the date the video was captured.
+ *          All  data related to that video will have the same tag appended after their prefix</li>
+ *
+ *      <li>Also note that files containing JSON Strings solely will have the suffix .json</li>
+ *      </ul>
+ * </p>
+ *
  * @author David Laubenstein, Giorgio Gross
- * Created by Giorgio Gross
+ *         Created by Giorgio Gross
  */
 public class MemoryManager {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
     private Context context;
-
+    private String tempDirName = "temp_0"; // default dir name
     private SharedPreferences appPreferences;
 
     /* #############################################################################################
@@ -38,6 +58,8 @@ public class MemoryManager {
 
         appPreferences = context.getSharedPreferences(MemoryKeys.APP_SHARED_PREFERENCES,
                 Context.MODE_PRIVATE);
+
+        tempDirName = "temp_" + System.currentTimeMillis();
     }
 
     /**
@@ -59,7 +81,7 @@ public class MemoryManager {
     ############################################################################################# */
 
     /**
-     * Get saved user settings
+     * Gets saved user settings
      *
      * @return settings of user
      */
@@ -88,46 +110,6 @@ public class MemoryManager {
     }
 
 
-    /* #############################################################################################
-
-                                  methods
-                                  Saving, creating and loading files
-
-    ############################################################################################# */
-
-    /**
-     * @return temporary video files as File
-     */
-    public File getTempVideoFile() {
-        String fileName = "vid_" + System.currentTimeMillis();
-        return new File(context.getFilesDir(), fileName);
-    }
-
-    /**
-     * deletes all temporary data
-     */
-    public void deleteTempData() {
-
-    }
-
-    /**
-     * returns the symmetric keyfile as a File
-     * @return File symmetric key
-     */
-    public File getTempSymmetricKeyFile() {
-
-        return null;
-    }
-
-    /**
-     * saves the encrypted symmetric key from a vodeo and returns the key as File
-     * @param videoName
-     * @param key
-     */
-    public File saveEncryptedSymmetricKey(String videoName, String key) {
-        return null;
-    }
-
     /**
      * delete all account data of a user
      */
@@ -136,125 +118,250 @@ public class MemoryManager {
     }
 
     /**
-     * saves the account data from parameter transfer
-     * @param account is an Account object
+     * Saves an Account instance by overriding the previous Account values in memory.
+     *
+     * @param account the Settings instance to be saved
      */
     public void saveAccountData(Account account) {
 
     }
 
     /**
-     * @return the Account object, which includes all account data
+     * Gets saved user account
+     *
+     * @return account of user containing user data
      */
     public Account getAccountData() {
         return null;
     }
 
     /**
-     * deletes the account data of a user
+     * Deletes all account data of the user
      */
     public void deleteAccountData() {
     }
 
+
+    /* #############################################################################################
+
+                                  methods
+                                  Saving, creating and loading files
+
+    ############################################################################################# */
+
     /**
-     * save the encrypted Video and returns the video as file
-     * @param videoName defines, which video has to be returned.
-     * @param encryptedVideo represents the encrypted video file
-     * @return video as File
+     * Creates and returns a temporary file which can be used to save video content. This file is
+     * located in the local directory of the app and cannot be accessed from outside.
+     *
+     * <p>
+     * As video files tend to become pretty large you are responsible for deleting the file.
+     * Alternatively, you can call {@link #deleteTempData()} to delete all files saved in the local
+     * temp directory.
+     * The directory will be created uniquely for each instance of {@link MemoryManager}.
+     * </p>
+     *
+     * @return file for video data
      */
-    public File saveEncryptedVideo(String videoName, File encryptedVideo) {
+    public File getTempVideoFile() {
+        String fileName = "vid_" + System.currentTimeMillis();
+        // todo create tempDir
+        // todo create these file inside folder named after value of tempDirName variable
+        return new File(context.getFilesDir(), fileName);
+    }
+
+    /**
+     * Creates and returns a temporary file which can be used to save metadata content. This file is
+     * located in the local directory of the app and cannot be accessed from outside.
+     *
+     * <p>
+     * Yu are responsible for deleting the file.
+     * Alternatively, you can call {@link #deleteTempData()} to delete all files saved in the local
+     * temp directory.
+     * The directory will be created uniquely for each instance of {@link MemoryManager}.
+     * </p>
+     *
+     * @return file for metadata
+     */
+    public File getTempMetadataFile() {
+        String fileName = "meta_" + System.currentTimeMillis();
+        // todo create these file inside folder named after value of tempDirName variable
+        return new File(context.getFilesDir(), fileName);
+    }
+
+    /**
+     * Deletes all temporary data located inside the {@link MemoryManager} instance's temp folder.
+     */
+    public void deleteTempData() {
+        // todo we could also add the "deleteOnExit()" method to getTempXXXFile().. (?)
+    }
+
+    /**
+     * Adds a suiting prefix to the video name and uses that String to create a new file inside the
+     * key folder on the external memory. The file may be used to write the encrypted symmetric
+     * key.
+     *
+     * <p>The file name will be key_<@param videoTag> where the tag resembles the ending of the file
+     * name, e.g. a date</p>
+     *
+     * @param videoTag Tag of the video this file will be associated with
+     */
+    public File createEncryptedSymmetricKeyFile(String videoTag) {
+        // todo use Metadata.PREFIX as prefix! See Video class for guidance
         return null;
     }
 
     /**
-     * saves the encrypted metadata of a video and
-     * @return a File as File
+     * Adds a suiting prefix to the video name and uses that String to create a new file inside the
+     * video folder on the external memory. The file may be used to write the encrypted video data.
+     *
+     * <p>The file name will be {@link Video#PREFIX VIDEO_}<@param videoTag> where the tag resembles
+     * the ending of the file name, e.g. a date</p>
+     *
+     * @param videoTag Tag of the video this file will be associated with
      */
-    public File saveEncryptedMetaData() {
+    public File createEncryptedVideoFile(String videoTag) {
+        // use Video.PREFIX as prefix!
         return null;
     }
 
     /**
-     * save the readable metadata of a video and returns a File as File
-     * @param videoName represents the name of the video
-     * @param metadata are the metadata as a Metadata object
-     * @return a File as a File
+     * Adds a suiting prefix to the video name and uses that String to create a new file inside the
+     * metadata folder on the external memory. The file may be used to write the encrypted metadata.
+     *
+     * <p>The file name will be {@link Metadata#PREFIX META_}<@param videoTag> where the tag
+     * resembles the ending of the file name, e.g. a date</p>
+     *
+     * @param videoTag Tag of the video this file will be associated with
      */
-
-    public File saveReadableMetadata(String videoName, Metadata metadata) {
+    public File createEncryptedMetaFile(String videoTag) {
         return null;
     }
 
     /**
-     * deletes the encrypted symmetric key
-     * @param videoName is the name of the video to find the encrypted video key
+     * Adds a suiting prefix to the video name and appends "_readable". Uses that String to create
+     * a new file inside the metadata folder on the external memory. The file may be used to write
+     * the readable metadata.
+     *
+     * <p>The file name will be {@link Metadata#PREFIX_READABLE META_READABLE_}<@param videoTag>
+     * where the tag resembles the ending of the file name, e.g. a date</p>
+     *
+     * @param videoTag Tag of the video this file will be associated with
      */
-    public void deleteEncryptedSymmetricKey(String videoName) {
+    public File saveReadableMetadata(String videoTag) {
+        return null;
+    }
+
+    /**
+     * Deletes the file containing the encrypted symmetric key associated with the passed video
+     * tag.
+     *
+     * <p>The video tag is determined when creating the video file with
+     * {@link #createEncryptedVideoFile(String)}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     */
+    public void deleteEncryptedSymmetricKeyFile(String videoTag) {
+    }
+
+    /**
+     * Deletes the file containing the encrypted metadata associated with the passed video tag.
+     *
+     * <p>The video tag is determined when creating the video file with
+     * {@link #createEncryptedVideoFile(String)}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     */
+    public void deleteEncryptedMetadataFile(String videoTag) {
+
+    }
+
+
+    /**
+     * Deletes the file containing the readable metadata associated with the passed video tag.
+     *
+     * <p>The video tag is determined when creating the video file with
+     * {@link #createEncryptedVideoFile(String)}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     */
+    public void deleteReadableMetadata(String videoTag) {
 
     }
 
     /**
-     * deletes the encrypted video File
-     * @param videoName is the name of the video to find the encrypted video file
+     * Deletes the file containing the encrypted video associated with the passed video tag.
+     *
+     * <p>If you know the video name but not the tag use {@link Video#extractTagFromName()}</p>
+     *
+     * @param videoTag Tag of the video
      */
-    public void deleteEncryptedVideo(String videoName) {
+    public void deleteEncryptedVideoFile(String videoTag) {
 
     }
 
-    /**
-     * deletes the encrypted metadata file
-     * @param videoName is the name of the video
-     */
-    public void deleteEncryptedMetadata(String videoName) {
+    // todo add convenience method to delete all files associated with one video which will call deleteEncryptedSymmetricKeyFile, deleteEncryptedVideoFile, deleteEncryptedMetadataFile and deleteReadableMetadata
 
-    }
 
     /**
-     * deletes the readable metadata
-     * @param videoName is the name of the video
-     */
-    public void deleteReadableMetadata(String videoName) {
-
-    }
-
-    /**
-     * @return all videos as an ArrayList<Video>
+     * Creates and returns a list containing all encrypted videos saved in the video directory on
+     * the external memory.
+     *
+     * <p>See {@link Video}</p>
+     *
+     * @return Videos as an ArrayList<Video>
      */
     public ArrayList<Video> getAllVideos() {
-       return null;
+        return null;
     }
 
     /**
+     * Gets the file containing the encrypted symmetric key from the key directory located on the
+     * external memory.
      *
-     * @param videoName is the name of the video
-     * @return the encrypted symmetric key as a File (video)
+     * @param videoTag Tag of the video the file is associated with
+     * @return the encrypted symmetric key as a file or null if there is none
      */
-    public File getEncryptedSymmetricKey(String videoName) {
+    @Nullable
+    public File getEncryptedSymmetricKey(String videoTag) {
         return null;
     }
 
     /**
+     * Gets the file containing the encrypted video from the video directory located on the
+     * external memory.
      *
-     * @param videoName is the name of the video
-     * @return the encrypted video file as File
+     * <p>If you know the video name but not the tag use {@link Video#extractTagFromName()}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     * @return the encrypted video as a file or null if there is none
      */
-    public File getEncryptedVideo(String videoName) {
+    @Nullable
+    public File getEncryptedVideo(String videoTag) {
         return null;
     }
 
     /**
-     * @param videoName is the name of the video
-     * @return encrypted metadata belongs to the video as a File
+     * Gets the file containing the encrypted metadata from the meta directory located on the
+     * external memory.
+     *
+     * @param videoTag Tag of the video the file is associated with
+     * @return the encrypted metadata as a file or null if there is none
      */
-    public File getEncryptedMetadata(String videoName) {
+    @Nullable
+    public File getEncryptedMetadata(String videoTag) {
         return null;
     }
 
     /**
-     * @param videoName is the name of the video
-     * @return the readable metadata belongs to the Video as File
+     * Gets the file containing the readable metadata from the key directory located on the
+     * external memory.
+     *
+     * @param videoTag Tag of the video the file is associated with
+     * @return the readable metadata as a file or null if there is none
      */
-    public Metadata getReadableMetadata(String videoName) {
-       return null;
+    @Nullable
+    public File getReadableMetadata(String videoTag) {
+        return null;
     }
+
 }

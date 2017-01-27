@@ -3,9 +3,11 @@ package de.pcc.privacycrashcam.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 /**
  * @author David Laubenstein
- * Created by David Laubenstein on 01/23/2017
+ *         Created by David Laubenstein on 01/23/2017
  */
 public class Metadata {
     /* #############################################################################################
@@ -14,6 +16,7 @@ public class Metadata {
     long date;
     String triggerType;
     float[] gForce = new float[3];
+
     /* #############################################################################################
      *                                  constructor
      * ###########################################################################################*/
@@ -23,25 +26,25 @@ public class Metadata {
         this.gForce = gForce;
     }
 
-    public Metadata(String json) {
+    public Metadata(String json) throws JSONException {
         // in case, the matadata infos are in "meta": {}
         JSONObject obj = null;
         JSONObject meta = null;
-        try {
-            obj = new JSONObject(json);
-            // go into account object
-            meta = obj.getJSONObject("meta");
-            // save Strings in account object to class attributes
-            this.date = meta.getLong("date");
-            this.triggerType = meta.getString("triggerType");
-            this.gForce[0] = (float) meta.getDouble("gForceX");
-            this.gForce[1] = (float) meta.getDouble("gForceY");
-            this.gForce[2] = (float) meta.getDouble("gForceZ");
-        } catch (JSONException e) {
-            // TODO: android exception handling???
-            e.printStackTrace();
-        }
+        obj = new JSONObject(json);
+        // go into account object
+        meta = obj.getJSONObject("meta");
+        // save Strings in account object to class attributes
+        this.date = meta.getLong("date");
+        this.triggerType = meta.getString("triggerType");
+        this.gForce[0] = (float) meta.getDouble("gForceX");
+        this.gForce[1] = (float) meta.getDouble("gForceY");
+        this.gForce[2] = (float) meta.getDouble("gForceZ");
     }
+
+    public Metadata(File metaFile) {
+        // todo read string from file and call Metadata(String) constructor
+    }
+
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
@@ -64,6 +67,7 @@ public class Metadata {
 
     /**
      * returns JSON String of metadata info
+     *
      * @return json String
      */
     public String getAsJSON() {
