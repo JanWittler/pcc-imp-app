@@ -41,7 +41,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private CamcorderProfile camcorderProfile = null;
     private MediaRecorder mediaRecorder = null;
     private boolean isHandlerRunning = false;
-    private boolean isPersisting = false;
+    private boolean isRecording = false;
 
     private Context context;
     private SurfaceView previewView;
@@ -77,7 +77,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             public void onPersistingStarted() {
                 // use new ring buffer to avoid conflicts
                 setUpBuffer();
-                isPersisting = false;
+                isRecording = false;
 
                 // update UI
                 CompatCameraHandler.this.recordCallback.onRecordingStopped();
@@ -285,8 +285,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     @Override
     public void schedulePersisting() {
         // don't start recording if we already record
-        if (isPersisting) return;
-        isPersisting = true;
+        if (isRecording) return;
+        isRecording = true;
 
         recordCallback.onRecordingStarted();
 
