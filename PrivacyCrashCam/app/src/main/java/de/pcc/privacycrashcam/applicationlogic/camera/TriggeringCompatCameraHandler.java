@@ -69,8 +69,10 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
         float maxRawVal = GRAVITY_CONSTANT * MAX_G_FORCE;
         if(event.values[0] > maxRawVal
                 || event.values[1] > maxRawVal
-                || event.values[2] > maxRawVal)
+                || event.values[2] > maxRawVal) {
+            Log.i(TAG, "_______________________ triggered PErsisiting " );
             schedulePersisting();
+        }
     }
 
     /**

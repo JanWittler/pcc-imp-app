@@ -130,15 +130,15 @@ public class CameraActivity extends MainActivity {
 
 
     @Override
-    protected void onResume() {
-        super.onPostResume();
+    protected void onStart() {
+        super.onStart();
         cameraPreview.setVisibility(View.VISIBLE);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        cameraPreview.setVisibility(View.GONE);
+    protected void onStop() {
+        super.onStop();
+        // cameraPreview.setVisibility(View.GONE);
     }
 
     @Override
