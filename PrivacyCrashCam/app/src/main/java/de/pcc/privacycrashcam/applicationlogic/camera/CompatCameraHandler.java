@@ -41,6 +41,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private CamcorderProfile camcorderProfile = null;
     private MediaRecorder mediaRecorder = null;
     private boolean isHandlerRunning = false;
+    private boolean isPersisting = false;
 
     private Context context;
     private SurfaceView previewView;
@@ -76,14 +77,16 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             public void onPersistingStarted() {
                 // use new ring buffer to avoid conflicts
                 setUpBuffer();
+                isPersisting = false;
 
                 // update UI
                 CompatCameraHandler.this.recordCallback.onRecordingStopped();
             }
 
             @Override
-            public void onPersistingStopped() {
-                // ignored
+            public void onPersistingStopped(boolean status) {
+                // ignored; make a notification later if status is false so that the user knows if
+                // there went something wrong
             }
         };
 
@@ -94,7 +97,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         setUpCamcorderProfile();
 
         // avoid NPE's if a client forgets to set the metadata
-        //this.metadata = new Metadata();
+        this.metadata = new Metadata();
     }
 
     private void setUpBuffer() {
@@ -125,10 +128,9 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             return false;
         }
 
-        Log.d(TAG, "cam");
         // set up camera
         camera = getCameraInstance();
-        Log.d(TAG, "cam instance" + camera);
+        Log.d(TAG, "cam instance " + camera);
         if (camera == null) {
             // camera was not available
             recordCallback.onError(context.getResources().
@@ -144,7 +146,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
         // pay attention to screen orientation
         Camera.CameraInfo info = CameraHelper.getDefaultBackFacingCameraInfo();
-        Display display = ((WindowManager)context.getSystemService(WINDOW_SERVICE))
+        Display display = ((WindowManager) context.getSystemService(WINDOW_SERVICE))
                 .getDefaultDisplay();
         Camera.Size optimalSize;
         int deviceAngle = 0;
@@ -225,21 +227,22 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         mediaRecorder.setCamera(camera);
 
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        Log.d(TAG, "set sources");
         mediaRecorder.setProfile(camcorderProfile);
-        Log.d(TAG, "set profile");
+
+        // get new file and add it to buffer and media recorder
         currentOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO); // = memoryManager.getTempVideoFile();
-        Log.d(TAG, "set file");
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
+        fileRingBuffer.put(currentOutputFile);
+
         mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
         mediaRecorder.setOrientationHint(90);
         mediaRecorder.setOnInfoListener(this);
 
-        Log.d(TAG, "Settings set up");
+        Log.d(TAG, "Media Recorder is set up");
         try {
             // maybe put this in an async task if performance turns out to be poor
             mediaRecorder.prepare();
-            Log.d(TAG, "prepared media recorder");
+            Log.d(TAG, "Media Recorder is prepared");
         } catch (IOException e) {
             e.printStackTrace();
             recordCallback.onError(context.getResources().getString(R.string.error_recorder));
@@ -281,12 +284,15 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void schedulePersisting() {
-        // todo
-        /*recordCallback.onRecordingStarted();
+        // don't start recording if we already record
+        if (isPersisting) return;
+        isPersisting = true;
+
+        recordCallback.onRecordingStarted();
 
         // create async task to persist the buffer
-        AsyncPersistor mPersistor = new AsyncPersistor(memoryManager, fileRingBuffer, persistCallback);
-        mPersistor.execute(metadata);*/
+        AsyncPersistor mPersistor = new AsyncPersistor(fileRingBuffer, persistCallback, context);
+        mPersistor.execute(metadata);
     }
 
 
@@ -297,7 +303,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void resumeHandler() {
-        if(isHandlerRunning) return;
+        if (isHandlerRunning) return;
 
         try {
             // take care of setting up camera, media recorder and recording
@@ -321,7 +327,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void pauseHandler() {
-        if(!isHandlerRunning) return;
+        if (!isHandlerRunning) return;
 
         isHandlerRunning = false;
         // take care of stopping preview and recording
@@ -330,9 +336,9 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             fileRingBuffer.put(currentOutputFile);
         } catch (RuntimeException re) {
             // No valid data was recorded as MediaRecorder.stop() was called before or right after
-            // MediaRecorder.start(). Delete the incomplete file; a new one will be allocated as
-            // soon as the Handler is resumed
-            currentOutputFile.delete();
+            // MediaRecorder.start(). Remove the incomplete file fro the buffer and delete it; a new
+            // one will be allocated as soon as the Handler is resumed
+            fileRingBuffer.pop().delete();
             re.printStackTrace();
         }
         releaseMediaRecorder();
@@ -341,11 +347,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
-        // Video is saved automatically, no need to call stopRecordingChunk() here..
-
-        // Insert output file into ring buffer
-        fileRingBuffer.put(currentOutputFile);
-
+        // Video is saved automatically, no need to call stopRecordingChunk() here.
+        // Just clean up last recording and restart recording
         // todo ensure that this section will never be called after pauseHandler was called. onInfo will be called asynchronously...
         if (!isHandlerRunning) return;
         releaseMediaRecorder();

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import de.pcc.privacycrashcam.applicationlogic.camera.CameraHelper;
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.MemoryKeys;
 import de.pcc.privacycrashcam.data.Metadata;
@@ -165,10 +166,13 @@ public class MemoryManager {
      * @return file for video data
      */
     public File getTempVideoFile() {
-        String fileName = "vid_" + System.currentTimeMillis();
-        // todo create tempDir
-        // todo create these file inside folder named after value of tempDirName variable
-        return new File(context.getFilesDir(), fileName);
+        // stub to test other classes. Replace the following line..
+        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
+
+        /*String fileName = Video.PREFIX + System.currentTimeMillis();
+        // todo create tempDir *tempDirName*
+        // todo create these file inside folder named after *tempDirName*
+        return new File(context.getFilesDir(), fileName);*/
     }
 
     /**
@@ -186,7 +190,7 @@ public class MemoryManager {
      */
     public File getTempMetadataFile() {
         String fileName = "meta_" + System.currentTimeMillis();
-        // todo create these file inside folder named after value of tempDirName variable
+        // todo create these files inside folder named after value of tempDirName variable
         return new File(context.getFilesDir(), fileName);
     }
 
@@ -208,8 +212,10 @@ public class MemoryManager {
      * @param videoTag Tag of the video this file will be associated with
      */
     public File createEncryptedSymmetricKeyFile(String videoTag) {
-        // todo use Metadata.PREFIX as prefix! See Video class for guidance
-        return null;
+        // use Key.PREFIX as prefix! See Video class for guidance
+
+        // stub to test other classes. Replace the following line..
+        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
     }
 
     /**
@@ -223,7 +229,9 @@ public class MemoryManager {
      */
     public File createEncryptedVideoFile(String videoTag) {
         // use Video.PREFIX as prefix!
-        return null;
+
+        // stub to test other classes. Replace the following line..
+        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
     }
 
     /**
@@ -236,7 +244,10 @@ public class MemoryManager {
      * @param videoTag Tag of the video this file will be associated with
      */
     public File createEncryptedMetaFile(String videoTag) {
-        return null;
+        // use Metadata.PREFIX as prefix!
+
+        // stub to test other classes. Replace the following line..
+        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
     }
 
     /**
@@ -249,8 +260,11 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video this file will be associated with
      */
-    public File saveReadableMetadata(String videoTag) {
-        return null;
+    public File createReadableMetadataFile(String videoTag) {
+        // use Metadata.PREFIX_READABLE as prefix!
+
+        // stub to test other classes. Replace the following line..
+        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
     }
 
     /**

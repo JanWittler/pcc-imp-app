@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -78,18 +81,12 @@ public class CameraActivity extends MainActivity {
         recordCallback = new RecordCallback() {
             @Override
             public void onRecordingStarted() {
-                // hide "ready" icon
-
-                // show "recorder" icon
-
+                showRecordingSymbol();
             }
 
             @Override
             public void onRecordingStopped() {
-                // hide "recorder" icon
-
-                // show "ready" icon
-
+                showViewingSymbol();
             }
 
             @Override
@@ -104,10 +101,31 @@ public class CameraActivity extends MainActivity {
         cameraPreview.setOnClickListener((View.OnClickListener) mCamHandler);
         cameraPreview.setCameraHandler(mCamHandler);
 
+        statusSymbol = (ImageView) findViewById(R.id.statusSymbol);
+        showViewingSymbol();
+        startStatusSymbolAnim();
+
         // don't show title
         setTitle("");
         // remove drawer shadow
         removeDrawerShadow();
+    }
+
+    private void showViewingSymbol() {
+        statusSymbol.setImageResource(R.drawable.ic_visibility_black_24dp);
+    }
+
+    private void showRecordingSymbol() {
+        statusSymbol.setImageResource(R.drawable.ic_videocam_black_24dp);
+    }
+
+    private void startStatusSymbolAnim() {
+        Animation fadeInOut = new AlphaAnimation(0.0f, 1.0f);
+        fadeInOut.setDuration(1500);
+        fadeInOut.setStartOffset(0);
+        fadeInOut.setRepeatMode(Animation.REVERSE);
+        fadeInOut.setRepeatCount(Animation.INFINITE);
+        statusSymbol.startAnimation(fadeInOut);
     }
 
 

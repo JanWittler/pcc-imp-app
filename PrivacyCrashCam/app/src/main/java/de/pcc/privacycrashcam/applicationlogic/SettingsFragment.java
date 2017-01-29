@@ -61,7 +61,8 @@ public class SettingsFragment extends Fragment {
     /**
      *
      */
+    @Override
     public void onPause() {
-
+        super.onPause();
     }
 }
