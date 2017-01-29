@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Buffer which stores files in a fifo-like queue.
  *
- * @author Giorgio
+ * @author Giorgio Groß, Josh Romanowski
  */
 public class FileRingBuffer {
 
@@ -36,16 +36,12 @@ public class FileRingBuffer {
      */
     public void put(File file) {
         if (!queue.offer(file)) {
-
             // Queue reached its capacity. Remove head and retry.
             queue.poll().delete();
-            put(file);
+            queue.add(file);
         }
 
-        FinishWritingObserver observer = new FinishWritingObserver(file.getAbsolutePath(),
-                FileObserver.CLOSE_WRITE);
-        observer.startWatching();
-        activeSaves.incrementAndGet();
+        onFileStarted(file);
     }
 
     /**
@@ -86,6 +82,17 @@ public class FileRingBuffer {
         return queue;
     }
 
+    protected void onFileStarted(File file) {
+        FinishWritingObserver observer = new FinishWritingObserver(file.getAbsolutePath(),
+                FileObserver.CLOSE_WRITE);
+        observer.startWatching();
+        activeSaves.incrementAndGet();
+    }
+
+    protected void onFileFinished() {
+        activeSaves.decrementAndGet();
+    }
+
     /**
      * Observer used to notify that writing all video snippets has finished.
      */
@@ -95,7 +102,7 @@ public class FileRingBuffer {
         }
 
         public void onEvent(int event, String path) {
-            activeSaves.decrementAndGet();
+            onFileFinished();
             this.stopWatching();
         }
     }
