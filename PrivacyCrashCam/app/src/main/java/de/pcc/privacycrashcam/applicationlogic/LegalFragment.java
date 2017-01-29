@@ -46,7 +46,20 @@ public class LegalFragment extends Fragment {
         // get the main layout describing the content
         base = (LinearLayout) inflater.inflate(R.layout.content_legal, container, false);
 
+        legal = (TextView) base.findViewById(R.id.legal);
+        legal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLicenses();
+            }
+        });
+
         // init view components
         return base;
+    }
+
+    public void showLicenses () {
+        new HTMLDialogViewer(getContext(), getLayoutInflater(null),
+                getString(R.string.legal_title), R.raw.legal).showDialog();
     }
 }
