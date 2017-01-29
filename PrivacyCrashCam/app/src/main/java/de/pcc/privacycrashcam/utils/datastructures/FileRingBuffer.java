@@ -1,6 +1,7 @@
 package de.pcc.privacycrashcam.utils.datastructures;
 
 import android.os.FileObserver;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
@@ -58,13 +59,13 @@ public class FileRingBuffer {
     }
 
     /**
-     * Gets and removes the head of the queue
+     * Gets and removes the head of the queue. The file will (of course) not be deleted.
      *
      * @return the queue head or null
      */
+    @Nullable
     public File pop() {
-        // todo
-        return null;
+        return queue.poll();
     }
 
     /**
