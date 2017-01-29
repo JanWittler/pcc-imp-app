@@ -2,6 +2,8 @@ package de.pcc.privacycrashcam.utils.dataprocessing;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Queue;
 
 import de.pcc.privacycrashcam.R;
+import de.pcc.privacycrashcam.applicationlogic.camera.CameraHelper;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
@@ -34,15 +37,13 @@ import de.pcc.privacycrashcam.utils.encryption.Encryptor;
  * Then it takes all recorded video snippets and creates one coherent file.
  * After that all data gets encrypted and save to the app's data storage.
  * <p>
- *     The process of persisting is asynchronous to the app's main thread.
- *     Therefore callbacks are used to inform the app about the persisting's progress.
+ * The process of persisting is asynchronous to the app's main thread.
+ * Therefore callbacks are used to inform the app about the persisting's progress.
  * </p>
  *
  * @author Josh Romanowski, Giorgio Groß
  */
-
 public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
-
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
@@ -84,14 +85,15 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
     /**
      * Creates a new persistor with the given parameters.
      *
-     * @param memoryManager   Manager for the app's memory access.
      * @param ringbuffer      Buffer containing the recorded video snippets.
      * @param persistCallback Callback used to give asynchronous response.
      * @param context         Android context of the recording.
      */
-    public AsyncPersistor(MemoryManager memoryManager, FileRingBuffer ringbuffer,
+    public AsyncPersistor(FileRingBuffer ringbuffer,
                           PersistCallback persistCallback, Context context) {
-        this.memoryManager = memoryManager;
+        // new mem manager will provide own temp directory for this operation
+        this.memoryManager = new MemoryManager(context);
+
         this.ringbuffer = ringbuffer;
         this.persistCallback = persistCallback;
         this.context = context;
@@ -106,6 +108,8 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Metadata... params) {
 
+        Log.i(TAG, "Background task started");
+
         // wait half a buffer size
         int timeToWait = settings.getBufferSizeSec() / 2;
 
@@ -116,7 +120,14 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
         }
 
-        persistCallback.onPersistingStarted();
+        // post to UI thread
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                persistCallback.onPersistingStarted();
+            }
+        });
+        Log.i(TAG, "Start writing files");
 
         // save metadata
         Metadata metaData = params[0];
@@ -126,12 +137,14 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         }
 
         String videoName = String.valueOf(metaData.getDate());
-        File metaLocation = memoryManager.saveReadableMetadata(videoName);
+        File metaLocation = memoryManager.createReadableMetadataFile(videoName);
         if (!saveMetadataToFile(metaLocation, metaData))
             return false;
 
         // concat video snippets
         Queue<File> vidSnippets = ringbuffer.demandData();
+        if (vidSnippets == null)
+            return false;
         File concatVid = memoryManager.getTempVideoFile();
         if (!concatVideos(vidSnippets, concatVid))
             return false;
@@ -144,8 +157,15 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         memoryManager.deleteTempData();
         ringbuffer.flushAll();
 
-        persistCallback.onPersistingStopped();
+        Log.i(TAG, "Finished writing files");
+
         return true;
+    }
+
+    @Override
+    protected void onPostExecute(Boolean status) {
+        super.onPostExecute(status);
+        persistCallback.onPersistingStopped(status);
     }
 
     /* #############################################################################################
