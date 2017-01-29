@@ -132,7 +132,7 @@ public class MemoryManager {
     /**
      * Gets saved user account
      *
-     * @return account of user containing user data
+     * @return account of user containing user data or null if none was found
      */
     public Account getAccountData() {
         return null;

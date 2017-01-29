@@ -18,10 +18,23 @@
     <string name="framesTitle">Frames</string>
     <string name="bufferSizeTitle">Buffer Size</string>
 
+    <!-- LEGAL -->
+    <string name="copyright">© PSE Team\n\n\nGiorgio Groß\nJosh Romanowski\nDavid Laubenstein</string>
+    <string name="licenses_title">Licenses</string>
+    <string name="legal_title">Legal Information</string>
+
+    <!-- WELCOME TEXTS -->
+    <string name="welcome_text">Welcome</string>
+    <string name="welcome_description">The Privacy Crash Cam will allow you to use your
+        Phone as a Dash Cam while respecting the rights of other people. To use this app you need
+        to allow access to the camera, your microphone and your device storage as otherwise not
+        videos can be recorded.</string>
+
     <!-- ERROR MESSAGES -->
     <string name="error_no_camera">Your device has no camera</string>
     <string name="error_camera_unavailable">There was a problem with your camera</string>
     <string name="error_recorder">Cannot record videos</string>
     <string name="error_undefined">An error occurred</string>
+    <string name="grant_permission">ALLOW AND START</string>
 
 </resources>
