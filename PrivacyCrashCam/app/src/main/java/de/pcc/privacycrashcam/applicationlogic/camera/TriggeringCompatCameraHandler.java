@@ -21,6 +21,9 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
     private Sensor accelSensor;
     private SensorManager sensorManager;
 
+    private long lastTap = 0;
+    private static final long DOUBLE_TAP_TIME_SPAN = 700; // 700ms to double tap
+
     /**
      * Creates a new camera handler with the passed parameters and sets up callbacks, camera, media
      * recorder and buffer. Also sets up the sensor.
@@ -61,7 +64,7 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
      * <p>See the SENSOR_STATUS_* constants in
      * {@link SensorManager SensorManager} for details.
      *
-     * @param sensor acceleration sensor
+     * @param sensor   acceleration sensor
      * @param accuracy The new accuracy of this sensor, one of
      *                 {@code SensorManager.SENSOR_STATUS_*}
      */
@@ -77,6 +80,11 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
      */
     @Override
     public void onClick(View v) {
-        // schedulePersisting();
+        long tapTime = System.currentTimeMillis();
+        if (tapTime - lastTap <= DOUBLE_TAP_TIME_SPAN) {
+            // double tap
+            schedulePersisting();
+        }
+        lastTap = tapTime;
     }
 }

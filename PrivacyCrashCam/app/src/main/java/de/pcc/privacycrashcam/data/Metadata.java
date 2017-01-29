@@ -6,13 +6,17 @@ import org.json.JSONObject;
 import java.io.File;
 
 /**
- * @author David Laubenstein
+ * @author David Laubenstein, Giorgio Groß
  *         Created by David Laubenstein on 01/23/2017
  */
 public class Metadata {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
+    private final static String TRIGGER_TYPE_DEFAULT = "NONE";
+    private final static String TRIGGER_TYPE_SENSOR = "SENSOR_INPUT";
+    private final static String TRIGGER_TYPE_TOUCH = "TOUCH_INPUT";
+
     long date;
     String triggerType;
     float[] gForce = new float[3];
@@ -20,6 +24,18 @@ public class Metadata {
     /* #############################################################################################
      *                                  constructor
      * ###########################################################################################*/
+
+    /**
+     * Default constructor. Will initialize default values.
+     */
+    public Metadata() {
+        date = System.currentTimeMillis();
+        triggerType = TRIGGER_TYPE_DEFAULT;
+        gForce[0] = 0;
+        gForce[1] = 0;
+        gForce[2] = 0;
+    }
+
     public Metadata(long date, String triggerType, float[] gForce) {
         this.date = date;
         this.triggerType = triggerType;
