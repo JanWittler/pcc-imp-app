@@ -16,6 +16,14 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import de.pcc.privacycrashcam.data.Account;
 
 /**
@@ -33,10 +41,9 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     private static final String API_CALL = "authenticate/";
     // responses to be expected
     private static final String API_RESPONSE_FAILURE_OTHER = "FAILURE";
+    private static final String API_RESPONSE_FAILURE_MISSING = "NO ACCOUNTID";
     private static final String API_RESPONSE_FAILURE_MISMATCH = "WRONG ACCOUNT";
     private static final String API_RESPONSE_SUCCESS = "SUCCESS";
-
-    private static final int TIME_OUT = 20000; // 20sec time out
 
     private Account account;
     private ServerResponseCallback<AuthenticationState> callback;
@@ -58,67 +65,34 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     @Override
     protected AuthenticationState doInBackground(String... params) {
-        AuthenticationState resultState = AuthenticationState.FAILURE_OTHER; // default value
+        AuthenticationState resultState;
         String domain = params[0];
-        InputStream is = null;
 
-        // log account - todo remove this log message later
-        try {
-            Log.i("SERVER", "json query: " + new JSONObject(account.getAsJSON()).toString(4));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        Form form = new Form();
+        form.param("data", account.getAsJSON());
+        Client client = ClientBuilder.newClient();
+        WebTarget webTarget = client.target(domain).path("webservice").path("authenticate");
+        Log.i(TAG, "URI: " + webTarget.getUri().toASCIIString());
+        Response response = webTarget.request().post(Entity.entity(form,
+                MediaType.APPLICATION_FORM_URLENCODED_TYPE), Response.class);
+        String responseContent = response.readEntity(String.class);
+        Log.i(TAG, "response: " + responseContent);
+
+        switch (responseContent) {
+            case API_RESPONSE_FAILURE_MISSING:
+                resultState = AuthenticationState.FAILURE_MISSING;
+                break;
+            case API_RESPONSE_FAILURE_MISMATCH:
+                resultState = AuthenticationState.FAILURE_MISMATCH;
+                break;
+            case API_RESPONSE_SUCCESS:
+                resultState = AuthenticationState.SUCCESS;
+                break;
+            default:
+                resultState = AuthenticationState.FAILURE_OTHER;
+                break;
         }
 
-        try {
-            // set up connection
-            URL url = new URL(domain + API_CALL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(TIME_OUT);
-            conn.setConnectTimeout(TIME_OUT);
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.connect();
-
-            // write data to the output stream
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter printout = new BufferedWriter(
-                    new OutputStreamWriter(os, "UTF-8"));
-            printout.write("data="+account.getAsJSON()); // todo edit param
-            printout.flush();
-            printout.close();
-
-            int response = conn.getResponseCode();
-            Log.i(TAG, "Server Response: " + response);
-            is = conn.getInputStream();
-
-            // Convert the InputStream into a string
-            String result = ServerHelper.readInputStream(is);
-
-            switch (result) {
-                case API_RESPONSE_FAILURE_OTHER:
-                    resultState = AuthenticationState.FAILURE_OTHER;
-                    break;
-                case API_RESPONSE_FAILURE_MISMATCH:
-                    resultState = AuthenticationState.FAILURE_MISMATCH;
-                    break;
-                case API_RESPONSE_SUCCESS:
-                    resultState = AuthenticationState.SUCCESS;
-                    break;
-            }
-        } catch (MalformedURLException | ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         return resultState;
     }
 

@@ -14,7 +14,7 @@ public class ServerProxy {
     /**
      * Domain to connect to the API
      */
-    private static final String URL = "http://laubenstone.de:2222/webservice/";
+    private static final String URL = "http://laubenstone.de:2222/";
 
     public ServerProxy () {
 
@@ -25,8 +25,8 @@ public class ServerProxy {
         new VideoUploadTask(videoFile, metadata, symKey, account, callback).execute(URL);
     }
 
-    public void authenticatheUser(Account account,
-                                  ServerResponseCallback<AuthenticationState> callback) {
+    public void authenticateUser(Account account,
+                                 ServerResponseCallback<AuthenticationState> callback) {
         new AuthenticateTask(account, callback).execute(URL);
     }
 

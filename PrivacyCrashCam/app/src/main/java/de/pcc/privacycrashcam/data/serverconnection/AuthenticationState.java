@@ -19,6 +19,11 @@ public enum AuthenticationState {
     FAILURE_MISMATCH,
 
     /**
+     * Account does not exist or mail and password do not match
+     */
+    FAILURE_MISSING,
+
+    /**
      * Something unexpected went wrong
      */
     FAILURE_OTHER;
