@@ -13,7 +13,7 @@ import de.pcc.privacycrashcam.R;
 /**
  * @author Giorgio
  */
-public class WelcomFragment extends Fragment {
+public class WelcomeFragment extends Fragment {
     private RelativeLayout base;
 
     @Nullable
