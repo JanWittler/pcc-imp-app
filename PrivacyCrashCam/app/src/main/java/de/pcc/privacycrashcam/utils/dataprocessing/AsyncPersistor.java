@@ -22,6 +22,8 @@ import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.camera.CameraHelper;
@@ -116,17 +118,30 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         try {
             Thread.sleep(timeToWait * 1000);
         } catch (InterruptedException e) {
-            Log.w(TAG, "Interrupted while waiting");
+            e.printStackTrace();
             return false;
         }
 
+        final Lock lock = new ReentrantLock();
         // post to UI thread
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                persistCallback.onPersistingStarted();
+                synchronized (lock) {
+                    persistCallback.onPersistingStarted();
+                    lock.notify();
+                }
+
             }
         });
+        synchronized (lock) {
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
         Log.i(TAG, "Start writing files");
 
         // save metadata
@@ -136,8 +151,8 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
         }
 
-        String videoName = String.valueOf(metaData.getDate());
-        File metaLocation = memoryManager.createReadableMetadataFile(videoName);
+        String videoTag = String.valueOf(metaData.getDate());
+        File metaLocation = memoryManager.createReadableMetadataFile(videoTag);
         if (!saveMetadataToFile(metaLocation, metaData))
             return false;
 
@@ -145,12 +160,23 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         Queue<File> vidSnippets = ringbuffer.demandData();
         if (vidSnippets == null)
             return false;
+        Log.i(TAG, "Received all written files");
+
+        // todo remove sleep call as soon as our memory manager is set up correctly. (this forces our file name to be different from the files in the buffer)
+        try {
+            Thread.sleep(timeToWait * 2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+        // --------------------------------------------------------------------
+
         File concatVid = memoryManager.getTempVideoFile();
         if (!concatVideos(vidSnippets, concatVid))
             return false;
 
         // encrypt files
-        if (!encrypt(videoName, concatVid, metaLocation))
+        if (!encrypt(videoTag, concatVid, metaLocation))
             return false;
 
         // delete temporary files
@@ -177,19 +203,19 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * Saves the files on the app. Destination files will be created according to the
      * to MemoryManager.
      *
-     * @param videoName   Video name of the video.
+     * @param videoTag    Name added to the actual video name
      * @param concatVideo Location of the video to encrypt.
      * @param meta        Location of the metadata to encrypt.
      * @return Returns whether encrypting was successful or not.
      */
-    private boolean encrypt(String videoName, File concatVideo, File meta) {
+    private boolean encrypt(String videoTag, File concatVideo, File meta) {
         File[] input = new File[]{
                 concatVideo,
                 meta};
         File[] output = new File[]{
-                memoryManager.createEncryptedVideoFile(videoName),
-                memoryManager.createEncryptedMetaFile(videoName)};
-        File encKey = memoryManager.createEncryptedSymmetricKeyFile(videoName);
+                memoryManager.createEncryptedVideoFile(videoTag),
+                memoryManager.createEncryptedMetaFile(videoTag)};
+        File encKey = memoryManager.createEncryptedSymmetricKeyFile(videoTag);
 
         InputStream publicKey = context.getResources().openRawResource(R.raw.publickey);
 
@@ -209,11 +235,11 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         List<Movie> clips = new LinkedList<>();
         try {
             for (File video : videos) {
-                Movie tm = MovieCreator.build(video.getAbsolutePath());
+                Movie tm = MovieCreator.build(video.getPath());
                 clips.add(tm);
             }
         } catch (IOException e) {
-            Log.w(TAG, "Error reading video snippets");
+            e.printStackTrace();
             return false;
         }
 

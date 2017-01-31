@@ -1,23 +1,21 @@
 package de.pcc.privacycrashcam.utils.datastructures;
 
-import android.os.FileObserver;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Buffer which stores files in a fifo-like queue.
+ * Buffer which stores files in a fifo queue.
  *
  * @author Giorgio Groß, Josh Romanowski
  */
 public class FileRingBuffer {
 
-    private Queue<File> queue;
-    private AtomicInteger activeSaves = new AtomicInteger(0);
+    private Queue<BufferItem> queue;
+    private int capacity;
 
     /**
      * Creates a new queue with the passed capacity.
@@ -25,7 +23,8 @@ public class FileRingBuffer {
      * @param capacity max number of elements
      */
     public FileRingBuffer(int capacity) {
-        this.queue = new ArrayBlockingQueue<>(capacity);
+        this.queue = new ArrayBlockingQueue<>(++capacity);
+        this.capacity = capacity;
     }
 
     /**
@@ -35,22 +34,21 @@ public class FileRingBuffer {
      * @param file element to be added
      */
     public void put(File file) {
-        if (!queue.offer(file)) {
+        BufferItem newItem = new BufferItem(file);
+        if (!queue.offer(newItem)) {
             // Queue reached its capacity. Remove head and retry.
-            queue.poll().delete();
-            queue.add(file);
+            pop().delete();
+            queue.add(newItem);
         }
-
-        onFileStarted(file);
     }
 
     /**
      * Removes all files from the buffer and deletes them.
      */
     public void flushAll() {
-        for (File file : queue) {
-            if (file.exists())
-                file.delete();
+        BufferItem item;
+        while ((item = queue.poll()) != null) {
+            item.getFile().delete();
         }
     }
 
@@ -61,7 +59,7 @@ public class FileRingBuffer {
      */
     @Nullable
     public File pop() {
-        return queue.poll();
+        return queue.poll().getFile();
     }
 
     /**
@@ -70,40 +68,20 @@ public class FileRingBuffer {
      * so demand data waits until all writing has finished.
      */
     public Queue<File> demandData() {
+        Queue<File> ret = new ArrayBlockingQueue<>(capacity);
 
-        try {
-            while (!activeSaves.compareAndSet(0, 0)) {
-                Thread.sleep(1000);
+        for (BufferItem item : queue) {
+            Log.i("FileRingBuffer", "checking if file is saved: " + item.getFile().getAbsolutePath());
+
+            try {
+                while (!item.isSaved()) {
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            Log.w("WEE", "Error while waiting for writing videos to finish");
+            ret.add(item.getFile());
         }
-
-        return queue;
-    }
-
-    protected void onFileStarted(File file) {
-        FinishWritingObserver observer = new FinishWritingObserver(file.getAbsolutePath(),
-                FileObserver.CLOSE_WRITE);
-        observer.startWatching();
-        activeSaves.incrementAndGet();
-    }
-
-    protected void onFileFinished() {
-        activeSaves.decrementAndGet();
-    }
-
-    /**
-     * Observer used to notify that writing all video snippets has finished.
-     */
-    private class FinishWritingObserver extends FileObserver {
-        private FinishWritingObserver(String path, int mask) {
-            super(path, mask);
-        }
-
-        public void onEvent(int event, String path) {
-            onFileFinished();
-            this.stopWatching();
-        }
+        return ret;
     }
 }

@@ -52,7 +52,6 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     private RecordCallback recordCallback;
     private File currentOutputFile;
-    private AsyncPersistor mPersistor;
     private FileRingBuffer fileRingBuffer;
 
     private PersistCallback persistCallback;
@@ -75,8 +74,12 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         this.persistCallback = new PersistCallback() {
             @Override
             public void onPersistingStarted() {
+                // save current file and set up new one
+                forceStopMediaRecorder();
                 // use new ring buffer to avoid conflicts
                 setUpBuffer();
+                // restart media recorder to force the use of a new file
+                restartMediaRecorder();
                 isRecording = false;
 
                 // update UI
@@ -232,7 +235,6 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // get new file and add it to buffer and media recorder
         currentOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO); // = memoryManager.getTempVideoFile();
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
-        fileRingBuffer.put(currentOutputFile);
 
         mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
         mediaRecorder.setOrientationHint(90);
@@ -305,8 +307,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     public void resumeHandler() {
         if (isHandlerRunning) return;
 
+        // take care of setting up camera, media recorder and recording
         try {
-            // take care of setting up camera, media recorder and recording
             if (!prepareCamera() || !prepareMediaRecorder()) {
                 pauseHandler();
                 return;
@@ -331,16 +333,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
         isHandlerRunning = false;
         // take care of stopping preview and recording
-        try {
-            stopRecordingChunk();
-            fileRingBuffer.put(currentOutputFile);
-        } catch (RuntimeException re) {
-            // No valid data was recorded as MediaRecorder.stop() was called before or right after
-            // MediaRecorder.start(). Remove the incomplete file fro the buffer and delete it; a new
-            // one will be allocated as soon as the Handler is resumed
-            fileRingBuffer.pop().delete();
-            re.printStackTrace();
-        }
+        forceStopMediaRecorder();
         releaseMediaRecorder();
         releaseCamera();
     }
@@ -348,12 +341,41 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
         // Video is saved automatically, no need to call stopRecordingChunk() here.
+        fileRingBuffer.put(currentOutputFile);
         // Just clean up last recording and restart recording
-        // todo ensure that this section will never be called after pauseHandler was called. onInfo will be called asynchronously...
+        restartMediaRecorder();
+    }
+
+    /**
+     * Stops the media recorder and inserts the file into the ring buffer. If this is called in an
+     * invalid state (e.g. immediately after starting the media recorder) the output file will be
+     * deleted.
+     */
+    private void forceStopMediaRecorder() {
+        try {
+            stopRecordingChunk(); // try to stop recording BEFORE inserting file into buffer
+            fileRingBuffer.put(currentOutputFile);
+        } catch (RuntimeException re) {
+            // No valid data was recorded as MediaRecorder.stop() was called before or right after
+            // MediaRecorder.start(). Remove the incomplete file fro the buffer and delete it; a new
+            // one will be allocated as soon as the Handler is resumed
+            currentOutputFile.delete();
+            re.printStackTrace();
+        }
+    }
+
+    /**
+     * Restarts the media recorder.
+     */
+    private void restartMediaRecorder() {
+        // todo Synchronize this method. (Calls to this method will be made in a non predictable manner)
         if (!isHandlerRunning) return;
         releaseMediaRecorder();
         // start recording new chunk
-        prepareMediaRecorder(); // will allocate also a new output file
+        if (!prepareMediaRecorder()) { // will allocate also a new output file
+            pauseHandler();
+            return;
+        }
         startRecordingChunk();
     }
 }

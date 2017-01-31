@@ -13,7 +13,7 @@ import android.view.View;
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.LogInFragment;
 import de.pcc.privacycrashcam.applicationlogic.LogInHelper;
-import de.pcc.privacycrashcam.applicationlogic.WelcomFragment;
+import de.pcc.privacycrashcam.applicationlogic.WelcomeFragment;
 
 /**
  * Log In Activity which handles requesting permission, authenticating the user or starting the
@@ -40,7 +40,7 @@ public class LogInActivity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!hasPermissions()) {
-            replaceFragment(new WelcomFragment());
+            replaceFragment(new WelcomeFragment());
         } else if (!LogInHelper.IsUserLoggedIn(getApplicationContext())) {
             replaceFragment(new LogInFragment());
         } else {
