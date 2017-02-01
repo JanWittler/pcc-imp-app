@@ -21,7 +21,7 @@ import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
 import de.pcc.privacycrashcam.utils.dataprocessing.PersistCallback;
-import de.pcc.privacycrashcam.utils.datastructures.FileRingBuffer;
+import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 
 import static android.content.Context.WINDOW_SERVICE;
 
@@ -52,7 +52,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     private RecordCallback recordCallback;
     private File currentOutputFile;
-    private FileRingBuffer fileRingBuffer;
+    private VideoRingBuffer videoRingBuffer;
 
     private PersistCallback persistCallback;
 
@@ -80,7 +80,6 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
                 setUpBuffer();
                 // restart media recorder to force the use of a new file
                 restartMediaRecorder();
-                isRecording = false;
 
                 // update UI
                 CompatCameraHandler.this.recordCallback.onRecordingStopped();
@@ -88,8 +87,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
             @Override
             public void onPersistingStopped(boolean status) {
-                // ignored; make a notification later if status is false so that the user knows if
-                // there went something wrong
+                // allow user to save new video (Multiple async tasks are not allowed to run)
+                isRecording = false;
             }
         };
 
@@ -105,7 +104,12 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     private void setUpBuffer() {
         int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH;
-        this.fileRingBuffer = new FileRingBuffer(bufferCapacity);
+        this.videoRingBuffer = new VideoRingBuffer(bufferCapacity,
+                memoryManager.getTempVideoFile().getParentFile(), ".mp4");
+    }
+
+    private void tearDownBuffer() {
+        videoRingBuffer.destroy();
     }
 
     /**
@@ -293,7 +297,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         recordCallback.onRecordingStarted();
 
         // create async task to persist the buffer
-        AsyncPersistor mPersistor = new AsyncPersistor(fileRingBuffer, persistCallback, context);
+        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, persistCallback, context);
         mPersistor.execute(metadata);
     }
 
@@ -339,9 +343,15 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     }
 
     @Override
+    public void destroyHandler() {
+        tearDownBuffer();
+        memoryManager.deleteTempData();
+    }
+
+    @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
         // Video is saved automatically, no need to call stopRecordingChunk() here.
-        fileRingBuffer.put(currentOutputFile);
+        videoRingBuffer.put(currentOutputFile);
         // Just clean up last recording and restart recording
         restartMediaRecorder();
     }
@@ -354,7 +364,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private void forceStopMediaRecorder() {
         try {
             stopRecordingChunk(); // try to stop recording BEFORE inserting file into buffer
-            fileRingBuffer.put(currentOutputFile);
+            videoRingBuffer.put(currentOutputFile);
         } catch (RuntimeException re) {
             // No valid data was recorded as MediaRecorder.stop() was called before or right after
             // MediaRecorder.start(). Remove the incomplete file fro the buffer and delete it; a new

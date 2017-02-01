@@ -26,11 +26,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.pcc.privacycrashcam.R;
-import de.pcc.privacycrashcam.applicationlogic.camera.CameraHelper;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
-import de.pcc.privacycrashcam.utils.datastructures.FileRingBuffer;
+import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 import de.pcc.privacycrashcam.utils.encryption.Encryptor;
 
 /**
@@ -70,7 +69,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
     /**
      * Ringbuffer that contains the recorded video snippets
      */
-    private FileRingBuffer ringbuffer;
+    private VideoRingBuffer ringbuffer;
     /**
      * Encryptor used to encrypt files and keys.
      */
@@ -91,7 +90,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * @param persistCallback Callback used to give asynchronous response.
      * @param context         Android context of the recording.
      */
-    public AsyncPersistor(FileRingBuffer ringbuffer,
+    public AsyncPersistor(VideoRingBuffer ringbuffer,
                           PersistCallback persistCallback, Context context) {
         // new mem manager will provide own temp directory for this operation
         this.memoryManager = new MemoryManager(context);
@@ -114,7 +113,6 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
 
         // wait half a buffer size
         int timeToWait = settings.getBufferSizeSec() / 2;
-
         try {
             Thread.sleep(timeToWait * 1000);
         } catch (InterruptedException e) {
@@ -122,26 +120,28 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
         }
 
+        // post to UI thread and wait until the UI has migrated to a completely new RingBuffer
         final Lock lock = new ReentrantLock();
-        // post to UI thread
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 synchronized (lock) {
+                    Log.i(TAG, "updating UI and CamHandler");
                     persistCallback.onPersistingStarted();
                     lock.notify();
                 }
-
             }
         });
         synchronized (lock) {
             try {
+                Log.i(TAG, "waiting for UI to finish update");
                 lock.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return false;
             }
         }
+        // UI has no reference to the ring buffer. We can now freely operate on it.
         Log.i(TAG, "Start writing files");
 
         // save metadata
@@ -160,16 +160,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         Queue<File> vidSnippets = ringbuffer.demandData();
         if (vidSnippets == null)
             return false;
-        Log.i(TAG, "Received all written files");
-
-        // todo remove sleep call as soon as our memory manager is set up correctly. (this forces our file name to be different from the files in the buffer)
-        try {
-            Thread.sleep(timeToWait * 2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return false;
-        }
-        // --------------------------------------------------------------------
+        Log.i(TAG, "All files to be concatenated were written");
 
         File concatVid = memoryManager.getTempVideoFile();
         if (!concatVideos(vidSnippets, concatVid))
@@ -235,7 +226,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         List<Movie> clips = new LinkedList<>();
         try {
             for (File video : videos) {
-                Movie tm = MovieCreator.build(video.getPath());
+                Movie tm = MovieCreator.build(video.getAbsolutePath());
                 clips.add(tm);
             }
         } catch (IOException e) {

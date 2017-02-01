@@ -31,4 +31,11 @@ public interface CameraHandler {
      */
     void pauseHandler();
 
+    /**
+     * Releases all resources allocated by the handler. The handler gets into an invalid state after
+     * making this call and thus cannot be reused. Call {@link #pauseHandler()} if you wish to reuse
+     * your handler instance.
+     */
+    void destroyHandler();
+
 }

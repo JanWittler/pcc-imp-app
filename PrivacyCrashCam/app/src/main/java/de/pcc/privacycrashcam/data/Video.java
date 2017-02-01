@@ -38,7 +38,7 @@ public class Video {
         return name;
     }
 
-    public String extractTagFromName() {
+    public static String extractTagFromName(String name) {
         if(!name.startsWith(PREFIX)) return name;
         return name.replaceFirst(PREFIX, "");
     }

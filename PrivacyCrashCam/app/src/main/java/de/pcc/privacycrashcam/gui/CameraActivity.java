@@ -144,6 +144,7 @@ public class CameraActivity extends MainActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mCamHandler.destroyHandler();
     }
 
     /**

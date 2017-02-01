@@ -198,7 +198,7 @@ public class MemoryManager {
      * Deletes all temporary data located inside the {@link MemoryManager} instance's temp folder.
      */
     public void deleteTempData() {
-        // todo we could also add the "deleteOnExit()" method to getTempXXXFile().. (?)
+        // todo delete all temp data plus the current tempDir folder
     }
 
     /**

@@ -20,15 +20,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by Josh Romanowski on 29.01.2017.
  */
-public class FileRingBufferTest {
+public class VideoRingBufferTest {
 
     @Mock
     private FileObserver observer;
-    private FileRingBuffer buffer;
+    private VideoRingBuffer buffer;
 
     @Before
     public void setUp() {
-        buffer = new FileRingBuffer(2);
+        buffer = new VideoRingBuffer(2);
     }
 
     @Test
