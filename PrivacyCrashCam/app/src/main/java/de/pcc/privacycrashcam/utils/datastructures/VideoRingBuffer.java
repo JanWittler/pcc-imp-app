@@ -45,8 +45,8 @@ public class VideoRingBuffer {
             @Override
             public void onEvent(int event, String path) {
                 if (event == FileObserver.CLOSE_WRITE) {
-                    // exclude subdirectories and non video files
-                    if (path == null || !path.endsWith(suffix) || path.contains("/")) return;
+                    // exclude (sub)directories and non video files
+                    if (path == null || !path.endsWith("." + suffix) || path.contains("/")) return;
 
                     Log.i("VideoRingBuffer", "Saved file named " + path);
                     fileSavedLookupTable.put(path, true);
@@ -57,7 +57,7 @@ public class VideoRingBuffer {
     }
 
     /**
-     * Cleans up buffer and stops watching for file events.
+     * Cleans up buffer and stops watching fgor file events.
      */
     public void destroy() {
         flushAll();
@@ -73,7 +73,8 @@ public class VideoRingBuffer {
     public void put(File file) {
         if (!queue.offer(file)) {
             // Queue reached its capacity. Remove head and retry.
-            pop().delete();
+            boolean res = pop().delete();
+            Log.i("VideoRingBuffer", "Res of delete: "+res);
             queue.add(file);
         }
 

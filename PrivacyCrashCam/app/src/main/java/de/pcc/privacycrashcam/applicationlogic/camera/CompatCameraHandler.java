@@ -12,12 +12,14 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
+import de.pcc.privacycrashcam.data.Video;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
 import de.pcc.privacycrashcam.utils.dataprocessing.PersistCallback;
@@ -40,8 +42,10 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private Camera.Parameters cameraParameters = null;
     private CamcorderProfile camcorderProfile = null;
     private MediaRecorder mediaRecorder = null;
+
     private boolean isHandlerRunning = false;
     private boolean isRecording = false;
+    private boolean canOperate = true;
 
     private Context context;
     private SurfaceView previewView;
@@ -74,15 +78,23 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         this.persistCallback = new PersistCallback() {
             @Override
             public void onPersistingStarted() {
-                // save current file and set up new one
-                forceStopMediaRecorder();
-                // use new ring buffer to avoid conflicts
-                setUpBuffer();
-                // restart media recorder to force the use of a new file
-                restartMediaRecorder();
-
                 // update UI
                 CompatCameraHandler.this.recordCallback.onRecordingStopped();
+
+                // save current file and set up new one
+                forceStopMediaRecorder();
+                // use new memory manager to access new temp directory
+                memoryManager = new MemoryManager(CompatCameraHandler.this.context);
+                // use new ring buffer to avoid conflicts
+                try {
+                    setUpBuffer();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    pauseHandler();
+                    return;
+                }
+                // restart media recorder to force the use of a new file
+                restartMediaRecorder();
             }
 
             @Override
@@ -95,17 +107,25 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // Load and apply settings
         this.memoryManager = new MemoryManager(context);
         this.settings = memoryManager.getSettings();
-        setUpBuffer();
+        try {
+            setUpBuffer();
+        } catch (FileNotFoundException e) {
+            recordCallback.onError(context.getResources().getString(R.string.memory_error));
+            canOperate = false;
+        }
         setUpCamcorderProfile();
 
         // avoid NPE's if a client forgets to set the metadata
         this.metadata = new Metadata();
     }
 
-    private void setUpBuffer() {
+    private void setUpBuffer() throws FileNotFoundException {
         int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH;
+
+        File someTempFile = memoryManager.getTempVideoFile();
+        if(someTempFile == null) throw new FileNotFoundException();
         this.videoRingBuffer = new VideoRingBuffer(bufferCapacity,
-                memoryManager.getTempVideoFile().getParentFile(), ".mp4");
+                someTempFile.getParentFile(), Video.SUFFIX);
     }
 
     private void tearDownBuffer() {
@@ -237,7 +257,9 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         mediaRecorder.setProfile(camcorderProfile);
 
         // get new file and add it to buffer and media recorder
-        currentOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO); // = memoryManager.getTempVideoFile();
+        currentOutputFile = memoryManager.getTempVideoFile();
+        if (currentOutputFile == null)
+            return false;
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
 
         mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
@@ -297,7 +319,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         recordCallback.onRecordingStarted();
 
         // create async task to persist the buffer
-        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, persistCallback, context);
+        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, memoryManager,
+                persistCallback, context);
         mPersistor.execute(metadata);
     }
 
@@ -309,7 +332,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void resumeHandler() {
-        if (isHandlerRunning) return;
+        if (!canOperate || isHandlerRunning) return;
 
         // take care of setting up camera, media recorder and recording
         try {

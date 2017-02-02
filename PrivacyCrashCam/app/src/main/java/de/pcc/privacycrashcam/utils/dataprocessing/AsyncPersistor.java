@@ -84,7 +84,8 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * ###########################################################################################*/
 
     /**
-     * Creates a new persistor with the given parameters.
+     * Creates a new persistor with the given parameters. The AsyncPersistor will use its own
+     * temporary directory.
      *
      * @param ringbuffer      Buffer containing the recorded video snippets.
      * @param persistCallback Callback used to give asynchronous response.
@@ -102,13 +103,35 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         this.settings = memoryManager.getSettings();
     }
 
+    /**
+     * Creates a new persistor with the given parameters. The AsyncPersistor will use create
+     * temporary data and operate on temporary files accessible to the passed {@link MemoryManager}
+     * instance. See {@link #AsyncPersistor(VideoRingBuffer, PersistCallback, Context)} if you
+     * want AsyncPersisort to use its own temp directory.
+     *
+     * @param ringbuffer      Buffer containing the recorded video snippets.
+     * @param memoryManager   MemoryManager instance to access temp files
+     * @param persistCallback Callback used to give asynchronous response.
+     * @param context         Android context of the recording.
+     */
+    public AsyncPersistor(VideoRingBuffer ringbuffer, MemoryManager memoryManager,
+                          PersistCallback persistCallback, Context context) {
+        // new mem manager will provide own temp directory for this operation
+        this.memoryManager = memoryManager;
+
+        this.ringbuffer = ringbuffer;
+        this.persistCallback = persistCallback;
+        this.context = context;
+        this.encryptor = new Encryptor();
+        this.settings = memoryManager.getSettings();
+    }
+
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
 
     @Override
     protected Boolean doInBackground(Metadata... params) {
-
         Log.i(TAG, "Background task started");
 
         // wait half a buffer size
@@ -141,7 +164,8 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
                 return false;
             }
         }
-        // UI has no reference to the ring buffer. We can now freely operate on it.
+        // UI has no reference to the ring buffer and the memory manager instance anymore. We can
+        // now freely operate on it.
         Log.i(TAG, "Start writing files");
 
         // save metadata
@@ -186,7 +210,9 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
     }
 
     /* #############################################################################################
-     *                                  helper methods
+
+                                        helper methods
+
      * ###########################################################################################*/
 
     /**

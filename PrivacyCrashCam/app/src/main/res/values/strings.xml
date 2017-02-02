@@ -36,5 +36,6 @@
     <string name="error_recorder">Cannot record videos</string>
     <string name="error_undefined">An error occurred</string>
     <string name="grant_permission">ALLOW AND START</string>
+    <string name="memory_error">Could not access device storage</string>
 
 </resources>

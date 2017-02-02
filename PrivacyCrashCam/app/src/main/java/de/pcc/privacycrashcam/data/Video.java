@@ -9,6 +9,7 @@ import java.io.File;
 
 public class Video {
     public static final String PREFIX = "VIDEO_";
+    public static final String SUFFIX = "mp4";
 
     /* #############################################################################################
      *                                  attributes
@@ -38,7 +39,7 @@ public class Video {
         return name;
     }
 
-    public static String extractTagFromName(String name) {
+    public String extractTagFromName(String name) {
         if(!name.startsWith(PREFIX)) return name;
         return name.replaceFirst(PREFIX, "");
     }

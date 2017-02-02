@@ -13,6 +13,9 @@ public class Metadata {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
+    public static final String PREFIX = "META_";
+    public static final String PREFIX_READABLE = "META_R_";
+    public static final String SUFFIX = "json";
     private final static String TRIGGER_TYPE_DEFAULT = "NONE";
     private final static String TRIGGER_TYPE_SENSOR = "SENSOR_INPUT";
     private final static String TRIGGER_TYPE_TOUCH = "TOUCH_INPUT";
@@ -87,7 +90,6 @@ public class Metadata {
      * @return json String
      */
     public String getAsJSON() {
-        //language=JSON
         String json = "{\n" +
                 "  \"meta\": {\n" +
                 "    \"date\": " + this.date + ",\n" +

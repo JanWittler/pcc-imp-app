@@ -99,7 +99,7 @@ public class CameraActivity extends MainActivity {
         mCamHandler = new TriggeringCompatCameraHandler(getApplicationContext(),
                 cameraPreview, recordCallback);
         cameraPreview.setOnClickListener((View.OnClickListener) mCamHandler);
-        cameraPreview.setCameraHandler(mCamHandler);
+                cameraPreview.setCameraHandler(mCamHandler);
 
         statusSymbol = (ImageView) findViewById(R.id.statusSymbol);
         showViewingSymbol();
@@ -143,8 +143,8 @@ public class CameraActivity extends MainActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mCamHandler.destroyHandler();
+        super.onDestroy();
     }
 
     /**

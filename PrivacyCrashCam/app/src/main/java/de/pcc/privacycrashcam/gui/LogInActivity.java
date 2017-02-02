@@ -45,6 +45,7 @@ public class LogInActivity extends MainActivity {
             replaceFragment(new LogInFragment());
         } else {
             CameraActivity.Launch(this);
+            finish();
         }
     }
 

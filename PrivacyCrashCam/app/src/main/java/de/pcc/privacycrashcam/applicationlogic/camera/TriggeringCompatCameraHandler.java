@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.io.FileNotFoundException;
+
 /**
  * Decorates the CompatCameraHandler so that it triggers recording on its own after recognizing a
  * button click or after measured acceleration force exceeds the set maximum.
