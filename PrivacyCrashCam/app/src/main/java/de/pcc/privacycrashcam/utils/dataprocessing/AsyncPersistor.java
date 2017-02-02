@@ -193,7 +193,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
 
         // delete temporary files
-        memoryManager.deleteTempData();
+        memoryManager.deleteCurrentTempData();
         ringbuffer.flushAll();
 
         Log.i(TAG, "Finished writing files");

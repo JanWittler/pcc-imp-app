@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 
 /**
  * @author David Laubenstein, Giorgio Groß, Josh Romanowski
- *         Created by David Laubenstein on 01/23/2017
  */
 public class Metadata {
     /* #############################################################################################
@@ -23,11 +22,11 @@ public class Metadata {
 
     public static final String PREFIX = "META_";
     public static final String PREFIX_READABLE = "META_R_";
-    public static final String SUFFIX = "json";
+    public static final String FILE_SUFFIX = "json";
 
-    private final static String TRIGGER_TYPE_DEFAULT = "NONE";
-    private final static String TRIGGER_TYPE_SENSOR = "SENSOR_INPUT";
-    private final static String TRIGGER_TYPE_TOUCH = "TOUCH_INPUT";
+    public final static String TRIGGER_TYPE_DEFAULT = "NONE";
+    public final static String TRIGGER_TYPE_SENSOR = "SENSOR_INPUT";
+    public final static String TRIGGER_TYPE_TOUCH = "TOUCH_INPUT";
 
     // JSON keys
     private final static String JSON_KEY_DATE = "date";

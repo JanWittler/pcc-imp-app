@@ -103,33 +103,15 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
                 isRecording = false;
             }
         };
-
-        // Load and apply settings
-        this.memoryManager = new MemoryManager(context);
-        this.settings = memoryManager.getSettings();
-        try {
-            setUpBuffer();
-        } catch (FileNotFoundException e) {
-            recordCallback.onError(context.getResources().getString(R.string.memory_error));
-            canOperate = false;
-        }
-        setUpCamcorderProfile();
-
-        // avoid NPE's if a client forgets to set the metadata
-        this.metadata = new Metadata();
     }
 
     private void setUpBuffer() throws FileNotFoundException {
         int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH;
 
         File someTempFile = memoryManager.getTempVideoFile();
-        if(someTempFile == null) throw new FileNotFoundException();
+        if (someTempFile == null) throw new FileNotFoundException();
         this.videoRingBuffer = new VideoRingBuffer(bufferCapacity,
                 someTempFile.getParentFile(), Video.SUFFIX);
-    }
-
-    private void tearDownBuffer() {
-        videoRingBuffer.destroy();
     }
 
     /**
@@ -224,9 +206,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      *
      * @return the camera or null if the camera is unavailable
      */
-    private
     @Nullable
-    Camera getCameraInstance() {
+    private Camera getCameraInstance() {
         if (camera != null) return camera;
         // returns null if camera is unavailable
         return CameraHelper.getDefaultBackFacingCameraInstance();
@@ -311,23 +292,26 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     }
 
     @Override
-    public void schedulePersisting() {
-        // don't start recording if we already record
-        if (isRecording) return;
-        isRecording = true;
+    public void createHandler() {
+        this.memoryManager = new MemoryManager(context);
 
-        recordCallback.onRecordingStarted();
+        // clean up all temporary data which was not deleted when exiting the app. This happens
+        // sometimes as onDestroy of the Activity is not called and we have no other option left
+        // to get notified when the app is closed.
+        memoryManager.deleteAllTempData();
 
-        // create async task to persist the buffer
-        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, memoryManager,
-                persistCallback, context);
-        mPersistor.execute(metadata);
-    }
+        // Load and apply settings
+        this.settings = memoryManager.getSettings();
+        try {
+            setUpBuffer();
+        } catch (FileNotFoundException e) {
+            recordCallback.onError(context.getResources().getString(R.string.memory_error));
+            canOperate = false;
+        }
+        setUpCamcorderProfile();
 
-
-    @Override
-    public void setMetadata(Metadata metadata) {
-        this.metadata = metadata;
+        // avoid NPE's if a client forgets to set the metadata
+        this.metadata = new Metadata();
     }
 
     @Override
@@ -355,6 +339,26 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     }
 
     @Override
+    public void schedulePersisting() {
+        // don't start recording if we already record
+        if (isRecording) return;
+        isRecording = true;
+
+        recordCallback.onRecordingStarted();
+
+        // create async task to persist the buffer
+        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, memoryManager,
+                persistCallback, context);
+        mPersistor.execute(metadata);
+    }
+
+
+    @Override
+    public void updateMetadata(Metadata metadata) {
+        this.metadata = metadata;
+    }
+
+    @Override
     public void pauseHandler() {
         if (!isHandlerRunning) return;
 
@@ -368,7 +372,11 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     @Override
     public void destroyHandler() {
         tearDownBuffer();
-        memoryManager.deleteTempData();
+        memoryManager.deleteCurrentTempData();
+    }
+
+    private void tearDownBuffer() {
+        videoRingBuffer.destroy();
     }
 
     @Override

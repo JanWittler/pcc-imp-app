@@ -11,6 +11,8 @@ import android.view.View;
 
 import java.io.FileNotFoundException;
 
+import de.pcc.privacycrashcam.data.Metadata;
+
 /**
  * Decorates the CompatCameraHandler so that it triggers recording on its own after recognizing a
  * button click or after measured acceleration force exceeds the set maximum.
@@ -24,6 +26,7 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
     private Sensor accelSensor;
     private SensorManager sensorManager;
 
+    private float[] accelValues = {0f, 0f, 0f};
     private long lastTap = 0;
     private static final long DOUBLE_TAP_TIME_SPAN = 700; // 700ms to double tap
 
@@ -60,19 +63,22 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-        if (event.values == null)
-            return;
+        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
+        if (event.values == null) return;
 
         /*Log.i(TAG, "VAL at 0: " + event.values[0]);
         Log.i(TAG, "VAL at 1: " + event.values[1]);
         Log.i(TAG, "VAL at 2: " + event.values[2]);*/
 
+        this.accelValues = event.values;
+
         float maxRawVal = GRAVITY_CONSTANT * MAX_G_FORCE;
         if(event.values[0] > maxRawVal
                 || event.values[1] > maxRawVal
                 || event.values[2] > maxRawVal) {
-            Log.i(TAG, "_______________________ triggered PErsisiting " );
+            Metadata metadata = new Metadata(System.currentTimeMillis(),
+                    Metadata.TRIGGER_TYPE_SENSOR, event.values);
+            updateMetadata(metadata);
             schedulePersisting();
         }
     }
@@ -101,6 +107,9 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
         long tapTime = System.currentTimeMillis();
         if (tapTime - lastTap <= DOUBLE_TAP_TIME_SPAN) {
             // double tap
+            Metadata metadata = new Metadata(System.currentTimeMillis(),
+                    Metadata.TRIGGER_TYPE_TOUCH, accelValues);
+            updateMetadata(metadata);
             schedulePersisting();
         }
         lastTap = tapTime;

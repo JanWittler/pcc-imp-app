@@ -98,6 +98,7 @@ public class CameraActivity extends MainActivity {
         cameraPreview = (CameraView) findViewById(R.id.sv_camera);
         mCamHandler = new TriggeringCompatCameraHandler(getApplicationContext(),
                 cameraPreview, recordCallback);
+        mCamHandler.createHandler();
         cameraPreview.setOnClickListener((View.OnClickListener) mCamHandler);
                 cameraPreview.setCameraHandler(mCamHandler);
 
@@ -133,12 +134,14 @@ public class CameraActivity extends MainActivity {
     protected void onStart() {
         super.onStart();
         cameraPreview.setVisibility(View.VISIBLE);
+        // resuming mCamHandler is done by cameraPreview
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         // cameraPreview.setVisibility(View.GONE);
+        // pausing mCamHandler is done by cameraPreview
     }
 
     @Override

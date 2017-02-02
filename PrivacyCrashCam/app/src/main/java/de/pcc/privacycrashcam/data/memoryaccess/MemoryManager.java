@@ -30,7 +30,7 @@ import de.pcc.privacycrashcam.data.Video;
  * storage for those files, respectively.
  * On the internal storage we have one directory for temporary data. This temporary directory is
  * created uniquely for each instance of this class. Callers must remember to call
- * {@link #deleteTempData()} in order to delete that directory as soon as they stop using this
+ * {@link #deleteCurrentTempData()} in order to delete that directory as soon as they stop using this
  * class.</p>
  * <p>
  * <p>For file organisation, we use prefixes and tags:
@@ -48,6 +48,7 @@ import de.pcc.privacycrashcam.data.Video;
  */
 public class MemoryManager {
     private static final String TAG = MemoryManager.class.getName();
+    private static final String TEMP_PARENT_DIR_NAME = "temp";
     private static final String TEMP_DIR_PREFIX = "temp_";
 
     /* #############################################################################################
@@ -55,7 +56,7 @@ public class MemoryManager {
      * ###########################################################################################*/
 
     private Context context;
-    private String tempDirName = "temp_0"; // default dir name
+    private String tempDirName = TEMP_DIR_PREFIX + "_0"; // default temp dir name
     private SharedPreferences appPreferences;
 
     /* #############################################################################################
@@ -73,11 +74,11 @@ public class MemoryManager {
 
     /* #############################################################################################
 
-                                                                                  XXXXXX
-                                                                                XX      XX
-                                                                               XX        XX
-                                                                               XX        XX
-                                                                                 XXXXXXXXX
+                                                                                  XXXXXXX
+                                                                                XX       XX
+                                                                               XX         XX
+                                                                               XX         XX
+                                                                                 XX     XX
                                     methods                                    XXXXXXXXXXXXX
                                     User Data saved in Shared Preferences    XXX           XXX
                                                                             XX               XX
@@ -148,8 +149,12 @@ public class MemoryManager {
 
     /* #############################################################################################
 
-                                  methods
-                                  Saving, creating and loading files
+                                                                                      +----+
+                                                                                    +-|....|
+                                  methods                                           | |....|
+                                  Saving, creating and loading files                | |..  |
+                                                                                    | +----+
+                                                                                    +----+
 
     ############################################################################################# */
 
@@ -158,8 +163,8 @@ public class MemoryManager {
      * located in the local directory of the app and cannot be accessed from outside.
      * <p>
      * <p>
-     * As video files tend to become pretty large you are responsible for deleting the file.
-     * Alternatively, you can call {@link #deleteTempData()} to delete all files saved in the local
+     * This file won't be accessible the next time the app is started.
+     * You can call {@link #deleteCurrentTempData()} to delete all files saved in the local
      * temp directory.
      * The directory will be created uniquely for each instance of {@link MemoryManager}.
      * </p>
@@ -181,8 +186,8 @@ public class MemoryManager {
      * located in the local directory of the app and cannot be accessed from outside.
      * <p>
      * <p>
-     * Yu are responsible for deleting the file.
-     * Alternatively, you can call {@link #deleteTempData()} to delete all files saved in the local
+     * This file won't be accessible the next time the app is started.
+     * You can call {@link #deleteCurrentTempData()} to delete all files saved in the local
      * temp directory.
      * The directory will be created uniquely for each instance of {@link MemoryManager}.
      * </p>
@@ -198,9 +203,16 @@ public class MemoryManager {
         return new File(mediaStorageDir.getPath() + File.separator + Metadata.PREFIX + timeStamp + ".mp4");
     }
 
+    /**
+     * Creates the temp parent directory if not existing and creates a directory to be used as temp
+     * directory for this MemoryManager instance inside of the parent directory. The temp directory
+     * will only be created if it does not already exist.
+     *
+     * @return directory to be used as temp directory for this MemoryManager instance or null
+     */
     @Nullable
     private File createTempDir() {
-        // todo this creates a folder in external memory. change this at the end to create the folder on the internal starage. see context.getFilesDir()
+        // todo this creates the temp directory in external memory. change this later to create the folder on the internal storage. see context.getFilesDir()
 
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -208,25 +220,33 @@ public class MemoryManager {
             return null;
         }
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), tempDirName);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d(TAG, "failed to create directory");
+        // Create the parent temp directory if it does not exist
+        File tempParentDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), TEMP_PARENT_DIR_NAME);
+        if (!tempParentDir.exists()) {
+            if (!tempParentDir.mkdirs()) {
+                Log.d(TAG, "failed to create parent directory");
                 return null;
             }
         }
 
-        return mediaStorageDir;
+        // Create the temp directory if it does not exist
+        File tempDirectory = new File(tempParentDir, tempDirName);
+        if (!tempDirectory.exists()) {
+            if (!tempDirectory.mkdirs()) {
+                Log.d(TAG, "failed to create temp directory");
+                return null;
+            }
+        }
+
+        return tempDirectory;
     }
 
     /**
      * Create new directory name to be used as temp directory. The directory will be created when
      * you call {@link #getTempMetadataFile()} or {@link #getTempVideoFile()} next time. You cannot
      * access the old directory anymore after calling this method, calls to
-     * {@link #deleteTempData()} will only affect the new temp directory.
+     * {@link #deleteCurrentTempData()} will only affect the new temp directory.
      */
     public void rebaseTempDir() {
         tempDirName = TEMP_DIR_PREFIX + System.currentTimeMillis();
@@ -235,10 +255,35 @@ public class MemoryManager {
     /**
      * Deletes all temporary data located inside the {@link MemoryManager} instance's temp folder.
      */
-    public void deleteTempData() {
+    public void deleteCurrentTempData() {
         File dir = createTempDir();
         if(dir == null) return;
-        for (File file : dir.listFiles()) file.delete();
+        recDeleteDir(dir);
+    }
+
+    /**
+     * Deletes all directories in internal memory inside the {@link #TEMP_PARENT_DIR_NAME}.
+     */
+    public void deleteAllTempData() {
+        File tempParentDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), TEMP_PARENT_DIR_NAME); // todo see createTempDir for parent directory of temp parent directory.
+        if (!tempParentDir.exists()) return;
+
+        for (File file : tempParentDir.listFiles()){
+            recDeleteDir(file);
+        }
+    }
+
+    /**
+     * Recursively delete directory and files inside directory
+     * @param dir directory or file to be deleted
+     */
+    private void recDeleteDir(File dir) {
+        if(dir.isDirectory()) {
+            for (File file : dir.listFiles()){
+                recDeleteDir(file);
+            }
+        }
         dir.delete();
     }
 
