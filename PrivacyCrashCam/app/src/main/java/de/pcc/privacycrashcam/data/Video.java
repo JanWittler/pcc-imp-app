@@ -14,19 +14,23 @@ public class Video {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-    String name;
-    File encVideoFile;
-    File encMetaFile;
-    Metadata readableMetadata;
+
+    private String name;
+    private File encVideoFile;
+    private File encMetaFile;
+    private Metadata readableMetadata;
+
     /* #############################################################################################
      *                                  constructors
      * ###########################################################################################*/
+
     public Video(String name, File encVideoFile, File encMetaFile, Metadata readableMetadata) {
         this.name = name;
         this.encVideoFile = encVideoFile;
         this.encMetaFile =  encMetaFile;
         this.readableMetadata = readableMetadata;
     }
+
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/

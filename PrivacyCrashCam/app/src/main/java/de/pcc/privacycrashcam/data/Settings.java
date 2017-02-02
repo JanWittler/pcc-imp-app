@@ -1,7 +1,7 @@
 package de.pcc.privacycrashcam.data;
 
 import android.media.CamcorderProfile;
-import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,25 +13,20 @@ import org.json.JSONObject;
  * Created by Giorgio Gross at 01/20/2017
  */
 public class Settings {
-    /* #############################################################################################
-     *                                  attributes
-     * ###########################################################################################*/
     // JSON keys
     public static final String SETTINGS_MAIN_KEY = "SETTINGS";
     public static final String JSON_KEY_FPS = "fps";
     public static final String JSON_KEY_BUFFER_SIZE_SEC = "bufferSizeSec";
     public static final String JSON_KEY_QUALITY = "quality";
-
     // default values
     public static final int FPS_DEFAULT = 10;
     public static final int BUFFER_SIZE_SEC_DEFAULT = 10;
     public static final int QUALITY_DEFAULT = CamcorderProfile.QUALITY_480P;
-    // Language=JSON
-    public static final String JSON_DEFAULT =
-            "{\"fps\":" + FPS_DEFAULT
-            + ", \"bufferSizeSec\":"+ BUFFER_SIZE_SEC_DEFAULT
-            + ", \"quality\":"+QUALITY_DEFAULT+"}";
+    private final static String TAG = Settings.class.getName();
 
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
     private int fps;
     private int bufferSizeSec;
     private int quality;
@@ -39,6 +34,11 @@ public class Settings {
     /* #############################################################################################
      *                                  constructors
      * ###########################################################################################*/
+
+    public Settings() {
+        this(FPS_DEFAULT, BUFFER_SIZE_SEC_DEFAULT, QUALITY_DEFAULT);
+    }
+
     /**
      * Creates a settings instance with the passed parameters
      *
@@ -74,21 +74,21 @@ public class Settings {
      * @return Settings as JSON string or the default settings if there was an error
      */
     public String getAsJSON() {
-        JSONObject mJsonSettings = new JSONObject();
+        JSONObject json = new JSONObject();
         try {
-            mJsonSettings.put(JSON_KEY_FPS, this.fps);
-            mJsonSettings.put(JSON_KEY_BUFFER_SIZE_SEC, this.bufferSizeSec);
-            mJsonSettings.put(JSON_KEY_QUALITY, this.quality);
+            json.put(JSON_KEY_FPS, this.fps);
+            json.put(JSON_KEY_BUFFER_SIZE_SEC, this.bufferSizeSec);
+            json.put(JSON_KEY_QUALITY, this.quality);
         } catch (JSONException e) {
-            e.printStackTrace();
-            return JSON_DEFAULT;
+            Log.w(TAG, "Error creating settings json");
         }
-        return mJsonSettings.toString();
+        return json.toString();
     }
 
     /* #############################################################################################
      *                                  getter/ setter
      * ###########################################################################################*/
+
     public int getFps() {
         return fps;
     }
