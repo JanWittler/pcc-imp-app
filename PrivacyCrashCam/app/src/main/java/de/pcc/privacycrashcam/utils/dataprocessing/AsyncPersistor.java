@@ -247,7 +247,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * @param concatVideo Location of the merged video.
      * @return Returns whether concatting the videos was successful or not.
      */
-    private boolean concatVideos(Queue<File> videos, File concatVideo) {
+    protected boolean concatVideos(Queue<File> videos, File concatVideo) {
         // read all video snippets
         List<Movie> clips = new LinkedList<>();
         try {
@@ -256,7 +256,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
                 clips.add(tm);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.w(TAG, "Error while reading video snippets");
             return false;
         }
 
@@ -276,11 +276,14 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             if (videoTracks.size() > 0) {
                 result.addTrack(new AppendTrack(videoTracks.toArray(new Track[videoTracks.size()])));
             }
-            Container out = new DefaultMp4Builder().build(result);
 
-            FileChannel fc = new RandomAccessFile(concatVideo, "rw").getChannel();
+            Container out = new DefaultMp4Builder().build(result);
+            RandomAccessFile raf = new RandomAccessFile(concatVideo, "rw");
+            FileChannel fc = raf.getChannel();
             out.writeContainer(fc);
+
             fc.close();
+            raf.close();
         } catch (IOException e) {
             Log.w(TAG, "Error while writing concat video");
             return false;
