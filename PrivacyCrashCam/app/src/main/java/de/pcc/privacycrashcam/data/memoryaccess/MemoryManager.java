@@ -2,7 +2,6 @@ package de.pcc.privacycrashcam.data.memoryaccess;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.CamcorderProfile;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -10,10 +9,10 @@ import android.util.Log;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import de.pcc.privacycrashcam.applicationlogic.camera.CameraHelper;
 import de.pcc.privacycrashcam.data.Account;
@@ -50,6 +49,7 @@ import de.pcc.privacycrashcam.data.Video;
 public class MemoryManager {
     private static final String TAG = MemoryManager.class.getName();
     private static final String TEMP_DIR_PREFIX = "temp_";
+
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
@@ -87,19 +87,17 @@ public class MemoryManager {
     ############################################################################################# */
 
     /**
-     * Gets saved user settings
+     * Gets saved user settings. Returns default settings if reading settings from shared
+     * preferences failed.
      *
      * @return settings of user
      */
     public Settings getSettings() {
         Settings settings;
         try {
-            settings = new Settings(appPreferences.getString(Settings.SETTINGS_MAIN_KEY,
-                    Settings.JSON_DEFAULT));
+            settings = new Settings(appPreferences.getString(Settings.SETTINGS_MAIN_KEY, ""));
         } catch (JSONException e) {
-            e.printStackTrace();
-            settings = new Settings(Settings.FPS_DEFAULT, Settings.BUFFER_SIZE_SEC_DEFAULT,
-                    Settings.QUALITY_DEFAULT);
+            settings = new Settings();
         }
         return settings;
     }
@@ -173,7 +171,7 @@ public class MemoryManager {
         File mediaStorageDir = createTempDir();
         if (mediaStorageDir == null) return null;
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.GERMANY).format(new Date());
         return new File(mediaStorageDir.getPath() + File.separator + Video.PREFIX + timeStamp
                 + "." + Video.SUFFIX);
     }

@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * @author David Laubenstein, Giorgio Groß
+ * @author David Laubenstein, Giorgio Groß, Josh Romanowski
  *         Created by David Laubenstein on 01/23/2017
  */
 public class Metadata {
@@ -60,17 +60,14 @@ public class Metadata {
     }
 
     public Metadata(String json) throws JSONException {
-        JSONObject obj;
-        JSONObject meta;
-        obj = new JSONObject(json);
+        JSONObject metadata = new JSONObject(json);
 
         // retrieve json data
-        meta = obj.getJSONObject("meta");
-        this.date = meta.getLong("date");
-        this.triggerType = meta.getString("triggerType");
-        this.gForce[0] = (float) meta.getDouble("gForceX");
-        this.gForce[1] = (float) meta.getDouble("gForceY");
-        this.gForce[2] = (float) meta.getDouble("gForceZ");
+        this.date = metadata.getLong(JSON_KEY_DATE);
+        this.triggerType = metadata.getString(JSON_KEY_TRIGGER_TYPE);
+        this.gForce[0] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_X);
+        this.gForce[1] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Y);
+        this.gForce[2] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Z);
     }
 
     public Metadata(File metaFile) throws JSONException, IOException {
@@ -92,17 +89,14 @@ public class Metadata {
             json = stringBuilder.toString();
         }
 
-        JSONObject obj;
-        JSONObject meta;
-        obj = new JSONObject(json);
+        JSONObject metadata = new JSONObject(json);
 
         // retrieve json data
-        meta = obj.getJSONObject("meta");
-        this.date = meta.getLong("date");
-        this.triggerType = meta.getString("triggerType");
-        this.gForce[0] = (float) meta.getDouble("gForceX");
-        this.gForce[1] = (float) meta.getDouble("gForceY");
-        this.gForce[2] = (float) meta.getDouble("gForceZ");
+        this.date = metadata.getLong(JSON_KEY_DATE);
+        this.triggerType = metadata.getString(JSON_KEY_TRIGGER_TYPE);
+        this.gForce[0] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_X);
+        this.gForce[1] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Y);
+        this.gForce[2] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Z);
     }
 
     /* #############################################################################################

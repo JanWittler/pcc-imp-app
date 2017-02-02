@@ -9,7 +9,7 @@ import org.json.JSONObject;
 /**
  * Class to store user settings.
  *
- * @author Giorgio Gross, David Laubenstein
+ * @author Giorgio Gross, David Laubenstein, Josh Romanowski
  * Created by Giorgio Gross at 01/20/2017
  */
 public class Settings {
