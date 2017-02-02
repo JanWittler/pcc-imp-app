@@ -13,6 +13,7 @@ import org.json.JSONObject;
  * Created by Giorgio Gross at 01/20/2017
  */
 public class Settings {
+
     // JSON keys
     public static final String SETTINGS_MAIN_KEY = "SETTINGS";
     public static final String JSON_KEY_FPS = "fps";

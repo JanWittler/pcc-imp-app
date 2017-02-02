@@ -45,14 +45,12 @@ import de.pcc.privacycrashcam.utils.encryption.Encryptor;
  * @author Josh Romanowski, Giorgio Groß
  */
 public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
+
+    private final static String TAG = AsyncPersistor.class.getName();
+
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-
-    /**
-     * Tag used for logging.
-     */
-    private final static String TAG = AsyncPersistor.class.getName();
 
     /**
      * Manager used to access the app's memory e.g. saving the video data.

@@ -11,10 +11,12 @@ import org.json.JSONObject;
  */
 
 public class Account {
+
     private final static String TAG = Account.class.getName();
 
-    private final static String JSON_TAG_NAME = "name";
-    private final static String JSON_TAG_PASSWORD = "password";
+    // JSON keys
+    private final static String JSON_KEY_MAIL = "mail";
+    private final static String JSON_KEY_PASSWORD = "password";
 
     /* #############################################################################################
      *                                  attributes
@@ -45,8 +47,8 @@ public class Account {
         JSONObject account = new JSONObject(json);
 
         // retrieve json data
-        this.mail = account.getString("mail");
-        this.password = account.getString("password");
+        this.mail = account.getString(JSON_KEY_MAIL);
+        this.password = account.getString(JSON_KEY_PASSWORD);
 
     }
 
@@ -59,8 +61,8 @@ public class Account {
     public String getAsJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put(JSON_TAG_NAME, this.mail);
-            json.put(JSON_TAG_PASSWORD, this.password);
+            json.put(JSON_KEY_MAIL, this.mail);
+            json.put(JSON_KEY_PASSWORD, this.password);
         } catch (JSONException e) {
             Log.w(TAG, "Error creating account json");
         }
