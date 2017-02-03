@@ -147,16 +147,22 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             @Override
             public void run() {
                 synchronized (lock) {
+                    lock.lock();
                     Log.i(TAG, "updating UI and CamHandler");
                     persistCallback.onPersistingStarted();
+                    lock.unlock();
                     lock.notify();
                 }
             }
         });
         synchronized (lock) {
             try {
-                Log.i(TAG, "waiting for UI to finish update");
-                lock.wait();
+                if(!lock.tryLock()) {
+                    Log.i(TAG, "waiting for UI to finish update");
+                    lock.wait();
+                } else {
+                    lock.unlock();
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return false;
