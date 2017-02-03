@@ -38,7 +38,7 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     /**
      * Function call which will be appended to the domain name
      */
-    private static final String API_CALL = "authenticate/";
+    private static final String API_CALL = "authenticate";
     // responses to be expected
     private static final String API_RESPONSE_FAILURE_OTHER = "FAILURE";
     private static final String API_RESPONSE_FAILURE_MISSING = "NO ACCOUNTID";
@@ -69,9 +69,9 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
         String domain = params[0];
 
         Form form = new Form();
-        form.param("data", account.getAsJSON());
+        form.param("account", account.getAsJSON());
         Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(domain).path("webservice").path("authenticate");
+        WebTarget webTarget = client.target(domain).path(API_CALL);
         Log.i(TAG, "URI: " + webTarget.getUri().toASCIIString());
         Response response = webTarget.request().post(Entity.entity(form,
                 MediaType.APPLICATION_FORM_URLENCODED_TYPE), Response.class);

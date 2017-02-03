@@ -14,7 +14,7 @@ public class ServerProxy {
     /**
      * Domain to connect to the API
      */
-    private static final String URL = "http://laubenstone.de:2222/";
+    private static final String URL = "http://laubenstone.de:2222/webservice/";
 
     public ServerProxy () {
 

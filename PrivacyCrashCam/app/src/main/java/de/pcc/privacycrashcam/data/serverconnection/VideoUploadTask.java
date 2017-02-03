@@ -2,9 +2,25 @@ package de.pcc.privacycrashcam.data.serverconnection;
 
 import android.os.AsyncTask;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.MultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+
 import java.io.File;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import de.pcc.privacycrashcam.data.Account;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 
 /**
  * Task to asynchronously upload video files of the user. This class already knows hwo to pass the
@@ -17,7 +33,10 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     /**
      * Function call which will be appended to the domain name
      */
-    private static final String API_CALL = "verifyAccount";
+    private static final String API_CALL = "authenticate/";
+
+    private static final String API_RESPONSE_SUCCESS = "Finished editing video";
+    private static final String API_RESPONSE_FAILURE = "FAILURE";
 
     private Account account;
     private ServerResponseCallback<RequestState> callback;
@@ -45,7 +64,44 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
 
     @Override
     protected RequestState doInBackground(String... params) {
-        return null;
+        RequestState requestState;
+        String domain = params[0];
+
+        Client client = ClientBuilder.newClient();
+        WebTarget webTarget = client.target(domain).path(API_CALL).register(MultiPartFeature.class);
+        MultiPart multiPart = new MultiPart();
+        multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
+        FileDataBodyPart video = new FileDataBodyPart("video", videoFile.getAbsoluteFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        FileDataBodyPart metadata = new FileDataBodyPart("metadata", this.metadata.getAbsoluteFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        FileDataBodyPart key = new FileDataBodyPart("key", symKey.getAbsoluteFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        FormDataBodyPart data = new FormDataBodyPart("account", account.getAsJSON());
+        multiPart.bodyPart(video);
+        multiPart.bodyPart(metadata);
+        multiPart.bodyPart(key);
+        multiPart.bodyPart(data);
+        Future<Response> futureResponse = webTarget.request().async().post(Entity.entity(multiPart, multiPart.getMediaType()), Response.class);
+        String responseContent = "";
+        try {
+            Response response = futureResponse.get();
+            responseContent = response.readEntity(String.class);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        switch (responseContent) {
+            case API_RESPONSE_FAILURE:
+                requestState = RequestState.FAILURE;
+                break;
+            case API_RESPONSE_SUCCESS:
+                requestState = RequestState.SUCCESS;
+                break;
+            default:
+                requestState = RequestState.FAILURE_OTHER;
+        }
+
+        return requestState;
     }
 
     @Override
