@@ -13,21 +13,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
+ * Datacontainer storing the metadata to the videorecording.
+ *
  * @author David Laubenstein, Giorgio Groß, Josh Romanowski
  */
 public class Metadata {
-    /* #############################################################################################
-     *                                  attributes
-     * ###########################################################################################*/
 
+    // File pre- and suffixes
     public static final String PREFIX = "META_";
     public static final String PREFIX_READABLE = "META_R_";
     public static final String FILE_SUFFIX = "json";
-
+    // trigger type constants
     public final static String TRIGGER_TYPE_DEFAULT = "NONE";
     public final static String TRIGGER_TYPE_SENSOR = "SENSOR_INPUT";
     public final static String TRIGGER_TYPE_TOUCH = "TOUCH_INPUT";
-
+    private final static String TAG = Metadata.class.getName();
     // JSON keys
     private final static String JSON_KEY_DATE = "date";
     private final static String JSON_KEY_TRIGGER_TYPE = "triggerType";
@@ -35,11 +35,22 @@ public class Metadata {
     private final static String JSON_KEY_TRIGGER_FORCE_Y = "triggerForceY";
     private final static String JSON_KEY_TRIGGER_FORCE_Z = "triggerForceZ";
 
-    private final static String TAG = Metadata.class.getName();
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
 
-    long date;
-    String triggerType;
-    float[] gForce = new float[3];
+    /**
+     * Date of the video recording trigger.
+     */
+    private long date;
+    /**
+     * How the video recording was triggered.
+     */
+    private String triggerType;
+    /**
+     * G-Force values in the moment the recording is triggered.
+     */
+    private float[] gForce = new float[3];
 
     /* #############################################################################################
      *                                  constructor
@@ -52,12 +63,25 @@ public class Metadata {
         this(System.currentTimeMillis(), TRIGGER_TYPE_DEFAULT, new float[]{0, 0, 0});
     }
 
+    /**
+     * Creates new metadata from given values.
+     *
+     * @param date        Date of the recording.
+     * @param triggerType Trigger type of the recording.
+     * @param gForce      GForce when triggering.
+     */
     public Metadata(long date, String triggerType, float[] gForce) {
         this.date = date;
         this.triggerType = triggerType;
         this.gForce = gForce;
     }
 
+    /**
+     * Creates new metadata with values read from a json string.
+     *
+     * @param json JSON string that contains
+     * @throws JSONException
+     */
     public Metadata(String json) throws JSONException {
         JSONObject metadata = new JSONObject(json);
 
@@ -72,16 +96,16 @@ public class Metadata {
     public Metadata(File metaFile) throws JSONException, IOException {
         String json = null;
 
+        // read file
         InputStream inputStream = new FileInputStream(metaFile);
-
         if (inputStream != null) {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String receiveString = "";
+            String ret;
             StringBuilder stringBuilder = new StringBuilder();
 
-            while ((receiveString = bufferedReader.readLine()) != null) {
-                stringBuilder.append(receiveString);
+            while ((ret = bufferedReader.readLine()) != null) {
+                stringBuilder.append(ret);
             }
 
             inputStream.close();
@@ -97,10 +121,6 @@ public class Metadata {
         this.gForce[1] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Y);
         this.gForce[2] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Z);
     }
-
-    /* #############################################################################################
-     *                                  methods
-     * ###########################################################################################*/
 
     /* #############################################################################################
      *                                  getter/ setter

@@ -221,8 +221,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
 
     /**
      * Encrypts metadata and video with a hybrid encryption algorithm.
-     * Saves the files on the app. Destination files will be created according to the
-     * to MemoryManager.
+     * Saves the files on the app. Destination files will be created according to the MemoryManager.
      *
      * @param videoTag    Name added to the actual video name
      * @param concatVideo Location of the video to encrypt.
@@ -302,7 +301,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * @param metadata Metadata to be saved.
      * @return Returns whether saving was successful or not.
      */
-    private boolean saveMetadataToFile(File output, Metadata metadata) {
+    protected boolean saveMetadataToFile(File output, Metadata metadata) {
         String metaJson = metadata.getAsJSON();
         try (PrintWriter out = new PrintWriter(output)) {
             out.println(metaJson);
