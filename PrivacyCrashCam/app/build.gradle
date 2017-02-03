@@ -29,6 +29,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
     compile 'com.googlecode.mp4parser:isoparser:1.0.1'
+    compile 'org.glassfish.jersey.media:jersey-media-multipart:2.25'
     compile 'org.glassfish.jersey.core:jersey-client:2.25.1'
     testCompile 'junit:junit:4.12'
     testCompile ('org.powermock:powermock-api-mockito:1.6.2') {
