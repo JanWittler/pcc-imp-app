@@ -106,7 +106,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     }
 
     private void setUpBuffer() throws FileNotFoundException {
-        int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH;
+        // +1 capacity to record at least the desired video length
+        int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH + 1;
 
         File someTempFile = memoryManager.getTempVideoFile();
         if (someTempFile == null) throw new FileNotFoundException();

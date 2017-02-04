@@ -36,8 +36,7 @@ public class VideoRingBuffer {
      * @param suffix    video file suffix
      */
     public VideoRingBuffer(int capacity, final File directory, final String suffix) {
-        // +1 capacity to record at least the desired video length
-        this.queue = new ArrayBlockingQueue<>(++capacity);
+        this.queue = new ArrayBlockingQueue<>(capacity);
         this.fileSavedLookupTable = new HashMap<>();
         this.capacity = capacity;
         this.directoryObserver = new FileObserver(directory.getAbsolutePath(),
@@ -57,11 +56,11 @@ public class VideoRingBuffer {
     }
 
     /**
-     * Cleans up buffer and stops watching fgor file events.
+     * Returns the real capacity of the buffer which is the original capacity + 1.
+     * @return total capacity
      */
-    public void destroy() {
-        flushAll();
-        directoryObserver.stopWatching();
+    public int getCapacity() {
+        return capacity;
     }
 
     /**
@@ -82,18 +81,6 @@ public class VideoRingBuffer {
     }
 
     /**
-     * Removes all files from the buffer and deletes them.
-     */
-    public void flushAll() {
-        fileSavedLookupTable.clear();
-
-        File file;
-        while ((file = queue.poll()) != null) {
-            file.delete();
-        }
-    }
-
-    /**
      * Gets and removes the head of the queue. The file will (of course) not be deleted.
      *
      * @return the queue head or null
@@ -111,6 +98,7 @@ public class VideoRingBuffer {
      * so demand data waits until all writing has finished.
      */
     public Queue<File> demandData() {
+        Queue<File> copiedQueue = new ArrayBlockingQueue<>(capacity);
         for (File file : queue) {
             Log.i("VideoRingBuffer", "checking if file is saved: " + file.getAbsolutePath() + "    name: "+file.getName());
 
@@ -120,10 +108,31 @@ public class VideoRingBuffer {
                         || !fileSavedLookupTable.get(file.getName())) {
                     Thread.sleep(1000);
                 }
+                copiedQueue.add(file);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        return queue;
+        return copiedQueue;
+    }
+
+    /**
+     * Removes all files from the buffer and deletes them.
+     */
+    public void flushAll() {
+        fileSavedLookupTable.clear();
+
+        File file;
+        while ((file = queue.poll()) != null) {
+            file.delete();
+        }
+    }
+
+    /**
+     * Cleans up buffer and stops watching fgor file events.
+     */
+    public void destroy() {
+        flushAll();
+        directoryObserver.stopWatching();
     }
 }
