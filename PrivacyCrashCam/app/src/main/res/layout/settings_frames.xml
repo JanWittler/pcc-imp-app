@@ -5,12 +5,12 @@
 
     <SeekBar
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="4"
-
+        android:layout_marginTop="20dp"
         android:id="@+id/seekBar"
-        android:progress="20"
-        android:max="60" />
+        android:progress="0"
+        android:max="50" />
 
     <TextView
         android:text="20"

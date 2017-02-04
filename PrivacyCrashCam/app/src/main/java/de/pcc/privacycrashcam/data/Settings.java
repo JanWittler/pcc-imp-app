@@ -10,7 +10,6 @@ import org.json.JSONObject;
  * Class to store user settings.
  *
  * @author Giorgio Gross, David Laubenstein, Josh Romanowski
- * Created by Giorgio Gross at 01/20/2017
  */
 public class Settings {
 
@@ -19,6 +18,7 @@ public class Settings {
     public static final String JSON_KEY_FPS = "fps";
     public static final String JSON_KEY_BUFFER_SIZE_SEC = "bufferSizeSec";
     public static final String JSON_KEY_QUALITY = "quality";
+
     // default values
     public static final int FPS_DEFAULT = 10;
     public static final int BUFFER_SIZE_SEC_DEFAULT = 10;
@@ -28,14 +28,27 @@ public class Settings {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
+
+    /**
+     * Framerate of the videorecording.
+     */
     private int fps;
+    /**
+     * Size of the ringbuffer in seconds.
+     */
     private int bufferSizeSec;
+    /**
+     * Quality of the video recording. Uses the CamcorderProfile.QUALITY values.
+     */
     private int quality;
 
     /* #############################################################################################
      *                                  constructors
      * ###########################################################################################*/
 
+    /**
+     * Creates new settings with default values.
+     */
     public Settings() {
         this(FPS_DEFAULT, BUFFER_SIZE_SEC_DEFAULT, QUALITY_DEFAULT);
     }
@@ -69,6 +82,7 @@ public class Settings {
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
+
     /**
      * Returns the Settings object as JSON string
      *

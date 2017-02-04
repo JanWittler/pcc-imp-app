@@ -1,8 +1,11 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +14,17 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import de.pcc.privacycrashcam.R;
+import de.pcc.privacycrashcam.data.Settings;
+import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 
 /**
  * Shows the settings view along with its view components and handles user input.
  *
- * @author Giorgio
+ * @author Giorgio Gross, David Laubenstein
+ * Created by Giorgio Gross at 01/20/2017
  */
 public class SettingsFragment extends Fragment {
 
@@ -25,16 +33,21 @@ public class SettingsFragment extends Fragment {
      * ###########################################################################################*/
 
     private RelativeLayout base;
+    private MemoryManager mM;
+    private Settings settings;
 
-    TextView qualityLow;
-    TextView qualityMedium;
-    TextView qualityHigh;
+
     TextView fps;
     TextView bufferSize;
     SeekBar fpsBar;
-    Button incBuffer;
-    Button decBuffer;
+    Button res_High;
+    Button res_Med;
+    Button res_Low;
+    Button b_incBuffer;
+    Button b_decBuffer;
     Button logOut;
+
+    private final int BUFFER_JUMP_SIZE = 5;
 
     /* #############################################################################################
      *                                  methods
@@ -53,9 +66,116 @@ public class SettingsFragment extends Fragment {
         // get the main layout describing the content
         base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
 
+        mM = new MemoryManager(getContext());
+        settings = mM.getSettings();
         // init view components
 
+        /**
+         * resolution handling
+         */
+        View.OnClickListener resHandler = new View.OnClickListener() {
+            public void onClick(View v) {
+                switch(v.getId()) {
+                    case R.id.tv_resHigh:
+                        settings.setQuality(Settings.QUALITY_HIGH);
+                        resetButtonColors();
+                        res_High.setTextColor(
+                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                        break;
+                    case R.id.tv_resMed:
+                        settings.setQuality(Settings.QUALITY_MEDIUM);
+                        resetButtonColors();
+                        res_Med.setTextColor(
+                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                        break;
+                    case R.id.tv_resLow:
+                        settings.setQuality(Settings.QUALITY_HIGH);
+                        resetButtonColors();
+                        res_Low.setTextColor(
+                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                        break;
+                    default:
+                        System.out.println("default");
+                        break;
+                }
+            }
+        };
+        res_High = (Button) base.findViewById(R.id.tv_resHigh);
+        res_High.setOnClickListener(resHandler);
+        res_Med = (Button) base.findViewById(R.id.tv_resMed);
+        res_Med.setOnClickListener(resHandler);
+        res_Low = (Button) base.findViewById(R.id.tv_resLow);
+        res_Low.setOnClickListener(resHandler);
+
+        /**
+         * frames handling
+         */
+        fpsBar = (SeekBar) base.findViewById(R.id.seekBar);
+        fpsBar.setProgress(settings.getFps());
+        fpsBar.requestLayout();
+        fpsBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+                // fps should be between 20 and 60
+                // there is no min value for progress, so we have to set the value + the min value
+                // and add this to the max value
+                fps = (TextView) base.findViewById(R.id.tv_frames);
+                int fps_Int = progress + 10;
+                settings.setFps(fps_Int);
+                fps.setText(Integer.toString(fps_Int));
+            }
+        });
+
+        /**
+         * buffer handling
+         */
+
+        View.OnClickListener bufferHandler = new View.OnClickListener() {
+            public void onClick(View v) {
+                bufferSize = (TextView) base.findViewById(R.id.tv_bufferSize);
+                switch(v.getId()) {
+                    case R.id.b_incBuffer:
+                        settings.setBufferSizeSec(settings.getBufferSizeSec() + BUFFER_JUMP_SIZE);
+                        bufferSize.setText(settings.getBufferSizeSec() + "sec");
+                        break;
+                    case R.id.b_decBuffer:
+                        if ((settings.getBufferSizeSec() - BUFFER_JUMP_SIZE) > 0) {
+                            settings.setBufferSizeSec(settings.getBufferSizeSec() -
+                                    BUFFER_JUMP_SIZE);
+                            bufferSize.setText(settings.getBufferSizeSec() + "sec");
+                        } else {
+                            //TODO: LOG!
+                            Log.d("SettingsFragment", "Buffer size cannot set under 0!");
+                        }
+                        break;
+                    default:
+                        //TODO: LOG!
+                        System.out.println("default");
+                        break;
+                }
+            }
+        };
+
+        b_incBuffer = (Button) base.findViewById(R.id.b_incBuffer);
+        b_incBuffer.setOnClickListener(bufferHandler);
+        b_decBuffer = (Button) base.findViewById(R.id.b_decBuffer);
+        b_decBuffer.setOnClickListener(bufferHandler);
         return base;
+    }
+
+    private void resetButtonColors() {
+        res_High.setTextColor(ContextCompat.getColor(getContext(), R.color.buttonColorDefault));
+        res_Med.setTextColor(ContextCompat.getColor(getContext(), R.color.buttonColorDefault));
+        res_Low.setTextColor(ContextCompat.getColor(getContext(), R.color.buttonColorDefault));
     }
 
     /**
@@ -64,5 +184,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        mM.saveSettings(settings);
     }
 }

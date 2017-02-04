@@ -34,7 +34,6 @@ public class VideosActivity extends ContainerActivity{
         Intent intent = new Intent(calling, VideosActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
-
     }
 
     @Override

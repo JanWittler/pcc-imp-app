@@ -6,12 +6,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Datacontainer for data concerning user accounts. Used to bundle the necessary information.
+ *
  * @author David Laubenstein, Josh Romanowski
- * Created by David Laubenstein on 1/24/17.
  */
 
 public class Account {
 
+    /**
+     * Tag used for logging.
+     */
     private final static String TAG = Account.class.getName();
 
     // JSON keys
@@ -22,12 +26,19 @@ public class Account {
      *                                  attributes
      * ###########################################################################################*/
 
+    /**
+     * E-mail address of the user
+     */
     private String mail;
+    /**
+     * Password of the user.
+     */
     private String password;
 
     /* #############################################################################################
      *                                  constructors
      * ###########################################################################################*/
+
     /**
      * constructor, which creates an account object with mail and password
      * @param mail represents the account mail
@@ -55,7 +66,10 @@ public class Account {
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
+
     /**
+     * Creates a JSON string out of the mail and password of the user.
+     *
      * @return JSON String with account information inside
      */
     public String getAsJSON() {
@@ -72,6 +86,7 @@ public class Account {
     /* #############################################################################################
      *                                  getter/ setter
      * ###########################################################################################*/
+
     public String getMail() {
         return mail;
     }
