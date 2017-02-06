@@ -20,9 +20,10 @@ public class Settings {
     public static final String JSON_KEY_QUALITY = "quality";
 
     // default values
-    public static final int FPS_DEFAULT = 10;
-    public static final int BUFFER_SIZE_SEC_DEFAULT = 10;
-    public static final int QUALITY_DEFAULT = CamcorderProfile.QUALITY_480P;
+    private static final int FPS_DEFAULT = 10;
+    private static final int BUFFER_SIZE_SEC_DEFAULT = 10;
+    private static final int QUALITY_DEFAULT = CamcorderProfile.QUALITY_480P;
+    public static final int QUALITY_HIGH = CamcorderProfile.QUALITY_720P;
     private final static String TAG = Settings.class.getName();
 
     /* #############################################################################################

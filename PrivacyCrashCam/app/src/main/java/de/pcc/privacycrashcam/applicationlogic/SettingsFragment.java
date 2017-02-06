@@ -77,13 +77,13 @@ public class SettingsFragment extends Fragment {
             public void onClick(View v) {
                 switch(v.getId()) {
                     case R.id.tv_resHigh:
-                        settings.setQuality(Settings.QUALITY_HIGH);
+                        settings.setQuality(Settings.QUALITY_HIGH);// todo edit high, low and medium quality
                         resetButtonColors();
                         res_High.setTextColor(
                                 ContextCompat.getColor(getContext(), R.color.colorAccent));
                         break;
                     case R.id.tv_resMed:
-                        settings.setQuality(Settings.QUALITY_MEDIUM);
+                        settings.setQuality(Settings.QUALITY_HIGH);
                         resetButtonColors();
                         res_Med.setTextColor(
                                 ContextCompat.getColor(getContext(), R.color.colorAccent));

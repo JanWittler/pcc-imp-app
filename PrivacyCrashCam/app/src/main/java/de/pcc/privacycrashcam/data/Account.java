@@ -19,8 +19,8 @@ public class Account {
     private final static String TAG = Account.class.getName();
 
     // JSON keys
-    private final static String JSON_KEY_MAIL = "mail";
-    private final static String JSON_KEY_PASSWORD = "password";
+    public final static String JSON_KEY_MAIL = "mail";
+    public final static String JSON_KEY_PASSWORD = "password";
 
     /* #############################################################################################
      *                                  attributes
@@ -73,14 +73,15 @@ public class Account {
      * @return JSON String with account information inside
      */
     public String getAsJSON() {
-        JSONObject json = new JSONObject();
         try {
+            JSONObject json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, this.mail);
             json.put(JSON_KEY_PASSWORD, this.password);
+            return json.toString();
         } catch (JSONException e) {
             Log.w(TAG, "Error creating account json");
         }
-        return json.toString();
+        return null;
     }
 
     /* #############################################################################################

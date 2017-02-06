@@ -113,12 +113,22 @@ public class VideoRingBufferTest {
 
     @Test
     public void destroy() throws Exception {
+        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
 
+        mBuffer.destroy();
+        for (int i = 0; i < videoChunks.length; i++) {
+            assertFalse(videoChunks[i].exists());
+        }
     }
 
     @Test
     public void flushAll() throws Exception {
+        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
 
+        mBuffer.flushAll();
+        for (int i = 0; i < videoChunks.length; i++) {
+            assertFalse(videoChunks[i].exists());
+        }
     }
 
     @After
