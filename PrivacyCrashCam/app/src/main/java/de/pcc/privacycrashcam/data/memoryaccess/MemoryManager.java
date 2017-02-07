@@ -300,11 +300,10 @@ public class MemoryManager {
      */
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
-        //TODO: If dir existing
         File keyDir = new File(context.getFilesDir() + File.separator + "keys");
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
-                Log.d(TAG, "failed to create key directory directory");
+                Log.d(TAG, "failed to create key directory");
                 return null;
             }
         }
@@ -322,9 +321,14 @@ public class MemoryManager {
      */
     public File createEncryptedVideoFile(String videoTag) {
         // use Video.PREFIX as prefix!
-
-        // stub to test other classes. Replace the following line..
-        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
+        File videoDir = new File(context.getFilesDir() + File.separator + "videos");
+        if(!videoDir.exists()) {
+            if(!videoDir.mkdir()){
+                Log.d(TAG, "failed to create key directory");
+                return null;
+            }
+        }
+        return new File(videoDir, "video_" + videoTag + ".avi");
     }
 
     /**
