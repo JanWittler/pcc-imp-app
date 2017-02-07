@@ -10,6 +10,7 @@ import org.json.JSONObject;
  * Class to store user settings.
  *
  * @author Giorgio Gross, David Laubenstein, Josh Romanowski
+ * Created by Giorgio Gross at 01/20/2017
  */
 public class Settings {
 
@@ -20,10 +21,12 @@ public class Settings {
     public static final String JSON_KEY_QUALITY = "quality";
 
     // default values
-    private static final int FPS_DEFAULT = 10;
-    private static final int BUFFER_SIZE_SEC_DEFAULT = 10;
-    private static final int QUALITY_DEFAULT = CamcorderProfile.QUALITY_480P;
+    public static final int FPS_DEFAULT = 10;
+    public static final int BUFFER_SIZE_SEC_DEFAULT = 10;
+    public static final int QUALITY_DEFAULT = CamcorderProfile.QUALITY_480P;
     public static final int QUALITY_HIGH = CamcorderProfile.QUALITY_720P;
+    public static final int QUALITY_MEDIUM = CamcorderProfile.QUALITY_480P;
+    public static final int QUALITY_LOW = CamcorderProfile.QUALITY_LOW;
     private final static String TAG = Settings.class.getName();
 
     /* #############################################################################################
