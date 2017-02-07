@@ -1,6 +1,5 @@
 package de.pcc.privacycrashcam.data.memoryaccess;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -301,13 +300,14 @@ public class MemoryManager {
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
         File keyDir = new File(context.getFilesDir() + File.separator + "keys");
+        // if dir is not existing, create dir
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
                 Log.d(TAG, "failed to create key directory");
                 return null;
             }
         }
-        return new File(keyDir, "key_" + videoTag + ".key");
+        return new File(keyDir, "KEY_" + videoTag + ".key");
     }
 
     /**
@@ -322,13 +322,14 @@ public class MemoryManager {
     public File createEncryptedVideoFile(String videoTag) {
         // use Video.PREFIX as prefix!
         File videoDir = new File(context.getFilesDir() + File.separator + "videos");
+        // if dir is not existing, create dir
         if(!videoDir.exists()) {
             if(!videoDir.mkdir()){
-                Log.d(TAG, "failed to create key directory");
+                Log.d(TAG, "failed to create video directory");
                 return null;
             }
         }
-        return new File(videoDir, "video_" + videoTag + ".avi");
+        return new File(videoDir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
     }
 
     /**
@@ -343,9 +344,15 @@ public class MemoryManager {
      */
     public File createEncryptedMetaFile(String videoTag) {
         // use Metadata.PREFIX as prefix!
-
-        // stub to test other classes. Replace the following line..
-        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
+        File metaDir = new File(context.getFilesDir() + File.separator + "meta");
+        // if dir is not existing, create dir
+        if(!metaDir.exists()) {
+            if(!metaDir.mkdir()){
+                Log.d(TAG, "failed to create meta directory");
+                return null;
+            }
+        }
+        return new File(metaDir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
     }
 
     /**

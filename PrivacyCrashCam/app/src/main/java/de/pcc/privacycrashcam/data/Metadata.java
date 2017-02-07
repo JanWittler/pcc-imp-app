@@ -22,7 +22,7 @@ public class Metadata {
     // File pre- and suffixes
     public static final String PREFIX = "META_";
     public static final String PREFIX_READABLE = "META_R_";
-    public static final String FILE_SUFFIX = "json";
+    public static final String SUFFIX = "json";
     // trigger type constants
     public final static String TRIGGER_TYPE_DEFAULT = "NONE";
     public final static String TRIGGER_TYPE_SENSOR = "SENSOR_INPUT";
