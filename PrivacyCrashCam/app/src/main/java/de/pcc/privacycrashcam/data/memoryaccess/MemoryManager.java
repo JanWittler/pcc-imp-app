@@ -1,5 +1,6 @@
 package de.pcc.privacycrashcam.data.memoryaccess;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -299,9 +300,15 @@ public class MemoryManager {
      */
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
-
-        // stub to test other classes. Replace the following line..
-        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
+        //TODO: If dir existing
+        File keyDir = new File(context.getFilesDir() + File.separator + "keys");
+        if (!keyDir.exists()) {
+            if (!keyDir.mkdirs()) {
+                Log.d(TAG, "failed to create key directory directory");
+                return null;
+            }
+        }
+        return new File(keyDir, "key_" + videoTag + ".key");
     }
 
     /**
@@ -414,7 +421,16 @@ public class MemoryManager {
      * @return Videos as an ArrayList<Video>
      */
     public ArrayList<Video> getAllVideos() {
-        return null;
+        ArrayList<Video> allVideos= new ArrayList<>();
+        Video video1 = new Video("video1", null, null, null);
+        Video video2 = new Video("video1", null, null, null);
+        Video video3 = new Video("video1", null, null, null);
+        Video video4 = new Video("video1", null, null, null);
+        allVideos.add(video1);
+        allVideos.add(video2);
+        allVideos.add(video3);
+        allVideos.add(video4);
+        return allVideos;
     }
 
     /**
@@ -426,6 +442,7 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedSymmetricKey(String videoTag) {
+
         return null;
     }
 
