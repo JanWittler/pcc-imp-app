@@ -420,7 +420,18 @@ public class MemoryManager {
      * @param videoTag Tag of the video the file is associated with
      */
     public void deleteEncryptedMetadataFile(String videoTag) {
-
+        File dir = new File(context.getFilesDir(), META_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+               Log.d(TAG, "File: " + Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX + " in dir: " +
+                       META_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, META_DIR + " dir not existing");
+        }
     }
 
 
@@ -433,7 +444,18 @@ public class MemoryManager {
      * @param videoTag Tag of the video the file is associated with
      */
     public void deleteReadableMetadata(String videoTag) {
-
+        File dir = new File(context.getFilesDir(), META_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+               Log.d(TAG, "File: " + Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX + " in dir: " +
+                       META_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, META_DIR + " dir not existing");
+        }
     }
 
     /**
@@ -444,7 +466,18 @@ public class MemoryManager {
      * @param videoTag Tag of the video
      */
     public void deleteEncryptedVideoFile(String videoTag) {
-
+        File dir = new File(context.getFilesDir(), VIDEO_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+                Log.d(TAG, "File: " + Video.PREFIX + videoTag + "." + Video.SUFFIX + " in dir: " +
+                        VIDEO_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, VIDEO_DIR + " dir not existing");
+        }
     }
 
     // todo add convenience method to delete all files associated with one video which will call deleteEncryptedSymmetricKeyFile, deleteEncryptedVideoFile, deleteEncryptedMetadataFile and deleteReadableMetadata
