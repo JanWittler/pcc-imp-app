@@ -51,6 +51,14 @@ public class MemoryManager {
     private static final String TEMP_PARENT_DIR_NAME = "temp";
     private static final String TEMP_DIR_PREFIX = "temp_";
 
+
+    private static final String KEY_DIR = "keys";
+    private static final String VIDEO_DIR = "videos";
+    private static final String META_DIR = "meta";
+
+    private static final String KEY_PREFIX = "KEY_";
+    private static final String KEY_SUFFIX = "key";
+
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
@@ -299,7 +307,7 @@ public class MemoryManager {
      */
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
-        File keyDir = new File(context.getFilesDir() + File.separator + "keys");
+        File keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR);
         // if dir is not existing, create dir
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
@@ -307,7 +315,7 @@ public class MemoryManager {
                 return null;
             }
         }
-        return new File(keyDir, "KEY_" + videoTag + ".key");
+        return new File(keyDir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
     }
 
     /**
@@ -321,7 +329,7 @@ public class MemoryManager {
      */
     public File createEncryptedVideoFile(String videoTag) {
         // use Video.PREFIX as prefix!
-        File videoDir = new File(context.getFilesDir() + File.separator + "videos");
+        File videoDir = new File(context.getFilesDir() + File.separator + VIDEO_DIR);
         // if dir is not existing, create dir
         if(!videoDir.exists()) {
             if(!videoDir.mkdir()){
@@ -344,7 +352,7 @@ public class MemoryManager {
      */
     public File createEncryptedMetaFile(String videoTag) {
         // use Metadata.PREFIX as prefix!
-        File metaDir = new File(context.getFilesDir() + File.separator + "meta");
+        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
             if(!metaDir.mkdir()){
@@ -368,8 +376,15 @@ public class MemoryManager {
     public File createReadableMetadataFile(String videoTag) {
         // use Metadata.PREFIX_READABLE as prefix!
 
-        // stub to test other classes. Replace the following line..
-        return CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
+        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
+        // if dir is not existing, create dir
+        if(!metaDir.exists()) {
+            if(!metaDir.mkdir()){
+                Log.d(TAG, "failed to create meta directory");
+                return null;
+            }
+        }
+        return new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
     }
 
     /**
@@ -382,6 +397,18 @@ public class MemoryManager {
      * @param videoTag Tag of the video the file is associated with
      */
     public void deleteEncryptedSymmetricKeyFile(String videoTag) {
+        File dir = new File(context.getFilesDir(), KEY_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+               Log.d(TAG, "File: " + KEY_PREFIX + videoTag + "." + KEY_SUFFIX + " in dir: " +
+                       KEY_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, KEY_DIR + " dir not existing");
+        }
     }
 
     /**
