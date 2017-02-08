@@ -127,7 +127,6 @@ public class MemoryManager {
      * delete all account data of a user
      */
     public void deleteAccount() {
-
     }
 
     /**
@@ -274,7 +273,7 @@ public class MemoryManager {
      */
     public void deleteAllTempData() {
         File tempParentDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), TEMP_PARENT_DIR_NAME); // todo see createTempDir for parent directory of temp parent directory.
+                Environment.DIRECTORY_PICTURES), TEMP_PARENT_DIR_NAME); //TODO: see createTempDir for parent directory of temp parent directory.
         if (!tempParentDir.exists()) return;
 
         for (File file : tempParentDir.listFiles()){
@@ -296,6 +295,99 @@ public class MemoryManager {
     }
 
     /**
+     * Deletes the file containing the encrypted symmetric key associated with the passed video
+     * tag.
+     * <p>
+     * <p>The video tag is determined when creating the video file with
+     * {@link #createEncryptedVideoFile(String)}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     */
+    public void deleteEncryptedSymmetricKeyFile(String videoTag) {
+        File dir = new File(context.getFilesDir(), KEY_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+                Log.d(TAG, "File: " + KEY_PREFIX + videoTag + "." + KEY_SUFFIX + " in dir: " +
+                        KEY_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, KEY_DIR + " dir not existing");
+        }
+    }
+
+    /**
+     * Deletes the file containing the encrypted metadata associated with the passed video tag.
+     * <p>
+     * <p>The video tag is determined when creating the video file with
+     * {@link #createEncryptedVideoFile(String)}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     */
+    public void deleteEncryptedMetadataFile(String videoTag) {
+        File dir = new File(context.getFilesDir(), META_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+                Log.d(TAG, "File: " + Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX + " in dir: " +
+                        META_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, META_DIR + " dir not existing");
+        }
+    }
+
+
+    /**
+     * Deletes the file containing the readable metadata associated with the passed video tag.
+     * <p>
+     * <p>The video tag is determined when creating the video file with
+     * {@link #createEncryptedVideoFile(String)}</p>
+     *
+     * @param videoTag Tag of the video the file is associated with
+     */
+    public void deleteReadableMetadata(String videoTag) {
+        File dir = new File(context.getFilesDir(), META_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+                Log.d(TAG, "File: " + Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX + " in dir: " +
+                        META_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, META_DIR + " dir not existing");
+        }
+    }
+
+    /**
+     * Deletes the file containing the encrypted video associated with the passed video tag.
+     * <p>
+     * <p>If you know the video name but not the tag use {@link Video#extractTagFromName(String)}</p>
+     *
+     * @param videoTag Tag of the video
+     */
+    public void deleteEncryptedVideoFile(String videoTag) {
+        File dir = new File(context.getFilesDir(), VIDEO_DIR);
+        if(dir.exists()) {
+            File file = new File(dir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
+            if (file.exists()) {
+                file.delete();
+            } else {
+                Log.d(TAG, "File: " + Video.PREFIX + videoTag + "." + Video.SUFFIX + " in dir: " +
+                        VIDEO_DIR + "does not exist!");
+            }
+        } else {
+            Log.d(TAG, VIDEO_DIR + " dir not existing");
+        }
+    }
+
+    /**
      * Adds a suiting prefix to the video name and uses that String to create a new file inside the
      * key folder on the external memory. The file may be used to write the encrypted symmetric
      * key.
@@ -305,6 +397,7 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video this file will be associated with
      */
+
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
         File keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR);
@@ -387,99 +480,6 @@ public class MemoryManager {
         return new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
     }
 
-    /**
-     * Deletes the file containing the encrypted symmetric key associated with the passed video
-     * tag.
-     * <p>
-     * <p>The video tag is determined when creating the video file with
-     * {@link #createEncryptedVideoFile(String)}</p>
-     *
-     * @param videoTag Tag of the video the file is associated with
-     */
-    public void deleteEncryptedSymmetricKeyFile(String videoTag) {
-        File dir = new File(context.getFilesDir(), KEY_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
-            if (file.exists()) {
-                file.delete();
-            } else {
-               Log.d(TAG, "File: " + KEY_PREFIX + videoTag + "." + KEY_SUFFIX + " in dir: " +
-                       KEY_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, KEY_DIR + " dir not existing");
-        }
-    }
-
-    /**
-     * Deletes the file containing the encrypted metadata associated with the passed video tag.
-     * <p>
-     * <p>The video tag is determined when creating the video file with
-     * {@link #createEncryptedVideoFile(String)}</p>
-     *
-     * @param videoTag Tag of the video the file is associated with
-     */
-    public void deleteEncryptedMetadataFile(String videoTag) {
-        File dir = new File(context.getFilesDir(), META_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
-            if (file.exists()) {
-                file.delete();
-            } else {
-               Log.d(TAG, "File: " + Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX + " in dir: " +
-                       META_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, META_DIR + " dir not existing");
-        }
-    }
-
-
-    /**
-     * Deletes the file containing the readable metadata associated with the passed video tag.
-     * <p>
-     * <p>The video tag is determined when creating the video file with
-     * {@link #createEncryptedVideoFile(String)}</p>
-     *
-     * @param videoTag Tag of the video the file is associated with
-     */
-    public void deleteReadableMetadata(String videoTag) {
-        File dir = new File(context.getFilesDir(), META_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
-            if (file.exists()) {
-                file.delete();
-            } else {
-               Log.d(TAG, "File: " + Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX + " in dir: " +
-                       META_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, META_DIR + " dir not existing");
-        }
-    }
-
-    /**
-     * Deletes the file containing the encrypted video associated with the passed video tag.
-     * <p>
-     * <p>If you know the video name but not the tag use {@link Video#extractTagFromName(String)}</p>
-     *
-     * @param videoTag Tag of the video
-     */
-    public void deleteEncryptedVideoFile(String videoTag) {
-        File dir = new File(context.getFilesDir(), VIDEO_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
-            if (file.exists()) {
-                file.delete();
-            } else {
-                Log.d(TAG, "File: " + Video.PREFIX + videoTag + "." + Video.SUFFIX + " in dir: " +
-                        VIDEO_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, VIDEO_DIR + " dir not existing");
-        }
-    }
-
     // todo add convenience method to delete all files associated with one video which will call deleteEncryptedSymmetricKeyFile, deleteEncryptedVideoFile, deleteEncryptedMetadataFile and deleteReadableMetadata
 
 
@@ -492,6 +492,7 @@ public class MemoryManager {
      * @return Videos as an ArrayList<Video>
      */
     public ArrayList<Video> getAllVideos() {
+        //TODO: write method
         ArrayList<Video> allVideos= new ArrayList<>();
         Video video1 = new Video("video1", null, null, null);
         Video video2 = new Video("video1", null, null, null);
