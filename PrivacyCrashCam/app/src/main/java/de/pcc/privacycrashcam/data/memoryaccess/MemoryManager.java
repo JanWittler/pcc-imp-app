@@ -514,7 +514,16 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedSymmetricKey(String videoTag) {
-
+        File keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR);
+        // if dir is not existing, create dir
+        if (!keyDir.exists()) {
+            if (!keyDir.mkdirs()) {
+                Log.d(TAG, "failed to create key directory");
+                return null;
+            }
+        }
+        File keyFile = new File(keyDir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
+        if (keyFile.exists()) return keyFile;
         return null;
     }
 
@@ -529,6 +538,14 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedVideo(String videoTag) {
+        File videoDir = new File(context.getFilesDir() + File.separator + VIDEO_DIR);
+        // if dir is not existing, create dir
+        if(!videoDir.exists()) {
+                Log.d(TAG, "failed to create video directory");
+                return null;
+        }
+        File videoFile = new File(videoDir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
+        if (videoFile.exists()) return videoFile;
         return null;
     }
 
@@ -541,6 +558,14 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedMetadata(String videoTag) {
+        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
+        // if dir is not existing, create dir
+        if(!metaDir.exists()) {
+                Log.d(TAG, "failed to create meta directory");
+                return null;
+            }
+        File metaFile = new File(metaDir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
+        if (metaFile.exists()) return metaFile;
         return null;
     }
 
@@ -553,7 +578,14 @@ public class MemoryManager {
      */
     @Nullable
     public File getReadableMetadata(String videoTag) {
+        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
+        // if dir is not existing, create dir
+        if(!metaDir.exists()) {
+                Log.d(TAG, "failed to create meta directory");
+                return null;
+        }
+        File metaFile = new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
+        if (metaFile.exists()) return metaFile;
         return null;
     }
-
 }
