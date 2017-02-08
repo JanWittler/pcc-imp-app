@@ -518,7 +518,7 @@ public class MemoryManager {
         // if dir is not existing, create dir
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
-                Log.d(TAG, "failed to create key directory");
+                Log.d(TAG, "no key directory existing");
                 return null;
             }
         }
@@ -541,7 +541,7 @@ public class MemoryManager {
         File videoDir = new File(context.getFilesDir() + File.separator + VIDEO_DIR);
         // if dir is not existing, create dir
         if(!videoDir.exists()) {
-                Log.d(TAG, "failed to create video directory");
+                Log.d(TAG, "no video directory existing");
                 return null;
         }
         File videoFile = new File(videoDir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
@@ -561,7 +561,7 @@ public class MemoryManager {
         File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
-                Log.d(TAG, "failed to create meta directory");
+                Log.d(TAG, "no meta directory existing");
                 return null;
             }
         File metaFile = new File(metaDir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
@@ -581,7 +581,7 @@ public class MemoryManager {
         File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
-                Log.d(TAG, "failed to create meta directory");
+                Log.d(TAG, "no meta directory existing");
                 return null;
         }
         File metaFile = new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
