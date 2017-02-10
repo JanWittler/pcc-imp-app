@@ -19,7 +19,7 @@ import de.pcc.privacycrashcam.applicationlogic.WelcomeFragment;
  * Log In Activity which handles requesting permission, authenticating the user or starting the
  * {@link CameraActivity}.
  *
- * @author Giorgio
+ * @author Giorgio Armani or better known as the one and only G.I.Giorgio
  */
 
 public class LogInActivity extends MainActivity {
@@ -52,6 +52,7 @@ public class LogInActivity extends MainActivity {
     public void grantPermissions(View v) {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.CAMERA,
+                        Manifest.permission.INTERNET,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 PERMISSIONS_REQUEST);
