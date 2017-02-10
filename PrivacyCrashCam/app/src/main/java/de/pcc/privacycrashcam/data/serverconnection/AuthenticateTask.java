@@ -40,7 +40,6 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     private static final String API_CALL = "authenticate";
     // responses to be expected
-    private static final String API_RESPONSE_FAILURE_OTHER = "FAILURE";
     private static final String API_RESPONSE_FAILURE_MISSING = "NO ACCOUNTID";
     private static final String API_RESPONSE_FAILURE_MISMATCH = "WRONG ACCOUNT";
     private static final String API_RESPONSE_SUCCESS = "SUCCESS";
@@ -96,6 +95,9 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
         return resultState;
     }
 
+    /**
+     * @param requestState
+     */
     @Override
     protected void onPostExecute(AuthenticationState requestState) {
         super.onPostExecute(requestState);

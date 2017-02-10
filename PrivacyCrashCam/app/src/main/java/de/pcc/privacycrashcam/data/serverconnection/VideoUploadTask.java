@@ -1,6 +1,7 @@
 package de.pcc.privacycrashcam.data.serverconnection;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -20,23 +21,22 @@ import javax.ws.rs.core.Response;
 
 import de.pcc.privacycrashcam.data.Account;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
-
 /**
  * Task to asynchronously upload video files of the user. This class already knows hwo to pass the
  * params to the REST interface, the API method call and how to parse the result.
  *
- * @author Giorgio Gross
+ * @author Fabian Wenzel
  */
 public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     private final static String TAG = VideoUploadTask.class.getName();
     /**
      * Function call which will be appended to the domain name
      */
-    private static final String API_CALL = "authenticate/";
+    private static final String API_CALL = "videoUpload";
 
     private static final String API_RESPONSE_SUCCESS = "Finished editing video";
-    private static final String API_RESPONSE_FAILURE = "FAILURE";
+    private static final String API_RESPONSE_INPUT_FAILURE = "Not all inputs were given correctly";
+    private static final String API_RESPONSE_EDITING_FAILURE = "Setting up for editing video failed. Processing aborted";
 
     private Account account;
     private ServerResponseCallback<RequestState> callback;
@@ -62,6 +62,10 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
         this.callback = callback;
     }
 
+    /**
+     * @param params Domain to access the API
+     * @return {@link RequestState}
+     */
     @Override
     protected RequestState doInBackground(String... params) {
         RequestState requestState;
@@ -69,6 +73,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
 
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.target(domain).path(API_CALL).register(MultiPartFeature.class);
+        Log.i(TAG, "URI: " + webTarget.getUri().toASCIIString());
         MultiPart multiPart = new MultiPart();
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
         FileDataBodyPart video = new FileDataBodyPart("video", videoFile.getAbsoluteFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
@@ -84,26 +89,31 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
         try {
             Response response = futureResponse.get();
             responseContent = response.readEntity(String.class);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException e) {
+            Log.i(TAG, "Failure on getting response!");
+            return RequestState.FAILURE_OTHER;
         }
+        Log.i(TAG, "response: " + responseContent);
 
         switch (responseContent) {
-            case API_RESPONSE_FAILURE:
-                requestState = RequestState.FAILURE;
-                break;
             case API_RESPONSE_SUCCESS:
                 requestState = RequestState.SUCCESS;
+                break;
+            case API_RESPONSE_EDITING_FAILURE:
+                requestState = RequestState.EDITING_FAILURE;
+                break;
+            case API_RESPONSE_INPUT_FAILURE:
+                requestState = RequestState.INPUT_FAILURE;
                 break;
             default:
                 requestState = RequestState.FAILURE_OTHER;
         }
-
         return requestState;
     }
 
+    /**
+     * @param requestState
+     */
     @Override
     protected void onPostExecute(RequestState requestState) {
         super.onPostExecute(requestState);

@@ -1,11 +1,30 @@
 package de.pcc.privacycrashcam.data.serverconnection;
 
 /**
- * Created by Fabi on 03.02.2017.
+ * Request state enum to determine if a server request for authenticating a user was
+ * successful.
+ *
+ * @author Fabian Wenzel
  */
-
 public enum RequestState {
+
+    /**
+     * The request was successful.
+     */
     SUCCESS,
-    FAILURE,
+
+    /**
+     * The MultiPartForm had not the right input for this kind of request.
+     */
+    INPUT_FAILURE,
+
+    /**
+     * An error occurred editing the video.
+     */
+    EDITING_FAILURE,
+
+    /**
+     * Something unexpected went wrong.
+     */
     FAILURE_OTHER
 }
