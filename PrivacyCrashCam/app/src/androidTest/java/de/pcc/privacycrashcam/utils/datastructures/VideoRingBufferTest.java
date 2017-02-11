@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Queue;
+
+import de.pcc.privacycrashcam.data.Video;
+import de.pcc.privacycrashcam.data.memoryaccess.MemoryManagerTest;
 
 import static org.junit.Assert.*;
 
@@ -30,9 +32,7 @@ public class VideoRingBufferTest {
      */
     private static final String TEST_DIRECTORY_NAME = "bufferTestData";
 
-    private File bufferTestDirectory;
     private File[] videoChunks;
-
     private VideoRingBuffer mBuffer;
 
     @BeforeClass
@@ -42,19 +42,14 @@ public class VideoRingBufferTest {
 
     @Before
     public void setUp() throws Exception {
-        bufferTestDirectory = InstrumentationRegistry.getTargetContext().getDir(TEST_DIRECTORY_NAME, Context.MODE_PRIVATE);
+        File bufferTestDirectory = InstrumentationRegistry.getTargetContext().getDir(TEST_DIRECTORY_NAME, Context.MODE_PRIVATE);
 
-        mBuffer = new VideoRingBuffer(CAPACITY, bufferTestDirectory, "mp4");
+        mBuffer = new VideoRingBuffer(CAPACITY, bufferTestDirectory, Video.SUFFIX);
+        // create test files
         videoChunks = new File[CAPACITY * 2];
         for (int i = 0; i < videoChunks.length; i++) {
-            videoChunks[i] = createFile("VID_"+i+".mp4");
+            videoChunks[i] = MemoryManagerTest.CreateFile(bufferTestDirectory, Video.PREFIX + i + "." + Video.SUFFIX);
         }
-    }
-
-    private File createFile(String name) throws IOException {
-        File file = new File(bufferTestDirectory, name);
-        file.createNewFile();
-        return file;
     }
 
     @Test
@@ -64,7 +59,7 @@ public class VideoRingBufferTest {
 
     @Test
     public void putCapacity() throws Exception {
-        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
+        for (int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
         Queue<File> bufferContent = mBuffer.demandData();
 
         assertTrue(bufferContent.size() == mBuffer.getCapacity());
@@ -86,20 +81,20 @@ public class VideoRingBufferTest {
 
     @Test
     public void popCapacity() throws Exception {
-        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
+        for (int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
 
         assertTrue(videoChunks.length >= mBuffer.getCapacity());
-        for(int i = 0; i < mBuffer.getCapacity(); i++) {
+        for (int i = 0; i < mBuffer.getCapacity(); i++) {
             assertEquals(videoChunks[i], mBuffer.pop());
         }
     }
 
     @Test
     public void popMoreThanCapacity() throws Exception {
-        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
+        for (int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
 
         assertTrue(videoChunks.length >= mBuffer.getCapacity());
-        for(int i = 0; i < mBuffer.getCapacity(); i++) {
+        for (int i = 0; i < mBuffer.getCapacity(); i++) {
             assertEquals(videoChunks[i], mBuffer.pop());
         }
 
@@ -107,30 +102,30 @@ public class VideoRingBufferTest {
     }
 
     @Test
-    public void demandData() throws Exception {
-
-    }
-
-    @Test
     public void destroy() throws Exception {
-        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
+        for (int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
 
+        Queue<File> bufferContent = mBuffer.demandData();
+        assertEquals(CAPACITY, bufferContent.size());
         mBuffer.destroy();
-        for (int i = 0; i < videoChunks.length; i++) {
-            assertFalse(videoChunks[i].exists());
+        for (File videoChunk : bufferContent) {
+            assertFalse(videoChunk.exists());
         }
     }
 
     @Test
     public void flushAll() throws Exception {
-        for(int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
+        for (int i = 0; i < mBuffer.getCapacity(); i++) mBuffer.put(videoChunks[i]);
 
+        Queue<File> bufferContent = mBuffer.demandData();
+        assertEquals(CAPACITY, bufferContent.size());
         mBuffer.flushAll();
-        for (int i = 0; i < videoChunks.length; i++) {
-            assertFalse(videoChunks[i].exists());
+        for (File videoChunk : bufferContent) {
+            assertFalse(videoChunk.exists());
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @After
     public void tearDown() throws Exception {
         for (File file : videoChunks) {
@@ -143,16 +138,4 @@ public class VideoRingBufferTest {
 
     }
 
-    /**
-     * Recursively delete directory and files inside directory
-     * @param dir directory or file to be deleted
-     */
-    private static void recDeleteDir(File dir) {
-        if(dir.isDirectory()) {
-            for (File file : dir.listFiles()){
-                recDeleteDir(file);
-            }
-        }
-        dir.delete();
-    }
 }

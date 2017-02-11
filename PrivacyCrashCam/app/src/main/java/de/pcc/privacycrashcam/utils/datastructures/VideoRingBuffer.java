@@ -88,6 +88,7 @@ public class VideoRingBuffer {
     @Nullable
     public File pop() {
         File file = queue.poll();
+        if (file == null) return null;
         fileSavedLookupTable.remove(file.getName());
         return file;
     }
@@ -129,7 +130,7 @@ public class VideoRingBuffer {
     }
 
     /**
-     * Cleans up buffer and stops watching fgor file events.
+     * Cleans up buffer and stops watching for file events.
      */
     public void destroy() {
         flushAll();
