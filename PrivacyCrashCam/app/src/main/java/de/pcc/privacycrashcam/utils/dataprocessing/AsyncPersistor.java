@@ -250,7 +250,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * @param concatVideo Location of the merged video.
      * @return Returns whether concatting the videos was successful or not.
      */
-    protected boolean concatVideos(Queue<File> videos, File concatVideo) {
+    private boolean concatVideos(Queue<File> videos, File concatVideo) {
         // read all video snippets
         List<Movie> clips = new LinkedList<>();
         try {
@@ -301,7 +301,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * @param metadata Metadata to be saved.
      * @return Returns whether saving was successful or not.
      */
-    protected boolean saveMetadataToFile(File output, Metadata metadata) {
+    private boolean saveMetadataToFile(File output, Metadata metadata) {
         String metaJson = metadata.getAsJSON();
         try (PrintWriter out = new PrintWriter(output)) {
             out.println(metaJson);
