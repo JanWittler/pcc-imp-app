@@ -26,9 +26,10 @@ public class HTMLDialogViewer {
 
     private String title;
     private @RawRes int rawRes;
+    private String content;
 
     /**
-     * Creates and shows the web view displaying the passed html file.
+     * Creates and shows a web view displaying the passed html file.
      *
      * @param context application context
      * @param inflater a layout inflater
@@ -39,7 +40,24 @@ public class HTMLDialogViewer {
         this.context = context;
         this.layout = inflater.inflate(R.layout.htmldialog, null);
         this.title = title;
+        this.content = "";
         this.rawRes = rawResource;
+    }
+
+    /**
+     * Creates and shows a web view displaying the passed string inside an html file.
+     *
+     * @param context application context
+     * @param inflater a layout inflater
+     * @param title the title of the dialog
+     * @param content the content as a string to be shown
+     */
+    public HTMLDialogViewer(Context context, LayoutInflater inflater, String title, String content){
+        this.context = context;
+        this.layout = inflater.inflate(R.layout.htmldialog, null);
+        this.title = title;
+        this.content = content;
+        this.rawRes = 0;
     }
 
     /**
@@ -63,7 +81,7 @@ public class HTMLDialogViewer {
     }
 
     private class HTMLfileLoader extends AsyncTask<Void, Void, Void> {
-        StringBuilder s_builder;
+        StringBuilder sBuilder;
 
         @Override
         protected void onPreExecute() {
@@ -71,16 +89,20 @@ public class HTMLDialogViewer {
 
         @Override
         protected Void doInBackground(Void... params) {
-            s_builder = new StringBuilder();
+            sBuilder = new StringBuilder();
 
-            InputStream rawResource = context.getResources().openRawResource(rawRes);
-            if(rawResource!=null) {
-                Scanner scan = new Scanner(rawResource);
+            if(rawRes != 0) {
+                InputStream rawResource = context.getResources().openRawResource(rawRes);
+                if (rawResource != null) {
+                    Scanner scan = new Scanner(rawResource);
 
-                while (scan.hasNextLine()) {
-                    s_builder.append(scan.nextLine());
-                    s_builder.append("\n");
+                    while (scan.hasNextLine()) {
+                        sBuilder.append(scan.nextLine());
+                        sBuilder.append("\n");
+                    }
                 }
+            } else {
+                sBuilder.append(content);
             }
 
             return null;
@@ -88,8 +110,8 @@ public class HTMLDialogViewer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if(wv_licenses != null && s_builder != null && !isCancelled()) {
-                wv_licenses.loadDataWithBaseURL(null, s_builder.toString(), "text/html", "utf-8", null);
+            if(wv_licenses != null && sBuilder != null && !isCancelled()) {
+                wv_licenses.loadDataWithBaseURL(null, sBuilder.toString(), "text/html", "utf-8", null);
                 wv_licenses.getSettings().setUseWideViewPort(true);
                 pb_licenseLoader.setVisibility(View.GONE);
             }

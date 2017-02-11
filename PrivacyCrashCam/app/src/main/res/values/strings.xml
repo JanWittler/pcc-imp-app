@@ -19,7 +19,7 @@
     <string name="bufferSizeTitle">Buffer Size</string>
 
     <!-- LEGAL -->
-    <string name="copyright">© PSE Team\n\n\nGiorgio Groß\nJosh Romanowski\nDavid Laubenstein</string>
+    <string name="copyright">© PSE Team\n\n\nGiorgio Groß\nJosh Romanowski\nDavid Laubenstein\nFabian Wenzel</string>
     <string name="licenses_title">Licenses</string>
     <string name="legal_title">Legal Information</string>
 
@@ -30,6 +30,11 @@
         to allow access to the camera, your microphone and your device storage as otherwise not
         videos can be recorded.</string>
 
+    <!-- VIDEO LIST -->
+    <string name="meta_info_title">Info</string>
+    <string name="meta_info">Date:%1$s\\nTrigger Type:%2$s\\nG-Force:%3$s</string>
+    <string name="video_upload_success">Video uploaded :)</string>
+
     <!-- ERROR MESSAGES -->
     <string name="error_no_camera">Your device has no camera</string>
     <string name="error_camera_unavailable">There was a problem with your camera</string>
@@ -37,5 +42,6 @@
     <string name="error_undefined">An error occurred</string>
     <string name="grant_permission">ALLOW AND START</string>
     <string name="memory_error">Could not access device storage</string>
+    <string name="error_no_connection">No internet connection found</string>
 
 </resources>

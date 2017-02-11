@@ -494,10 +494,10 @@ public class MemoryManager {
     public ArrayList<Video> getAllVideos() {
         //TODO: write method
         ArrayList<Video> allVideos= new ArrayList<>();
-        Video video1 = new Video("video1", null, null, null);
-        Video video2 = new Video("video1", null, null, null);
-        Video video3 = new Video("video1", null, null, null);
-        Video video4 = new Video("video1", null, null, null);
+        Video video1 = new Video("video1", null, null, null, null);
+        Video video2 = new Video("video2", null, null, null, null);
+        Video video3 = new Video("video3", null, null, null, null);
+        Video video4 = new Video("video4", null, null, null, null);
         allVideos.add(video1);
         allVideos.add(video2);
         allVideos.add(video3);

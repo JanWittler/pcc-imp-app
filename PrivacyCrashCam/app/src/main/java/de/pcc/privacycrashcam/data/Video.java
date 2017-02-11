@@ -18,17 +18,19 @@ public class Video {
     private String name;
     private File encVideoFile;
     private File encMetaFile;
+    private File encSymKeyFile;
     private Metadata readableMetadata;
 
     /* #############################################################################################
      *                                  constructors
      * ###########################################################################################*/
 
-    public Video(String name, File encVideoFile, File encMetaFile, Metadata readableMetadata) {
+    public Video(String name, File encVideoFile, File encMetaFile, File encSymKeyFile, Metadata readableMetadata) {
         this.name = name;
         this.encVideoFile = encVideoFile;
         this.encMetaFile =  encMetaFile;
         this.readableMetadata = readableMetadata;
+        this.encSymKeyFile = encSymKeyFile;
     }
 
     /* #############################################################################################
@@ -58,5 +60,9 @@ public class Video {
 
     public Metadata getReadableMetadata() {
         return readableMetadata;
+    }
+
+    public File getEncSymKeyFile() {
+        return encSymKeyFile;
     }
 }
