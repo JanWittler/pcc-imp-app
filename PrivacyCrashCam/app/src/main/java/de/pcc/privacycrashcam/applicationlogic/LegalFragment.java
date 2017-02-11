@@ -16,24 +16,15 @@ import android.widget.TextView;
 import de.pcc.privacycrashcam.R;
 
 /**
- * @author David Laubenstein
- * Created by David Laubenstein on 1/27/17.
+ * Shows the legal information, licenses and links to homepage and privacy policy.
+ *
+ * @author Giorgio Groß
  */
 public class LegalFragment extends Fragment {
 
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-
-    private LinearLayout base;
-
-    private TextView legal;
-    private TextView privacy;
-    private TextView licences;
-    private TextView website;
-    private AlertDialog.Builder dialogBuilder;
-    private WebView content;
-    private ProgressBar loading;
 
     /* #############################################################################################
      *                                  methods
@@ -44,9 +35,9 @@ public class LegalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // get the main layout describing the content
-        base = (LinearLayout) inflater.inflate(R.layout.content_legal, container, false);
+        LinearLayout base = (LinearLayout) inflater.inflate(R.layout.content_legal, container, false);
 
-        legal = (TextView) base.findViewById(R.id.legal);
+        TextView legal = (TextView) base.findViewById(R.id.legal);
         legal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
