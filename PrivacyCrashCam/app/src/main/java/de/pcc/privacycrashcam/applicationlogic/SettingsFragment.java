@@ -1,6 +1,5 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,17 +13,16 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
+import de.pcc.privacycrashcam.gui.LogInActivity;
 
 /**
  * Shows the settings view along with its view components and handles user input.
  *
  * @author Giorgio Gross, David Laubenstein
- * Created by Giorgio Gross at 01/20/2017
+ *         Created by Giorgio Gross at 01/20/2017
  */
 public class SettingsFragment extends Fragment {
 
@@ -33,7 +31,7 @@ public class SettingsFragment extends Fragment {
      * ###########################################################################################*/
 
     private RelativeLayout base;
-    private MemoryManager mM;
+    private MemoryManager memoryManager;
     private Settings settings;
 
 
@@ -66,8 +64,8 @@ public class SettingsFragment extends Fragment {
         // get the main layout describing the content
         base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
 
-        mM = new MemoryManager(getContext());
-        settings = mM.getSettings();
+        memoryManager = new MemoryManager(getContext());
+        settings = memoryManager.getSettings();
         // init view components
 
         /**
@@ -75,7 +73,7 @@ public class SettingsFragment extends Fragment {
          */
         View.OnClickListener resHandler = new View.OnClickListener() {
             public void onClick(View v) {
-                switch(v.getId()) {
+                switch (v.getId()) {
                     case R.id.tv_resHigh:
                         settings.setQuality(Settings.QUALITY_HIGH);// todo edit high, low and medium quality
                         resetButtonColors();
@@ -124,7 +122,7 @@ public class SettingsFragment extends Fragment {
             }
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // fps should be between 20 and 60
                 // there is no min value for progress, so we have to set the value + the min value
                 // and add this to the max value
@@ -142,7 +140,7 @@ public class SettingsFragment extends Fragment {
         View.OnClickListener bufferHandler = new View.OnClickListener() {
             public void onClick(View v) {
                 bufferSize = (TextView) base.findViewById(R.id.tv_bufferSize);
-                switch(v.getId()) {
+                switch (v.getId()) {
                     case R.id.b_incBuffer:
                         settings.setBufferSizeSec(settings.getBufferSizeSec() + BUFFER_JUMP_SIZE);
                         bufferSize.setText(settings.getBufferSizeSec() + "sec");
@@ -153,12 +151,10 @@ public class SettingsFragment extends Fragment {
                                     BUFFER_JUMP_SIZE);
                             bufferSize.setText(settings.getBufferSizeSec() + "sec");
                         } else {
-                            //TODO: LOG!
                             Log.d("SettingsFragment", "Buffer size cannot set under 0!");
                         }
                         break;
                     default:
-                        //TODO: LOG!
                         System.out.println("default");
                         break;
                 }
@@ -169,6 +165,15 @@ public class SettingsFragment extends Fragment {
         b_incBuffer.setOnClickListener(bufferHandler);
         b_decBuffer = (Button) base.findViewById(R.id.b_decBuffer);
         b_decBuffer.setOnClickListener(bufferHandler);
+
+        logOut = (Button) base.findViewById(R.id.logOut);
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                memoryManager.deleteAccountData();
+                LogInActivity.Launch(getActivity());
+            }
+        });
         return base;
     }
 
@@ -184,6 +189,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        mM.saveSettings(settings);
+        memoryManager.saveSettings(settings);
     }
 }

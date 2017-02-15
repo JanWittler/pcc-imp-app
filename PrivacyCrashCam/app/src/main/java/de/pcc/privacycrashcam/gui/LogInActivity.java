@@ -1,6 +1,8 @@
 package de.pcc.privacycrashcam.gui;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +27,17 @@ import de.pcc.privacycrashcam.applicationlogic.WelcomeFragment;
 public class LogInActivity extends MainActivity {
     private final static String TAG = LogInActivity.class.getName();
     private static final int PERMISSIONS_REQUEST = 4711;
+
+    /**
+     * Starts a new intent with the {@link CameraActivity CameraActivity}
+     *
+     * @param calling the activity which is doing this call
+     */
+    public static void Launch(Activity calling){
+        Intent intent = new Intent(calling, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        calling.startActivity(intent);
+    }
 
     @Override
     public int getLayoutRes() {
@@ -62,19 +75,8 @@ public class LogInActivity extends MainActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length == 3
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Restart activity to show camera or log in view
-                    recreate();
-                } else {
-                    // permission denied. Close App.
-                    finish();
-                }
-            }
+            case PERMISSIONS_REQUEST:
+                recreate();
         }
     }
 
