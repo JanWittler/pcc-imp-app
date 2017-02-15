@@ -127,7 +127,8 @@ public class VideosFragment extends Fragment {
             }
 
             mHolder.title.setText(videos.get(position).getName());
-            // mHolder.caption.setText(String.format(Long.toString(videos.get(position).getReadableMetadata().getDate())));
+            //TODO: set date format
+            mHolder.caption.setText(String.format(Long.toString(videos.get(position).getReadableMetadata().getDate())));
 
             mHolder.upload.setOnClickListener(new View.OnClickListener() {
                 @Override
