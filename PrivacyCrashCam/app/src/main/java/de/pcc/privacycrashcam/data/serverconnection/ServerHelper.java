@@ -12,28 +12,25 @@ import java.util.Scanner;
 
 public class ServerHelper {
     private final static String TAG = ServerHelper.class.getName();
+    public static final String HOST = "http://laubenstone.de:2222";
+    public static final String URL = HOST + "/webservice/";
 
     /**
-     * Reads an input stream and converts it to a string.
      *
-     * @param stream The input stream read from the server response
-     * @return The input stream as a String
+     * @return
      */
-    public static String readInputStream(InputStream stream) throws IOException {
-        if(stream == null) return ""; // default return value
+    public static boolean isOnline() {
 
-        Scanner s = new Scanner(stream, "UTF-8");
-        StringBuilder mBuffer = new StringBuilder();
-        try {
-            while (s.hasNext()) {
-                mBuffer.append(s.next());
-                mBuffer.append(" ");
-            }
-        } finally{
-            s.close();
-            Log.i("BUFFER", "the read buffer is " + mBuffer.toString());
-        }
-        return mBuffer.toString();
+//        Runtime runtime = Runtime.getRuntime();
+//        try {
+//
+//            Process ipProcess = runtime.exec("/system/bin/ping -c 1 " + HOST);
+//            int     exitValue = ipProcess.waitFor();
+//            return (exitValue == 0);
+//
+//        } catch (IOException e) { e.printStackTrace(); }
+//        catch (InterruptedException e) { e.printStackTrace(); }
+
+        return true;
     }
-
 }
