@@ -41,7 +41,7 @@ public class LogInActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         if (!hasPermissions()) {
             replaceFragment(new WelcomeFragment());
-        } else if (LogInHelper.IsUserLoggedIn(getApplicationContext())) {
+        } else if (!LogInHelper.IsUserLoggedIn(getApplicationContext())) {
             replaceFragment(new LogInFragment());
         } else {
             CameraActivity.Launch(this);

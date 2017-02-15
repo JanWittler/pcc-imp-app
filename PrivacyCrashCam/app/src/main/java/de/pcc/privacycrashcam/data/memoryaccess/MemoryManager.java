@@ -147,7 +147,12 @@ public class MemoryManager {
     @Nullable
     public Account getAccountData() {
         try {
-            return new Account(appPreferences.getString(Account.ACCOUNT_MAIN_KEY, null));
+            String account = appPreferences.getString(Account.ACCOUNT_MAIN_KEY, null);
+            if (account == null) {
+                return null;
+            } else {
+                return new Account(account);
+            }
         } catch (JSONException e) {
             Log.d(TAG, "No Account in Shared Preferences");
         }
@@ -616,9 +621,10 @@ public class MemoryManager {
      * @param parentDir
      * @return
      */
-    private List<File> getListFiles(File parentDir) {
+    private ArrayList<File> getListFiles(File parentDir) {
         ArrayList<File> inFiles = new ArrayList<File>();
         File[] files = parentDir.listFiles();
+        if (files == null) return inFiles;
         for (File file : files) {
             if (file.isDirectory()) {
                 inFiles.addAll(getListFiles(file));

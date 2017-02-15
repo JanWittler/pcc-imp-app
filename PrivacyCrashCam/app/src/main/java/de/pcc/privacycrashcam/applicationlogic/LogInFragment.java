@@ -13,8 +13,10 @@ import android.widget.Toast;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Account;
+import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.data.serverconnection.AuthenticateTask;
 import de.pcc.privacycrashcam.data.serverconnection.AuthenticationState;
+import de.pcc.privacycrashcam.data.serverconnection.ServerProxy;
 import de.pcc.privacycrashcam.data.serverconnection.ServerResponseCallback;
 import de.pcc.privacycrashcam.gui.CameraActivity;
 
@@ -39,13 +41,15 @@ public class LogInFragment extends Fragment {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Account account = new Account(et_mail.getText().toString(),
+                final Account account = new Account(et_mail.getText().toString(),
                         et_password.getText().toString());
-                AuthenticateTask authenticateTask = new AuthenticateTask(account, new ServerResponseCallback<AuthenticationState>() {
+                new ServerProxy().authenticateUser(account, new ServerResponseCallback<AuthenticationState>() {
                     @Override
                     public void onResponse(AuthenticationState response) {
-                       switch (response) {
+                        switch (response) {
                            case SUCCESS:
+                               MemoryManager memoryManager = new MemoryManager(getContext());
+                               memoryManager.saveAccountData(account);
                                CameraActivity.Launch(getActivity());
                                getActivity().finish();
                                break;
