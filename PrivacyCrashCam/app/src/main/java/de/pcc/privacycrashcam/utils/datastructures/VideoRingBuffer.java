@@ -72,8 +72,7 @@ public class VideoRingBuffer {
     public void put(File file) {
         if (!queue.offer(file)) {
             // Queue reached its capacity. Remove head and retry.
-            boolean res = pop().delete();
-            Log.i("VideoRingBuffer", "Res of delete: "+res);
+            pop().delete();
             queue.add(file);
         }
 

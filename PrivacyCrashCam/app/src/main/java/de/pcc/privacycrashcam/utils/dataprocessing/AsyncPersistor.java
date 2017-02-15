@@ -22,6 +22,8 @@ import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -142,31 +144,26 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         }
 
         // post to UI thread and wait until the UI has migrated to a completely new RingBuffer
-        final Lock lock = new ReentrantLock();
+        final CyclicBarrier mBarrier = new CyclicBarrier(2);
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                synchronized (lock) {
-                    lock.lock();
-                    Log.i(TAG, "updating UI and CamHandler");
-                    persistCallback.onPersistingStarted();
-                    lock.unlock();
-                    lock.notify();
+                Log.i(TAG, "updating UI and CamHandler");
+                persistCallback.onPersistingStarted();
+                try {
+                    mBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    e.printStackTrace();
                 }
             }
         });
-        synchronized (lock) {
-            try {
-                if(!lock.tryLock()) {
-                    Log.i(TAG, "waiting for UI to finish update");
-                    lock.wait();
-                } else {
-                    lock.unlock();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return false;
-            }
+        try {
+            Log.i(TAG, "waiting for UI to finish update");
+            mBarrier.await();
+        } catch (InterruptedException ex) {
+            return false;
+        } catch (BrokenBarrierException ex) {
+            return false;
         }
         // UI has no reference to the ring buffer and the memory manager instance anymore. We can
         // now freely operate on it.
@@ -190,7 +187,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
         Log.i(TAG, "All files to be concatenated were written");
 
-        File concatVid = memoryManager.getTempVideoFile();
+        File concatVid = memoryManager.getTempVideoFile(); // todo change to non temp
         if (!concatVideos(vidSnippets, concatVid))
             return false;
 
