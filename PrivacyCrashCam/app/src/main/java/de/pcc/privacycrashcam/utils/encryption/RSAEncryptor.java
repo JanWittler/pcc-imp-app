@@ -92,7 +92,7 @@ public class RSAEncryptor implements IKeyEncryptor {
         byte[] cipherText;
         try {
             // get an RSA cipher object and print the provider
-            final Cipher cipher = Cipher.getInstance("RSA");
+            final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             // encrypt the plain text using the public key
             cipher.init(Cipher.ENCRYPT_MODE, key);
             cipherText = cipher.doFinal(text.getBytes());
