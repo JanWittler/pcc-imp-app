@@ -95,10 +95,9 @@ public class Metadata {
 
     public Metadata(File metaFile) throws JSONException, IOException {
         String json = null;
-
         // read file
-        InputStream inputStream = new FileInputStream(metaFile);
-        if (inputStream != null) {
+        if (metaFile != null) {
+            InputStream inputStream = new FileInputStream(metaFile);
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String ret;
@@ -110,16 +109,23 @@ public class Metadata {
 
             inputStream.close();
             json = stringBuilder.toString();
+            JSONObject metadata = new JSONObject(json);
+
+            // retrieve json data
+            this.date = metadata.getLong(JSON_KEY_DATE);
+            this.triggerType = metadata.getString(JSON_KEY_TRIGGER_TYPE);
+            this.gForce[0] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_X);
+            this.gForce[1] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Y);
+            this.gForce[2] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Z);
+        } else {
+
+            // retrieve json data
+            this.date = System.currentTimeMillis();
+            this.triggerType = TRIGGER_TYPE_DEFAULT;
+            this.gForce[0] = 0F;
+            this.gForce[1] = 0F;
+            this.gForce[2] = 0F;
         }
-
-        JSONObject metadata = new JSONObject(json);
-
-        // retrieve json data
-        this.date = metadata.getLong(JSON_KEY_DATE);
-        this.triggerType = metadata.getString(JSON_KEY_TRIGGER_TYPE);
-        this.gForce[0] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_X);
-        this.gForce[1] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Y);
-        this.gForce[2] = (float) metadata.getDouble(JSON_KEY_TRIGGER_FORCE_Z);
     }
 
     /* #############################################################################################
