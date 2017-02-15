@@ -14,6 +14,11 @@ public enum RequestState {
     SUCCESS,
 
     /**
+     * Netowrk not reachable
+     */
+    FAILURE_NETWORK,
+
+    /**
      * The MultiPartForm had not the right input for this kind of request.
      */
     INPUT_FAILURE,

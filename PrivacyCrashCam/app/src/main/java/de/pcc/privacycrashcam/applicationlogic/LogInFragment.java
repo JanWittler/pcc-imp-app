@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -37,13 +38,15 @@ public class LogInFragment extends Fragment {
         // init view components
         final EditText et_mail = (EditText) base.findViewById(R.id.eT_mail);
         final EditText et_password = (EditText) base.findViewById(R.id.et_password);
-        Button login = (Button) base.findViewById(R.id.b_login);
+        final ProgressBar loginProgress = (ProgressBar) base.findViewById(R.id.pb_login);
+        final Button login = (Button) base.findViewById(R.id.b_login);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                changeVisibility(login, loginProgress);
                 final Account account = new Account(et_mail.getText().toString(),
                         et_password.getText().toString());
-                new ServerProxy().authenticateUser(account, new ServerResponseCallback<AuthenticationState>() {
+                new ServerProxy(getContext()).authenticateUser(account, new ServerResponseCallback<AuthenticationState>() {
                     @Override
                     public void onResponse(AuthenticationState response) {
                         switch (response) {
@@ -86,5 +89,14 @@ public class LogInFragment extends Fragment {
             }
         });
         return base;
+    }
+    private void changeVisibility(Button  button, ProgressBar progressBar) {
+        if(button.getVisibility() == View.VISIBLE) {
+            button.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            button.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+        }
     }
 }

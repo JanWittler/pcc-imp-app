@@ -72,8 +72,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     @Override
     protected RequestState doInBackground(String... params) {
         if (!ServerHelper.IsNetworkAvailable(context)) {
-            callback.onError("No network available");
-            return null;
+            return RequestState.FAILURE_NETWORK;
         }
 
         RequestState requestState;
@@ -127,6 +126,8 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     @Override
     protected void onPostExecute(RequestState requestState) {
         super.onPostExecute(requestState);
-        callback.onResponse(requestState);
+        if(requestState != RequestState.FAILURE_NETWORK)
+            callback.onResponse(requestState);
+        else callback.onError("No network available");
     }
 }

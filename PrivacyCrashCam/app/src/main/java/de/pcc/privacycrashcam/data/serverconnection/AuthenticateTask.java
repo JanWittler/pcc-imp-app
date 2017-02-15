@@ -67,10 +67,9 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     @Override
     protected AuthenticationState doInBackground(String... params) {
-        if (!ServerHelper.IsNetworkAvailable(context)) {
-            callback.onError("No network available");
-            return null;
-        }
+        if (!ServerHelper.IsNetworkAvailable(context))
+            return AuthenticationState.FAILURE_NETWORK;
+
 
         AuthenticationState resultState;
         String domain = params[0];
@@ -112,8 +111,8 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     protected void onPostExecute(AuthenticationState requestState) {
         super.onPostExecute(requestState);
 
-        if(requestState != null)
+        if(requestState != AuthenticationState.FAILURE_NETWORK)
             callback.onResponse(requestState);
+        else callback.onError("No network available");
     }
-
 }

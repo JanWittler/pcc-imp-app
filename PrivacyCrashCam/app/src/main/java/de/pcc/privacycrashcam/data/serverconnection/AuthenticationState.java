@@ -14,6 +14,11 @@ public enum AuthenticationState {
     SUCCESS,
 
     /**
+     * Netowrk not reachable
+     */
+    FAILURE_NETWORK,
+
+    /**
      * Account does not exist or mail and password do not match
      */
     FAILURE_MISMATCH,

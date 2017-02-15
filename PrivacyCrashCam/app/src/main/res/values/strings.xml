@@ -44,4 +44,9 @@
     <string name="memory_error">Could not access device storage</string>
     <string name="error_no_connection">No internet connection found</string>
 
+    <!-- LOGIN VIEWS -->
+    <string name="mail">Mail</string>
+    <string name="password">Password</string>
+    <string name="et_mail">test@example.com</string>
+    <string name="et_password">your password</string>
 </resources>

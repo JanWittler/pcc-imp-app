@@ -182,7 +182,7 @@ public class VideosFragment extends Fragment {
             toggleProgressBar(mHolder);
 
             Video item = videos.get(index);
-            ServerProxy proxy = new ServerProxy();
+            ServerProxy proxy = new ServerProxy(getContext());
             proxy.videoUpload(item.getEncVideoFile(), item.getEncMetaFile(),
                     item.getEncSymKeyFile(), memoryManager.getAccountData(),
                     new ServerResponseCallback<RequestState>() {
