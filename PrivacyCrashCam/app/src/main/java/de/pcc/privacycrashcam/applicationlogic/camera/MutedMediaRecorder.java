@@ -18,6 +18,9 @@ public class MutedMediaRecorder extends MediaRecorder {
     @Override
     public void setProfile(CamcorderProfile profile) {
         setOutputFormat(profile.fileFormat);
+        // todo some devices need a audio source in order to record video
+        // setAudioSource();
+        // setAudioEncoder(AudioEncoder.AAC);
         setVideoFrameRate(profile.videoFrameRate);
         setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
         setVideoEncodingBitRate(profile.videoBitRate);
