@@ -233,8 +233,6 @@ public class MemoryManager {
      */
     @Nullable
     private File createTempDir() {
-        // todo this creates the temp directory in external memory. change this later to create the folder on the internal storage. see context.getFilesDir()
-
         // Create the parent temp directory if it does not exist
         File tempParentDir = new File(context.getFilesDir() +
                 File.separator + TEMP_PARENT_DIR_NAME);
@@ -407,7 +405,7 @@ public class MemoryManager {
 
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
-        File keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR);
+        File keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR); // CameraHelper.getOutputFile(KEY_PREFIX, videoTag, Metadata.SUFFIX);
         // if dir is not existing, create dir
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
@@ -429,7 +427,7 @@ public class MemoryManager {
      */
     public File createEncryptedVideoFile(String videoTag) {
         // use Video.PREFIX as prefix!
-        File videoDir = new File(context.getFilesDir() + File.separator + VIDEO_DIR);
+        File videoDir = new File(context.getFilesDir() + File.separator + VIDEO_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX, videoTag, Metadata.SUFFIX);
         // if dir is not existing, create dir
         if(!videoDir.exists()) {
             if(!videoDir.mkdir()){
@@ -452,7 +450,7 @@ public class MemoryManager {
      */
     public File createEncryptedMetaFile(String videoTag) {
         // use Metadata.PREFIX as prefix!
-        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
+        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX, videoTag, Metadata.SUFFIX);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
             if(!metaDir.mkdir()){
@@ -476,7 +474,7 @@ public class MemoryManager {
     public File createReadableMetadataFile(String videoTag) {
         // use Metadata.PREFIX_READABLE as prefix!
 
-        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR);
+        File metaDir = new File(context.getFilesDir() + File.separator + META_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX_READABLE, videoTag, Metadata.SUFFIX);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
             if(!metaDir.mkdir()){
