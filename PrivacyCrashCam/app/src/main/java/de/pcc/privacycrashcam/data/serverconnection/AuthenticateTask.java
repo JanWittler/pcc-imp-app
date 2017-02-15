@@ -70,7 +70,6 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
         if (!ServerHelper.IsNetworkAvailable(context))
             return AuthenticationState.FAILURE_NETWORK;
 
-
         AuthenticationState resultState;
         String domain = params[0];
 
