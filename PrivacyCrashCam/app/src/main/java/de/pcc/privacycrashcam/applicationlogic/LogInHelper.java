@@ -17,8 +17,7 @@ public class LogInHelper {
      * @return true is log in data was found, false otherwise
      */
     public static boolean IsUserLoggedIn(Context context) {
-        return true; // // TODO: 29.01.17
-        // return new MemoryManager(context).getAccountData() != null;
+        return new MemoryManager(context).getAccountData() != null;
     }
 
     /**
