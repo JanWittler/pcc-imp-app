@@ -95,7 +95,7 @@ public class RSAEncryptor implements IKeyEncryptor {
             final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             // encrypt the plain text using the public key
             cipher.init(Cipher.ENCRYPT_MODE, key);
-            cipherText = cipher.doFinal(text.getBytes());
+            cipherText = cipher.doFinal(text.getBytes(text));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             Log.w(TAG, "Encrypting the symmetric key failed");
