@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -97,7 +98,8 @@ public class RSAEncryptor implements IKeyEncryptor {
             cipher.init(Cipher.ENCRYPT_MODE, key);
             cipherText = cipher.doFinal(text.getBytes(text));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
-                | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+                | InvalidKeyException | BadPaddingException | IllegalBlockSizeException
+                | UnsupportedEncodingException e) {
             Log.w(TAG, "Encrypting the symmetric key failed");
             return null;
         }
