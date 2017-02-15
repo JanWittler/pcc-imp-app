@@ -115,5 +115,4 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
         if(requestState != null)
             callback.onResponse(requestState);
     }
-
 }

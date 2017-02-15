@@ -18,6 +18,9 @@ import java.util.Scanner;
 
 public class ServerHelper {
     private final static String TAG = ServerHelper.class.getName();
+    /**
+     * Domain to connect to the API
+     */
     public static final String HOST = "http://laubenstone.de:2222";
     public static final String URL = HOST + "/webservice/";
 

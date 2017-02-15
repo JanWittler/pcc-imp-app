@@ -13,10 +13,6 @@ import de.pcc.privacycrashcam.data.Account;
  */
 
 public class ServerProxy {
-    /**
-     * Domain to connect to the API
-     */
-    private static final String URL = "http://laubenstone.de:2222/webservice/";
     private Context context;
 
     public ServerProxy (Context context) {
@@ -25,12 +21,11 @@ public class ServerProxy {
 
     public void videoUpload(File videoFile, File metadata, File symKey, Account account,
                             ServerResponseCallback<RequestState> callback) {
-        new VideoUploadTask(videoFile, metadata, symKey, account, callback, context).execute(URL);
+        new VideoUploadTask(videoFile, metadata, symKey, account, callback, context).execute(ServerHelper.URL);
     }
 
     public void authenticateUser(Account account,
                                  ServerResponseCallback<AuthenticationState> callback) {
-        new AuthenticateTask(account, callback, context).execute(URL);
+        new AuthenticateTask(account, callback, context).execute(ServerHelper.URL);
     }
-
 }
