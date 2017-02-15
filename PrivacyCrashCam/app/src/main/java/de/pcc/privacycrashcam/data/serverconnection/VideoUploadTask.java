@@ -68,6 +68,10 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
      */
     @Override
     protected RequestState doInBackground(String... params) {
+        if (!ServerHelper.isOnline()) {
+            callback.onError("No connection to HOST");
+            return null;
+        }
         RequestState requestState;
         String domain = params[0];
 

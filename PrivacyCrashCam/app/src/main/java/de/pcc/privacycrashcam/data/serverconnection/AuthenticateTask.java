@@ -64,6 +64,10 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     @Override
     protected AuthenticationState doInBackground(String... params) {
+        if (!ServerHelper.isOnline()) {
+            callback.onError("No connection to HOST");
+            return null;
+        }
         AuthenticationState resultState;
         String domain = params[0];
 
@@ -103,5 +107,4 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
         super.onPostExecute(requestState);
         callback.onResponse(requestState);
     }
-
 }
