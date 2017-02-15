@@ -1,5 +1,6 @@
 package de.pcc.privacycrashcam.data.serverconnection;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -43,19 +44,21 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     private static final String API_RESPONSE_FAILURE_MISSING = "NO ACCOUNTID";
     private static final String API_RESPONSE_FAILURE_MISMATCH = "WRONG ACCOUNT";
     private static final String API_RESPONSE_SUCCESS = "SUCCESS";
+    private Context context;
 
     private Account account;
     private ServerResponseCallback<AuthenticationState> callback;
 
     /**
      * Sets up a new task to authenticate the user with the passed parameters
-     *
-     * @param account   Account which will be used for upload
+     *  @param account   Account which will be used for upload
      * @param callback  Observer which is notified about errors and state changes
+     * @param context
      */
-    public AuthenticateTask(Account account, ServerResponseCallback<AuthenticationState> callback) {
+    public AuthenticateTask(Account account, ServerResponseCallback<AuthenticationState> callback, Context context) {
         this.account = account;
         this.callback = callback;
+        this.context = context;
     }
 
     /**
@@ -64,6 +67,11 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     @Override
     protected AuthenticationState doInBackground(String... params) {
+        if (!ServerHelper.IsNetworkAvailable(context)) {
+            callback.onError("No network available");
+            return null;
+        }
+
         AuthenticationState resultState;
         String domain = params[0];
 
@@ -96,12 +104,16 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     }
 
     /**
-     * @param requestState
+     * Called after authentication was executed.
+     *
+     * @param requestState the result state or null if the network was unavailable
      */
     @Override
     protected void onPostExecute(AuthenticationState requestState) {
         super.onPostExecute(requestState);
-        callback.onResponse(requestState);
+
+        if(requestState != null)
+            callback.onResponse(requestState);
     }
 
 }

@@ -1,5 +1,6 @@
 package de.pcc.privacycrashcam.data.serverconnection;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -37,6 +38,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     private static final String API_RESPONSE_SUCCESS = "Finished editing video";
     private static final String API_RESPONSE_INPUT_FAILURE = "Not all inputs were given correctly";
     private static final String API_RESPONSE_EDITING_FAILURE = "Setting up for editing video failed. Processing aborted";
+    private Context context;
 
     private Account account;
     private ServerResponseCallback<RequestState> callback;
@@ -46,20 +48,21 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
 
     /**
      * Sets up a new task to upload the video data with the passed parameters
-     *
-     * @param videoFile file pointing to the video to upload
+     *  @param videoFile file pointing to the video to upload
      * @param metadata  file pointing to the metadata of the video
      * @param symKey    asymmetric encrypted key used to encrypt video and metadata
      * @param account   Account which will be used for upload
      * @param callback  Observer which is notified about errors and state changes
+     * @param context
      */
     public VideoUploadTask(File videoFile, File metadata, File symKey, Account account,
-                           ServerResponseCallback<RequestState> callback) {
+                           ServerResponseCallback<RequestState> callback, Context context) {
         this.videoFile = videoFile;
         this.metadata = metadata;
         this.symKey = symKey;
         this.account = account;
         this.callback = callback;
+        this.context = context;
     }
 
     /**
@@ -68,6 +71,11 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
      */
     @Override
     protected RequestState doInBackground(String... params) {
+        if (!ServerHelper.IsNetworkAvailable(context)) {
+            callback.onError("No network available");
+            return null;
+        }
+
         RequestState requestState;
         String domain = params[0];
 
@@ -112,7 +120,9 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     }
 
     /**
-     * @param requestState
+     * Called after video upload was executed.
+     *
+     * @param requestState the result state or null if the network was unavailable
      */
     @Override
     protected void onPostExecute(RequestState requestState) {
