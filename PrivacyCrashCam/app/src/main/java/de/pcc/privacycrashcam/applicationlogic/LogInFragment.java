@@ -15,7 +15,6 @@ import android.widget.Toast;
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
-import de.pcc.privacycrashcam.data.serverconnection.AuthenticateTask;
 import de.pcc.privacycrashcam.data.serverconnection.AuthenticationState;
 import de.pcc.privacycrashcam.data.serverconnection.ServerProxy;
 import de.pcc.privacycrashcam.data.serverconnection.ServerResponseCallback;
@@ -36,7 +35,7 @@ public class LogInFragment extends Fragment {
         base = (RelativeLayout) inflater.inflate(R.layout.content_login, container, false);
 
         // init view components
-        final EditText et_mail = (EditText) base.findViewById(R.id.eT_mail);
+        final EditText et_mail = (EditText) base.findViewById(R.id.et_mail);
         final EditText et_password = (EditText) base.findViewById(R.id.et_password);
         final ProgressBar loginProgress = (ProgressBar) base.findViewById(R.id.pb_login);
         final Button login = (Button) base.findViewById(R.id.b_login);
