@@ -18,6 +18,7 @@ public class Account {
      */
     private final static String TAG = Account.class.getName();
 
+    public final static String ACCOUNT_MAIN_KEY = "ACCOUNT";
     // JSON keys
     public final static String JSON_KEY_MAIL = "mail";
     public final static String JSON_KEY_PASSWORD = "password";

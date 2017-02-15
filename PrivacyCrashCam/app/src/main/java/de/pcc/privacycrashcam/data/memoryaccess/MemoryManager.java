@@ -5,21 +5,27 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.camera.CameraHelper;
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.MemoryKeys;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Handles access to the device storage.
@@ -122,20 +128,15 @@ public class MemoryManager {
         mAppPrefEditor.apply();
     }
 
-
-    /**
-     * delete all account data of a user
-     */
-    public void deleteAccount() {
-    }
-
     /**
      * Saves an Account instance by overriding the previous Account values in memory.
      *
      * @param account the Settings instance to be saved
      */
     public void saveAccountData(Account account) {
-
+        SharedPreferences.Editor mAppPrefEditor = appPreferences.edit();
+        mAppPrefEditor.putString(Account.ACCOUNT_MAIN_KEY, account.getAsJSON());
+        mAppPrefEditor.apply();
     }
 
     /**
@@ -143,7 +144,13 @@ public class MemoryManager {
      *
      * @return account of user containing user data or null if none was found
      */
+    @Nullable
     public Account getAccountData() {
+        try {
+            return new Account(appPreferences.getString(Account.ACCOUNT_MAIN_KEY, null));
+        } catch (JSONException e) {
+            Log.d(TAG, "No Account in Shared Preferences");
+        }
         return null;
     }
 
@@ -151,6 +158,9 @@ public class MemoryManager {
      * Deletes all account data of the user
      */
     public void deleteAccountData() {
+        SharedPreferences.Editor mAppPrefEditor = appPreferences.edit();
+        mAppPrefEditor.remove(Account.ACCOUNT_MAIN_KEY);
+        mAppPrefEditor.apply();
     }
 
 
@@ -492,16 +502,29 @@ public class MemoryManager {
      * @return Videos as an ArrayList<Video>
      */
     public ArrayList<Video> getAllVideos() {
-        //TODO: write method
         ArrayList<Video> allVideos= new ArrayList<>();
-        Video video1 = new Video("video1", null, null, null, null);
-        Video video2 = new Video("video2", null, null, null, null);
-        Video video3 = new Video("video3", null, null, null, null);
-        Video video4 = new Video("video4", null, null, null, null);
-        allVideos.add(video1);
-        allVideos.add(video2);
-        allVideos.add(video3);
-        allVideos.add(video4);
+        //get video directory
+        File videosDir = new File(context.getFilesDir() + File.separator + VIDEO_DIR);
+        //Initialize all videos from folder as videos
+        List<File> videosInDir = getListFiles(videosDir);
+        for (File video : videosInDir) {
+            // access to Metadata
+            File metaDataFile = getEncryptedMetadata(Video.extractTagFromName(video.getName()));
+            //File metaDataFile = new File(context.getFilesDir() + File.separator + META_DIR +
+             //       video.getName().replaceFirst(Video.PREFIX, Metadata.PREFIX).replaceFirst(Video.SUFFIX, Metadata.SUFFIX));
+            Metadata readableMetadata = null;
+            try {
+                readableMetadata = new Metadata(getReadableMetadata(Video.extractTagFromName(video.getName())));
+            } catch (JSONException|IOException e) {
+                Log.d(TAG, "Error reading metadata file!");
+            }
+            // add video to arrayList
+            allVideos.add(new Video(video.getName(), video,
+                    metaDataFile,
+                    getEncryptedSymmetricKey(video.getName()),
+                    readableMetadata
+                    ));
+        }
         return allVideos;
     }
 
@@ -587,5 +610,22 @@ public class MemoryManager {
         File metaFile = new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
         if (metaFile.exists()) return metaFile;
         return null;
+    }
+
+    /**
+     * @param parentDir
+     * @return
+     */
+    private List<File> getListFiles(File parentDir) {
+        ArrayList<File> inFiles = new ArrayList<File>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inFiles.addAll(getListFiles(file));
+            } else {
+                inFiles.add(parentDir);
+            }
+        }
+        return inFiles;
     }
 }
