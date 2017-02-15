@@ -9,9 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
-import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -60,7 +57,7 @@ public class AESEncryptor implements IFileEncryptor {
         // open cipher
         Cipher encipher;
         try {
-            encipher = Cipher.getInstance("AES");
+            encipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             encipher.init(Cipher.ENCRYPT_MODE, key);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             Log.w(TAG, "Initializing cipher failed");
