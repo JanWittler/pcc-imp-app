@@ -46,7 +46,7 @@ public class RSAEncryptor implements IKeyEncryptor {
         }
 
         // encode key as string
-        String encodedKey = Base64.encodeToString(input.getEncoded(), Base64.DEFAULT);
+        String encodedKey = Base64.encodeToString(input.getEncoded(), Base64.NO_WRAP);
 
         ObjectInputStream inputStream;
         PublicKey key = null;
