@@ -2,7 +2,6 @@ package de.pcc.privacycrashcam.data.memoryaccess;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -236,15 +235,9 @@ public class MemoryManager {
     private File createTempDir() {
         // todo this creates the temp directory in external memory. change this later to create the folder on the internal storage. see context.getFilesDir()
 
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-        if (!Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            return null;
-        }
-
         // Create the parent temp directory if it does not exist
-        File tempParentDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), TEMP_PARENT_DIR_NAME);
+        File tempParentDir = new File(context.getFilesDir() +
+                File.separator + TEMP_PARENT_DIR_NAME);
         if (!tempParentDir.exists()) {
             if (!tempParentDir.mkdirs()) {
                 Log.d(TAG, "failed to create parent directory");
@@ -287,8 +280,7 @@ public class MemoryManager {
      * Deletes all directories in internal memory inside the {@link #TEMP_PARENT_DIR_NAME}.
      */
     public void deleteAllTempData() {
-        File tempParentDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), TEMP_PARENT_DIR_NAME); //TODO: see createTempDir for parent directory of temp parent directory.
+        File tempParentDir = new File(context.getFilesDir() + TEMP_PARENT_DIR_NAME);
         if (!tempParentDir.exists()) return;
 
         for (File file : tempParentDir.listFiles()){
@@ -526,7 +518,7 @@ public class MemoryManager {
             // add video to arrayList
             allVideos.add(new Video(video.getName(), video,
                     metaDataFile,
-                    getEncryptedSymmetricKey(video.getName()),
+                    getEncryptedSymmetricKey(Video.extractTagFromName(video.getName())),
                     readableMetadata
                     ));
         }
@@ -629,7 +621,7 @@ public class MemoryManager {
             if (file.isDirectory()) {
                 inFiles.addAll(getListFiles(file));
             } else {
-                inFiles.add(parentDir);
+                inFiles.add(file);
             }
         }
         return inFiles;

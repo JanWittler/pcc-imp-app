@@ -46,8 +46,14 @@ public class Video {
     }
 
     public static String extractTagFromName(String name) {
-        if(!name.startsWith(PREFIX)) return name;
-        return name.replaceFirst(PREFIX, "");
+        String tmp = "";
+        if(name.startsWith(PREFIX)) {
+            tmp = name.replaceFirst(PREFIX, "");
+        }
+        if (tmp.endsWith(SUFFIX)) {
+            return tmp.replace("." + SUFFIX,"");
+        }
+        return tmp;
     }
 
     public File getEncVideoFile() {
