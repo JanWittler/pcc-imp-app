@@ -129,7 +129,7 @@ public class VideosFragment extends Fragment {
             }
 
             mHolder.title.setText(videos.get(position).getName());
-            mHolder.caption.setText(String.format(getDate(videos.get(position).getReadableMetadata().getDate(), "dd.MM.yyyy hh:mm:ss")));
+            mHolder.caption.setText(String.format(getDate(videos.get(position).getReadableMetadata().getDate(), "dd.MM.yyyy HH:mm:ss")));
 
             mHolder.upload.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -215,8 +215,8 @@ public class VideosFragment extends Fragment {
             // set up the metadata content so that a user can read it easily
             Metadata videoMeta = videos.get(index).getReadableMetadata();
             String unformatted = getContext().getString(R.string.meta_info);
-            // todo format date according to localization   and print g force as a vector (maybe add a method to Metadata.java for this)
-            String formatted = String.format(unformatted, getDate(videoMeta.getDate(), "dd.MM.yyyy hh:mm:ss"),
+            // todo format date according to localization  and print g force as a vector (maybe add a method to Metadata.java for this)
+            String formatted = String.format(unformatted, getDate(videoMeta.getDate(), "dd.MM.yyyy HH:mm:ss"),
                     videoMeta.getTriggerType(), videoMeta.getgForce().toString());
 
             // show a dialog
