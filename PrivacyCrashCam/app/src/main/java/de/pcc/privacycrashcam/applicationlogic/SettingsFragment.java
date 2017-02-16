@@ -1,5 +1,6 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,7 +46,7 @@ public class SettingsFragment extends Fragment {
     Button b_decBuffer;
     Button logOut;
 
-    private final int BUFFER_JUMP_SIZE = 5;
+    private final int BUFFER_CHUNK_SIZE = 5;
 
     /* #############################################################################################
      *                                  methods
@@ -75,19 +76,19 @@ public class SettingsFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.tv_resHigh:
-                        settings.setQuality(Settings.QUALITY_HIGH);// todo edit high, low and medium quality
+                        settings.setQuality(Settings.QUALITY_HIGH);
                         resetButtonColors();
                         res_High.setTextColor(
                                 ContextCompat.getColor(getContext(), R.color.colorAccent));
                         break;
                     case R.id.tv_resMed:
-                        settings.setQuality(Settings.QUALITY_HIGH);
+                        settings.setQuality(Settings.QUALITY_MEDIUM);
                         resetButtonColors();
                         res_Med.setTextColor(
                                 ContextCompat.getColor(getContext(), R.color.colorAccent));
                         break;
                     case R.id.tv_resLow:
-                        settings.setQuality(Settings.QUALITY_HIGH);
+                        settings.setQuality(Settings.QUALITY_LOW);
                         resetButtonColors();
                         res_Low.setTextColor(
                                 ContextCompat.getColor(getContext(), R.color.colorAccent));
@@ -139,16 +140,15 @@ public class SettingsFragment extends Fragment {
 
         View.OnClickListener bufferHandler = new View.OnClickListener() {
             public void onClick(View v) {
-                bufferSize = (TextView) base.findViewById(R.id.tv_bufferSize);
                 switch (v.getId()) {
                     case R.id.b_incBuffer:
-                        settings.setBufferSizeSec(settings.getBufferSizeSec() + BUFFER_JUMP_SIZE);
+                        settings.setBufferSizeSec(settings.getBufferSizeSec() + BUFFER_CHUNK_SIZE);
                         bufferSize.setText(settings.getBufferSizeSec() + "sec");
                         break;
                     case R.id.b_decBuffer:
-                        if ((settings.getBufferSizeSec() - BUFFER_JUMP_SIZE) > 0) {
+                        if ((settings.getBufferSizeSec() - BUFFER_CHUNK_SIZE) > 0) {
                             settings.setBufferSizeSec(settings.getBufferSizeSec() -
-                                    BUFFER_JUMP_SIZE);
+                                    BUFFER_CHUNK_SIZE);
                             bufferSize.setText(settings.getBufferSizeSec() + "sec");
                         } else {
                             Log.d("SettingsFragment", "Buffer size cannot set under 0!");
@@ -165,6 +165,9 @@ public class SettingsFragment extends Fragment {
         b_incBuffer.setOnClickListener(bufferHandler);
         b_decBuffer = (Button) base.findViewById(R.id.b_decBuffer);
         b_decBuffer.setOnClickListener(bufferHandler);
+
+        bufferSize = (TextView) base.findViewById(R.id.tv_bufferSize);
+        bufferSize.setText(settings.getBufferSizeSec() + "sec");
 
         logOut = (Button) base.findViewById(R.id.logOut);
         logOut.setOnClickListener(new View.OnClickListener() {
