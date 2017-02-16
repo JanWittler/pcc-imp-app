@@ -16,7 +16,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
@@ -127,8 +129,7 @@ public class VideosFragment extends Fragment {
             }
 
             mHolder.title.setText(videos.get(position).getName());
-            //TODO: set date format
-            mHolder.caption.setText(String.format(Long.toString(videos.get(position).getReadableMetadata().getDate())));
+            mHolder.caption.setText(String.format(getDate(videos.get(position).getReadableMetadata().getDate(), "dd.MM.yyyy hh:mm:ss")));
 
             mHolder.upload.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -215,11 +216,28 @@ public class VideosFragment extends Fragment {
             Metadata videoMeta = videos.get(index).getReadableMetadata();
             String unformatted = getContext().getString(R.string.meta_info);
             // todo format date according to localization   and print g force as a vector (maybe add a method to Metadata.java for this)
-            String formatted = String.format(unformatted, String.valueOf(videoMeta.getDate()),
+            String formatted = String.format(unformatted, getDate(videoMeta.getDate(), "dd.MM.yyyy hh:mm:ss"),
                     videoMeta.getTriggerType(), videoMeta.getgForce().toString());
 
             // show a dialog
             new HTMLDialogViewer(getContext(), inflater, getContext().getResources().getString(R.string.meta_info_title), formatted).showDialog();
+        }
+
+        /**
+         * Return date in specified format.
+         * @param milliSeconds Date in milliseconds
+         * @param dateFormat Date format
+         * @return String representing date in specified format
+         */
+        public String getDate(long milliSeconds, String dateFormat)
+        {
+            // Create a DateFormatter object for displaying date in specified format.
+            SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+            // Create a calendar object that will convert the date and time value in milliseconds to date.
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(milliSeconds);
+            return formatter.format(calendar.getTime());
         }
     }
 }

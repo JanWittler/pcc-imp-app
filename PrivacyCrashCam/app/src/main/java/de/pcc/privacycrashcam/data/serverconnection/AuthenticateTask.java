@@ -31,7 +31,7 @@ import de.pcc.privacycrashcam.data.Account;
  * Task to asynchronously authenticate the user. This class already knows hwo to pass the params to
  * the REST interface, the API method call and how to parse the result.
  *
- * @author Giorgio Gross
+ * @author Giorgio Gross, David Laubenstein
  */
 public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationState> {
     private final static String TAG = AuthenticateTask.class.getName();
