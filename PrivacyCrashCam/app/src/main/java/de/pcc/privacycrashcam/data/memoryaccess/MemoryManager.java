@@ -241,6 +241,12 @@ public class MemoryManager {
     private File createTempDir() {
         // Create the parent temp directory if it does not exist
         File tempParentDir = getFilesDir(File.separator + TEMP_PARENT_DIR_NAME);
+        if (!tempParentDir.exists()) {
+            if (!tempParentDir.mkdirs()) {
+                Log.d(TAG, "failed to create parent directory");
+                return null;
+            }
+        }
         // Create the temp directory if it does not exist
         File tempDirectory = new File(tempParentDir, tempDirName);
         if (!tempDirectory.exists()) {
