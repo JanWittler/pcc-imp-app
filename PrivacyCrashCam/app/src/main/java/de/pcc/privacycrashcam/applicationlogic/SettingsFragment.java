@@ -19,6 +19,8 @@ import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.gui.LogInActivity;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Shows the settings view along with its view components and handles user input.
  *
@@ -99,6 +101,9 @@ public class SettingsFragment extends Fragment {
                 }
             }
         };
+
+
+
         res_High = (Button) base.findViewById(R.id.tv_resHigh);
         res_High.setOnClickListener(resHandler);
         res_Med = (Button) base.findViewById(R.id.tv_resMed);
@@ -106,14 +111,33 @@ public class SettingsFragment extends Fragment {
         res_Low = (Button) base.findViewById(R.id.tv_resLow);
         res_Low.setOnClickListener(resHandler);
 
+        resetButtonColors();
+        switch (settings.getQuality()) {
+            case Settings.QUALITY_DEFAULT:
+                 res_Med.setTextColor(
+                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                break;
+            case Settings.QUALITY_HIGH:
+                res_High.setTextColor(
+                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                break;
+            case Settings.QUALITY_LOW:
+                res_Low.setTextColor(
+                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                break;
+            default:
+                Log.d(TAG, "No default Quality set");
+                break;
+        }
         /**
          * frames handling
          */
         fpsBar = (SeekBar) base.findViewById(R.id.seekBar);
         fpsBar.setProgress(settings.getFps());
+        fps = (TextView) base.findViewById(R.id.tv_frames);
+        fps.setText(Integer.toString(settings.getFps()));
         fpsBar.requestLayout();
         fpsBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
@@ -127,7 +151,6 @@ public class SettingsFragment extends Fragment {
                 // fps should be between 20 and 60
                 // there is no min value for progress, so we have to set the value + the min value
                 // and add this to the max value
-                fps = (TextView) base.findViewById(R.id.tv_frames);
                 int fps_Int = progress + 10;
                 settings.setFps(fps_Int);
                 fps.setText(Integer.toString(fps_Int));
@@ -180,6 +203,9 @@ public class SettingsFragment extends Fragment {
         return base;
     }
 
+    /**
+     *
+     */
     private void resetButtonColors() {
         res_High.setTextColor(ContextCompat.getColor(getContext(), R.color.buttonColorDefault));
         res_Med.setTextColor(ContextCompat.getColor(getContext(), R.color.buttonColorDefault));
@@ -187,7 +213,8 @@ public class SettingsFragment extends Fragment {
     }
 
     /**
-     *
+     * if settingsFragment is paused, the settings will be saved, so that the settings
+     * will be the same after reopening the settings fragment
      */
     @Override
     public void onPause() {

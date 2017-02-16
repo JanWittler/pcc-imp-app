@@ -14,7 +14,7 @@ import de.pcc.privacycrashcam.applicationlogic.SettingsFragment;
  * <p>Sets the {@link SettingsFragment SettingsFragment} as content of the
  * {@link ContainerActivity ContainerActivity}</p>
  *
- * @author Giorgio
+ * @author Giorgio Gross, David Laubenstein
  */
 public class SettingsActivity extends ContainerActivity {
 

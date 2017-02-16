@@ -21,7 +21,7 @@ import de.pcc.privacycrashcam.applicationlogic.WelcomeFragment;
  * Log In Activity which handles requesting permission, authenticating the user or starting the
  * {@link CameraActivity}.
  *
- * @author Giorgio Armani or better known as the one and only G.I.Giorgio
+ * @author Giorgio Armani or better known as the one and only G.I.Giorgio, David Laubenstein
  */
 
 public class LogInActivity extends MainActivity {
