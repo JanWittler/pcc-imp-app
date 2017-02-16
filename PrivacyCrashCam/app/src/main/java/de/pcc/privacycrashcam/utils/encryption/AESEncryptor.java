@@ -88,6 +88,7 @@ public class AESEncryptor implements IFileEncryptor {
         KeyGenerator kgen;
         try {
             kgen = KeyGenerator.getInstance("AES");
+            kgen.init(128);
         } catch (NoSuchAlgorithmException e) {
             Log.w(TAG, "Wasn't able to find AES algorithm");
             return null;

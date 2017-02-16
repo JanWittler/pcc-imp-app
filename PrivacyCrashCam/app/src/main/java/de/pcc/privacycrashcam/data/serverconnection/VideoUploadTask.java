@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -105,7 +106,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
         try {
             Response response = futureResponse.get();
             responseContent = response.readEntity(String.class);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | ProcessingException e) {
             Log.i(TAG, "Failure on getting response!");
             client.close();
             return RequestState.FAILURE_OTHER;
