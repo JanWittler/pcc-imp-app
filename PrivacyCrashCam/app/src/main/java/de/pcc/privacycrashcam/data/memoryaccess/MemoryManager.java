@@ -240,21 +240,7 @@ public class MemoryManager {
     @Nullable
     private File createTempDir() {
         // Create the parent temp directory if it does not exist
-        File tempParentDir;
-        if (saveInInternalStorage) {
-            tempParentDir = new File(context.getFilesDir() +
-                    File.separator + TEMP_PARENT_DIR_NAME);
-        } else {
-            tempParentDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + TEMP_PARENT_DIR_NAME);
-        }
-        if (!tempParentDir.exists()) {
-            if (!tempParentDir.mkdirs()) {
-                Log.d(TAG, "failed to create parent directory");
-                return null;
-            }
-        }
-
+        File tempParentDir = getFilesDir(File.separator + TEMP_PARENT_DIR_NAME);
         // Create the temp directory if it does not exist
         File tempDirectory = new File(tempParentDir, tempDirName);
         if (!tempDirectory.exists()) {
@@ -290,13 +276,7 @@ public class MemoryManager {
      * Deletes all directories in internal memory inside the {@link #TEMP_PARENT_DIR_NAME}.
      */
     public void deleteAllTempData() {
-        File tempParentDir;
-        if (saveInInternalStorage) {
-            tempParentDir = new File(context.getFilesDir() + TEMP_PARENT_DIR_NAME);
-        } else {
-            tempParentDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-            TEMP_PARENT_DIR_NAME);
-        }
+        File tempParentDir = getFilesDir(TEMP_PARENT_DIR_NAME);
         if (!tempParentDir.exists()) return;
 
         for (File file : tempParentDir.listFiles()){
@@ -327,13 +307,7 @@ public class MemoryManager {
      * @param videoTag Tag of the video the file is associated with
      */
     public void deleteEncryptedSymmetricKeyFile(String videoTag) {
-        File dir;
-        if (saveInInternalStorage) {
-            dir = new File(context.getFilesDir(), KEY_DIR);
-        } else {
-            dir = new File(EXTERNAL_STORAGE_DIR_PICTURES, KEY_DIR);
-        }
-
+        File dir = getFilesDir(File.separator + KEY_DIR);
         if(dir.exists()) {
             File file = new File(dir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
             if (file.exists()) {
@@ -356,12 +330,7 @@ public class MemoryManager {
      * @param videoTag Tag of the video the file is associated with
      */
     public void deleteEncryptedMetadataFile(String videoTag) {
-        File dir;
-        if (saveInInternalStorage) {
-            dir = new File(context.getFilesDir(), META_DIR);
-        } else {
-            dir = new File(EXTERNAL_STORAGE_DIR_PICTURES, META_DIR);
-        }
+        File dir = getFilesDir(File.separator + META_DIR);
         if(dir.exists()) {
             File file = new File(dir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
             if (file.exists()) {
@@ -385,12 +354,7 @@ public class MemoryManager {
      * @param videoTag Tag of the video the file is associated with
      */
     public void deleteReadableMetadata(String videoTag) {
-        File dir;
-        if (saveInInternalStorage) {
-            dir = new File(context.getFilesDir(), META_DIR);
-        } else {
-            dir = new File(EXTERNAL_STORAGE_DIR_PICTURES, META_DIR);
-        }
+        File dir = getFilesDir(File.separator + META_DIR);
         if(dir.exists()) {
             File file = new File(dir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
             if (file.exists()) {
@@ -412,12 +376,7 @@ public class MemoryManager {
      * @param videoTag Tag of the video
      */
     public void deleteEncryptedVideoFile(String videoTag) {
-        File dir;
-        if (saveInInternalStorage) {
-            dir = new File(context.getFilesDir(), VIDEO_DIR);
-        } else {
-            dir = new File(EXTERNAL_STORAGE_DIR_PICTURES, VIDEO_DIR);
-        }
+        File dir = getFilesDir(File.separator + VIDEO_DIR);
         if(dir.exists()) {
             File file = new File(dir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
             if (file.exists()) {
@@ -443,13 +402,7 @@ public class MemoryManager {
      */
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
-        File keyDir;
-        if (saveInInternalStorage) {
-            keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR); // CameraHelper.getOutputFile(KEY_PREFIX, videoTag, Metadata.SUFFIX);
-        } else {
-            keyDir = new File(EXTERNAL_STORAGE_DIR_PICTURES + File.separator +
-            KEY_DIR);
-        }
+        File keyDir = getFilesDir(File.separator + KEY_DIR);
         // if dir is not existing, create dir
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
@@ -471,14 +424,7 @@ public class MemoryManager {
      */
     public File createEncryptedVideoFile(String videoTag) {
         // use Video.PREFIX as prefix!
-        File videoDir;
-        if (saveInInternalStorage) {
-            videoDir = new File(context.getFilesDir() +
-                    File.separator + VIDEO_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX, videoTag, Metadata.SUFFIX);
-        } else {
-            videoDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + VIDEO_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX, videoTag, Metadata.SUFFIX);
-        }
+        File videoDir = getFilesDir(File.separator + VIDEO_DIR);
         // if dir is not existing, create dir
         if(!videoDir.exists()) {
             if(!videoDir.mkdir()){
@@ -501,14 +447,7 @@ public class MemoryManager {
      */
     public File createEncryptedMetaFile(String videoTag) {
         // use Metadata.PREFIX as prefix!
-        File metaDir;
-        if (saveInInternalStorage) {
-            metaDir = new File(context.getFilesDir() +
-                    File.separator + META_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX, videoTag, Metadata.SUFFIX);
-        } else {
-            metaDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + META_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX, videoTag, Metadata.SUFFIX);
-        }
+        File metaDir = getFilesDir(File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
             if(!metaDir.mkdir()){
@@ -531,14 +470,7 @@ public class MemoryManager {
      */
     public File createReadableMetadataFile(String videoTag) {
         // use Metadata.PREFIX_READABLE as prefix!
-        File metaDir;
-        if (saveInInternalStorage) {
-            metaDir = new File(context.getFilesDir() +
-                    File.separator + META_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX_READABLE, videoTag, Metadata.SUFFIX);
-        } else {
-            metaDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + META_DIR); // CameraHelper.getOutputFile(Metadata.PREFIX_READABLE, videoTag, Metadata.SUFFIX);
-        }
+        File metaDir = getFilesDir(File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
             if(!metaDir.mkdir()){
@@ -563,14 +495,7 @@ public class MemoryManager {
     public ArrayList<Video> getAllVideos() {
         ArrayList<Video> allVideos= new ArrayList<>();
         //get video directory
-        File videosDir;
-        if (saveInInternalStorage) {
-            videosDir = new File(context.getFilesDir() +
-                    File.separator + VIDEO_DIR);
-        } else {
-            videosDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + VIDEO_DIR);
-        }
+        File videosDir = getFilesDir(File.separator + VIDEO_DIR);
         //Initialize all videos from folder as videos
         List<File> videosInDir = getListFiles(videosDir);
         for (File video : videosInDir) {
@@ -603,12 +528,7 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedSymmetricKey(String videoTag) {
-        File keyDir;
-        if (saveInInternalStorage) {
-            keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR);
-        } else {
-            keyDir = new File(EXTERNAL_STORAGE_DIR_PICTURES + File.separator + KEY_DIR);
-        }
+        File keyDir = getFilesDir(File.separator + KEY_DIR);
         // if dir is not existing, create dir
         if (!keyDir.exists()) {
             if (!keyDir.mkdirs()) {
@@ -632,14 +552,7 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedVideo(String videoTag) {
-        File videoDir;
-        if (saveInInternalStorage) {
-            videoDir = new File(context.getFilesDir() +
-                    File.separator + VIDEO_DIR);
-        } else {
-            videoDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + VIDEO_DIR);
-        }
+        File videoDir = getFilesDir(File.separator + VIDEO_DIR);
         // if dir is not existing, create dir
         if(!videoDir.exists()) {
                 Log.d(TAG, "no video directory existing");
@@ -659,14 +572,7 @@ public class MemoryManager {
      */
     @Nullable
     public File getEncryptedMetadata(String videoTag) {
-        File metaDir;
-        if (saveInInternalStorage) {
-            metaDir = new File(context.getFilesDir() +
-                    File.separator + META_DIR);
-        } else {
-            metaDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + META_DIR);
-        }
+        File metaDir = getFilesDir(File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
                 Log.d(TAG, "no meta directory existing");
@@ -686,14 +592,7 @@ public class MemoryManager {
      */
     @Nullable
     public File getReadableMetadata(String videoTag) {
-        File metaDir;
-        if (saveInInternalStorage) {
-            metaDir = new File(context.getFilesDir() +
-                    File.separator + META_DIR);
-        } else {
-            metaDir = new File(EXTERNAL_STORAGE_DIR_PICTURES +
-                    File.separator + META_DIR);
-        }
+        File metaDir = getFilesDir(File.separator + META_DIR);
         // if dir is not existing, create dir
         if(!metaDir.exists()) {
                 Log.d(TAG, "no meta directory existing");
@@ -720,5 +619,15 @@ public class MemoryManager {
             }
         }
         return inFiles;
+    }
+
+    private File getFilesDir(String additionalPath) {
+        File file;
+        if (saveInInternalStorage) {
+            file = new File(context.getFilesDir() + additionalPath);
+        } else {
+            file = new File(EXTERNAL_STORAGE_DIR_PICTURES + additionalPath);
+        }
+        return file;
     }
 }
