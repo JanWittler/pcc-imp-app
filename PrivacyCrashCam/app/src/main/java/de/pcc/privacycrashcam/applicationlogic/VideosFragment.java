@@ -217,7 +217,7 @@ public class VideosFragment extends Fragment {
             String unformatted = getContext().getString(R.string.meta_info);
             // todo format date according to localization  and print g force as a vector (maybe add a method to Metadata.java for this)
             String formatted = String.format(unformatted, getDate(videoMeta.getDate(), "dd.MM.yyyy HH:mm:ss"),
-                    videoMeta.getTriggerType(), videoMeta.getgForce().toString());
+                    videoMeta.getTriggerType(), videoMeta.getgForce()[0] + ", " + videoMeta.getgForce()[1] + ", " + videoMeta.getgForce()[2]);
 
             // show a dialog
             new HTMLDialogViewer(getContext(), inflater, getContext().getResources().getString(R.string.meta_info_title), formatted).showDialog();
