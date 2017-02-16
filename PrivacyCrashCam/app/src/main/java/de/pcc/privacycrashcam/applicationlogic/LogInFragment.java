@@ -58,18 +58,22 @@ public class LogInFragment extends Fragment {
                            case FAILURE_MISMATCH:
                                Toast.makeText(getContext(), "Mail and password are not matching",
                                 Toast.LENGTH_SHORT).show();
+                               changeVisibility(login, loginProgress);
                                break;
                            case FAILURE_MISSING:
                                Toast.makeText(getContext(), "Account not existing",
                                 Toast.LENGTH_SHORT).show();
+                               changeVisibility(login, loginProgress);
                                break;
                            case FAILURE_OTHER:
                                Toast.makeText(getContext(), "Account error!",
                                 Toast.LENGTH_SHORT).show();
+                               changeVisibility(login, loginProgress);
                                break;
                            default:
                                Toast.makeText(getContext(), getString(R.string.error_no_connection),
                                 Toast.LENGTH_SHORT).show();
+                               changeVisibility(login, loginProgress);
                                break;
                        }
                     }
@@ -83,8 +87,7 @@ public class LogInFragment extends Fragment {
                     public void onError(String error) {
                         Toast.makeText(getContext(), getString(R.string.error_no_connection),
                                 Toast.LENGTH_SHORT).show();
-                        loginProgress.setVisibility(View.INVISIBLE);
-                        login.setVisibility(View.VISIBLE);
+                        changeVisibility(login, loginProgress);
                     }
                 });
             }
