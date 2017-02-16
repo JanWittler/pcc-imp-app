@@ -187,7 +187,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
         Log.i(TAG, "All files to be concatenated were written");
 
-        File concatVid = memoryManager.getTempVideoFile(); // todo change to non temp
+        File concatVid = memoryManager.getTempVideoFile();
         if (!concatVideos(vidSnippets, concatVid))
             return false;
 

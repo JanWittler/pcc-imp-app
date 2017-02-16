@@ -32,7 +32,10 @@
 
     <!-- VIDEO LIST -->
     <string name="meta_info_title">Info</string>
-    <string name="meta_info">Date:%1$s\\nTrigger Type:%2$s\\nG-Force:%3$s</string>
+    <string name="meta_info">
+        Date:%1$s
+        Trigger Type:%2$s
+        G-Force:%3$s</string>
     <string name="video_upload_success">Video uploaded :)</string>
 
     <!-- ERROR MESSAGES -->

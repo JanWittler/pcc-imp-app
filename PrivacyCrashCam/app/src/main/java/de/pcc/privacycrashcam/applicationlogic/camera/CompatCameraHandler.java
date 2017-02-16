@@ -244,7 +244,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             return false;
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
 
-        mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
+        mediaRecorder.setMaxDuration(settings.getBufferSizeSec() * 1000);
         mediaRecorder.setOrientationHint(90);
         mediaRecorder.setOnInfoListener(this);
 
