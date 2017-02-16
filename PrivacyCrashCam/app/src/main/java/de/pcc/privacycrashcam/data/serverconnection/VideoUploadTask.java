@@ -48,7 +48,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
 
     /**
      * Sets up a new task to upload the video data with the passed parameters
-     *  @param videoFile file pointing to the video to upload
+     * @param videoFile file pointing to the video to upload
      * @param metadata  file pointing to the metadata of the video
      * @param symKey    asymmetric encrypted key used to encrypt video and metadata
      * @param account   Account which will be used for upload
@@ -66,8 +66,12 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     }
 
     /**
+     * Uploads a dataset (consisting out of an encrypted video, metadata and symmetric key file)
+     * to the webservice for processing. As the process is resource intensive the work on the
+     * server is asynchronous so this waits for a response before processing it further on.
+     *
      * @param params Domain to access the API
-     * @return {@link RequestState}
+     * @return {@link RequestState} Returns if the upload was successful or what failed.
      */
     @Override
     protected RequestState doInBackground(String... params) {
@@ -75,12 +79,13 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
             return RequestState.FAILURE_NETWORK;
         }
 
-        RequestState requestState;
+        // setup client
         String domain = params[0];
-
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.target(domain).path(API_CALL).register(MultiPartFeature.class);
         Log.i(TAG, "URI: " + webTarget.getUri().toASCIIString());
+
+        // build multiPart
         MultiPart multiPart = new MultiPart();
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
         FileDataBodyPart video = new FileDataBodyPart("video", videoFile.getAbsoluteFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
@@ -91,16 +96,25 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
         multiPart.bodyPart(metadata);
         multiPart.bodyPart(key);
         multiPart.bodyPart(data);
+
+        // actual post call
         Future<Response> futureResponse = webTarget.request().async().post(Entity.entity(multiPart, multiPart.getMediaType()), Response.class);
-        String responseContent = "";
+
+        // wait for response
+        String responseContent;
         try {
             Response response = futureResponse.get();
             responseContent = response.readEntity(String.class);
         } catch (InterruptedException | ExecutionException e) {
             Log.i(TAG, "Failure on getting response!");
+            client.close();
             return RequestState.FAILURE_OTHER;
         }
+        client.close();
+
+        // handle response
         Log.i(TAG, "response: " + responseContent);
+        RequestState requestState;
 
         switch (responseContent) {
             case API_RESPONSE_SUCCESS:
