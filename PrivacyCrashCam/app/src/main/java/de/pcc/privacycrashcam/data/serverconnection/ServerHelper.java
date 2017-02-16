@@ -21,8 +21,9 @@ public class ServerHelper {
     /**
      * Domain to connect to the API
      */
-    public static final String HOST = "http://laubenstone.de:2222";
-    public static final String URL = HOST + "/webservice/";
+    public static final String PORT = ":2222";
+    public static final String HOST = "http://laubenstone.de";
+    public static final String URL = HOST + PORT + "/webservice/";
 
     /**
      * Synchronous method which pings the server and checks if it is reachable. Do not use this on
