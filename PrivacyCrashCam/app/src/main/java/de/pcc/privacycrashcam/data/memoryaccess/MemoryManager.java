@@ -72,7 +72,7 @@ public class MemoryManager {
      * if we test, we need access to the files, so here is a boolean to change between
      * internal and external storage
      */
-    private final boolean saveInInternalStorage = false;
+    private final boolean saveInInternalStorage = true;
     private final File EXTERNAL_STORAGE_DIR_PICTURES = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES);
 
