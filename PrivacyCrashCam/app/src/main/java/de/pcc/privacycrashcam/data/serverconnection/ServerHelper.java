@@ -33,28 +33,14 @@ public class ServerHelper {
      * @return true when network was reached, false otherwise
      */
     public static boolean IsNetworkAvailable (Context context) {
-        ConnectivityManager mConnManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        boolean isTheoreticallyAvailable = (mConnManager.getActiveNetworkInfo() != null
-                && mConnManager.getActiveNetworkInfo().isConnected()
-                && mConnManager.getActiveNetworkInfo().isConnectedOrConnecting());
-
-        if(!isTheoreticallyAvailable)
-            return false;
-
         try {
-            java.net.URL mUrl = new URL(HOST);
-            HttpURLConnection mUrlConn = (HttpURLConnection) (mUrl).openConnection();
-            mUrlConn.setRequestProperty("User-Agent", "Test");
-            mUrlConn.setRequestProperty("Connection", "close");
-            mUrlConn.setConnectTimeout(1500);
-            mUrlConn.connect();
-            return (mUrlConn.getResponseCode() >= 200
-                    && mUrlConn.getResponseCode() <= 299);
-        } catch (IOException e) {
+            Process p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 google.com");
+            int returnVal = p1.waitFor();
+            boolean reachable = (returnVal==0);
+            return reachable;
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
-
+        return false;
     }
-
 }
