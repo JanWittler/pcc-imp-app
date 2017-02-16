@@ -53,7 +53,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
      * @param symKey    asymmetric encrypted key used to encrypt video and metadata
      * @param account   Account which will be used for upload
      * @param callback  Observer which is notified about errors and state changes
-     * @param context
+     * @param context   Application context
      */
     public VideoUploadTask(File videoFile, File metadata, File symKey, Account account,
                            ServerResponseCallback<RequestState> callback, Context context) {

@@ -51,9 +51,10 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
 
     /**
      * Sets up a new task to authenticate the user with the passed parameters
-     *  @param account   Account which will be used for upload
-     * @param callback  Observer which is notified about errors and state changes
-     * @param context
+     *
+     * @param account  Account which will be used for upload
+     * @param callback Observer which is notified about errors and state changes
+     * @param context  Application context
      */
     public AuthenticateTask(Account account, ServerResponseCallback<AuthenticationState> callback, Context context) {
         this.account = account;
@@ -110,7 +111,7 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     protected void onPostExecute(AuthenticationState requestState) {
         super.onPostExecute(requestState);
 
-        if(requestState != AuthenticationState.FAILURE_NETWORK)
+        if (requestState != AuthenticationState.FAILURE_NETWORK)
             callback.onResponse(requestState);
         else callback.onError("No network available");
     }

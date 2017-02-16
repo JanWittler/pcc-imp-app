@@ -108,8 +108,10 @@ public class MemoryManager {
      */
     public Settings getSettings() {
         Settings settings;
+        String jSettings = appPreferences.getString(Settings.SETTINGS_MAIN_KEY, null);
+        if(jSettings == null) return new Settings();
         try {
-            settings = new Settings(appPreferences.getString(Settings.SETTINGS_MAIN_KEY, ""));
+            settings = new Settings(jSettings);
         } catch (JSONException e) {
             settings = new Settings();
         }
@@ -402,7 +404,6 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video this file will be associated with
      */
-
     public File createEncryptedSymmetricKeyFile(String videoTag) {
         // use Key.PREFIX as prefix! See Video class for guidance
         File keyDir = new File(context.getFilesDir() + File.separator + KEY_DIR); // CameraHelper.getOutputFile(KEY_PREFIX, videoTag, Metadata.SUFFIX);
