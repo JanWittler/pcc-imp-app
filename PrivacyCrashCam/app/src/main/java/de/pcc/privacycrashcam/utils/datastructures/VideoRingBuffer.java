@@ -16,6 +16,11 @@ import java.util.concurrent.ArrayBlockingQueue;
  * @author Giorgio Groß, Josh Romanowski
  */
 public class VideoRingBuffer {
+
+    /* #############################################################################################
+     *                                  attributes
+     * ###########################################################################################*/
+
     /**
      * Hash table to quickly look up the buffered items from the file observer's onEvent method.
      * We use filenames as key. The reference table might contain more elements than the queue
@@ -27,6 +32,10 @@ public class VideoRingBuffer {
     private Queue<File> queue;
     private int capacity;
     private FileObserver directoryObserver;
+
+    /* #############################################################################################
+     *                                  constructors
+     * ###########################################################################################*/
 
     /**
      * Creates a new queue with the passed capacity.
@@ -55,13 +64,9 @@ public class VideoRingBuffer {
         this.directoryObserver.startWatching();
     }
 
-    /**
-     * Returns the real capacity of the buffer which is the original capacity + 1.
-     * @return total capacity
-     */
-    public int getCapacity() {
-        return capacity;
-    }
+    /* #############################################################################################
+     *                                  methods
+     * ###########################################################################################*/
 
     /**
      * Add a new file to the buffer. Will remove and delete the oldest file from the buffer if the
@@ -134,5 +139,18 @@ public class VideoRingBuffer {
     public void destroy() {
         flushAll();
         directoryObserver.stopWatching();
+    }
+
+    /* #############################################################################################
+     *                                  getter/setter
+     * ###########################################################################################*/
+
+    /**
+     * Returns the real capacity of the buffer which is the original capacity + 1.
+     *
+     * @return total capacity
+     */
+    public int getCapacity() {
+        return capacity;
     }
 }

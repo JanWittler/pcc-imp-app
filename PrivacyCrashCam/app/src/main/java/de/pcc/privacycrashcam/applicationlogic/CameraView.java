@@ -1,13 +1,9 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
 import android.content.Context;
-import android.hardware.Camera;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.io.IOException;
 
 import de.pcc.privacycrashcam.applicationlogic.camera.CameraHandler;
 
@@ -22,7 +18,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
      *                                  attributes
      * ###########################################################################################*/
 
-    private final static String TAG = "CAM_VIEW";
     private SurfaceHolder mHolder;
     private CameraHandler cameraHandler;
 
