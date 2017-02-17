@@ -19,6 +19,11 @@ import javax.crypto.SecretKey;
 /**
  * Class that takes a symmetric AES SecretKey and encrypts files with it.
  *
+ * <p>Specifically uses AES/ECB/PKCS5Padding version of the AES algorithm as standard AES algorithms
+ * vary between Android and desktop JRE's. Therefore be careful when changing the algorithms.
+ * Also exclusively uses 128 bit keys as some Android devices use other formats as default
+ * but 128 bit is the only size supported by all Java JRE's.</p>
+ *
  * @author Josh Romanowski
  */
 

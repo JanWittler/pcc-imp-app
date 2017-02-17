@@ -14,6 +14,8 @@ import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -24,8 +26,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
@@ -71,7 +71,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      */
     private VideoRingBuffer ringbuffer;
     /**
-     * Encryptor used to encrypt files and keys.
+     * Encryptor used to encryptAndPersist files and keys.
      */
     private Encryptor encryptor;
     /**
@@ -191,8 +191,8 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         if (!concatVideos(vidSnippets, concatVid))
             return false;
 
-        // encrypt files
-        if (!encrypt(videoTag, concatVid, metaLocation))
+        // encryptAndPersist files
+        if (!encryptAndPersist(videoTag, concatVid, metaLocation))
             return false;
 
         // delete temporary files
@@ -221,22 +221,42 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * Saves the files on the app. Destination files will be created according to the MemoryManager.
      *
      * @param videoTag    Name added to the actual video name
-     * @param concatVideo Location of the video to encrypt.
-     * @param meta        Location of the metadata to encrypt.
+     * @param concatVideo Location of the video to encryptAndPersist.
+     * @param meta        Location of the metadata to encryptAndPersist.
      * @return Returns whether encrypting was successful or not.
      */
-    private boolean encrypt(String videoTag, File concatVideo, File meta) {
+    private boolean encryptAndPersist(String videoTag, File concatVideo, File meta) {
+        // encrypt
         File[] input = new File[]{
                 concatVideo,
                 meta};
         File[] output = new File[]{
-                memoryManager.createEncryptedVideoFile(videoTag),
+                memoryManager.getTempVideoFile(),
                 memoryManager.createEncryptedMetaFile(videoTag)};
         File encKey = memoryManager.createEncryptedSymmetricKeyFile(videoTag);
-
         InputStream publicKey = context.getResources().openRawResource(R.raw.publickey);
+        if (!encryptor.encrypt(input, output, publicKey, encKey))
+            return false;
 
-        return encryptor.encrypt(input, output, publicKey, encKey);
+        // finally persist encrypted video
+        byte[] buffer = new byte[1024];
+        int read;
+        try {
+            FileInputStream fis = new FileInputStream(output[0]);
+            FileOutputStream fos = new FileOutputStream(memoryManager.createEncryptedVideoFile(videoTag));
+
+            while ((read = fis.read(buffer)) != -1) {
+                fos.write(buffer, 0, read);
+            }
+            fos.flush();
+            fis.close();
+            fos.close();
+        } catch (IOException e) {
+            Log.w(TAG, "Persisting encrypted video failed");
+            return false;
+        }
+
+        return true;
     }
 
     /**
