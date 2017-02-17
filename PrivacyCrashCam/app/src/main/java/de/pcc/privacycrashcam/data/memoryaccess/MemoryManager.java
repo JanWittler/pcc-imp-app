@@ -639,6 +639,14 @@ public class MemoryManager {
     }
 
     /**
+     * returns a directory rootProjectDir without an additional path
+     * @return the path as File
+     */
+    private File getFilesDir() {
+        return getFilesDir("");
+    }
+
+    /**
      * returns a directory rootProjectDir/additionalPath
      * the rootProjectDir depends on the boolean saveInternalStorage, so if the boolean is
      * true: the path is in internalStorage, false: the path is in externalStorage
