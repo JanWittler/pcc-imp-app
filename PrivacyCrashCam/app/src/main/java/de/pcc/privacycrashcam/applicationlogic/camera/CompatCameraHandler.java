@@ -375,11 +375,12 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void pauseHandler() {
-        if (!isHandlerRunning) return;
-
+        if(isHandlerRunning) {
+            // take care of stopping recording
+            forceStopMediaRecorder();
+        }
         isHandlerRunning = false;
-        // take care of stopping preview and recording
-        forceStopMediaRecorder();
+        // take care of stopping preview
         releaseMediaRecorder();
         releaseCamera();
     }
@@ -413,8 +414,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             videoRingBuffer.put(currentOutputFile);
         } catch (RuntimeException re) {
             // No valid data was recorded as MediaRecorder.stop() was called before or right after
-            // MediaRecorder.start(). Remove the incomplete file fro the buffer and delete it; a new
-            // one will be allocated as soon as the Handler is resumed
+            // MediaRecorder.start(). Remove the incomplete file from the buffer and delete it;
+            // a new one will be allocated as soon as the Handler is resumed
             if (currentOutputFile != null && currentOutputFile.exists()) currentOutputFile.delete();
             re.printStackTrace();
         }
