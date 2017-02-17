@@ -6,7 +6,7 @@ import android.media.MediaRecorder;
 /**
  * Media Recorder for recording video only.
  *
- * @author The one and only G.I.Giorgio
+ * @author Giorgio
  */
 public class MutedMediaRecorder extends MediaRecorder {
 
