@@ -153,7 +153,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         // choose suitable fps rate
         int desiredFps = settings.getFps();
         List<int []> fpsRanges = cameraParameters.getSupportedPreviewFpsRange();
-        camcorderProfile.videoFrameRate = fpsRanges.get(0)[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+        camcorderProfile.videoFrameRate = (int) Math.floor((double) fpsRanges.get(0)[Camera.Parameters.PREVIEW_FPS_MAX_INDEX] / (double) 1000);
         for(int[] range : fpsRanges) {
             int min = (int) Math.ceil((double) range[Camera.Parameters.PREVIEW_FPS_MIN_INDEX] / (double) 1000);
             int max = (int) Math.floor((double) range[Camera.Parameters.PREVIEW_FPS_MAX_INDEX] / (double) 1000);
