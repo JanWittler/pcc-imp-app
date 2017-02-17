@@ -48,18 +48,15 @@ public class SettingsFragment extends Fragment {
     Button b_decBuffer;
     Button logOut;
 
+    /**
+     * this is the size, the + and - which increase/decrease the buffer size change the value
+     */
     private final int BUFFER_CHUNK_SIZE = 5;
 
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
 
-    /**
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
-     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -73,6 +70,7 @@ public class SettingsFragment extends Fragment {
 
         /**
          * resolution handling
+         * onClickListener resHandler, which changes quality
          */
         View.OnClickListener resHandler = new View.OnClickListener() {
             public void onClick(View v) {
@@ -111,7 +109,10 @@ public class SettingsFragment extends Fragment {
         res_Low = (Button) base.findViewById(R.id.tv_resLow);
         res_Low.setOnClickListener(resHandler);
 
+        // resets the colors of the resolution buttons
         resetButtonColors();
+        // get the actual quality saved in the settings and set this as the active
+        // button in the view
         switch (settings.getQuality()) {
             case Settings.QUALITY_DEFAULT:
                  res_Med.setTextColor(
@@ -129,6 +130,7 @@ public class SettingsFragment extends Fragment {
                 Log.d(TAG, "No default Quality set");
                 break;
         }
+
         /**
          * frames handling
          */
@@ -189,9 +191,13 @@ public class SettingsFragment extends Fragment {
         b_decBuffer = (Button) base.findViewById(R.id.b_decBuffer);
         b_decBuffer.setOnClickListener(bufferHandler);
 
+        // get the actual buffer size saved in the settings and set this value in the view
         bufferSize = (TextView) base.findViewById(R.id.tv_bufferSize);
         bufferSize.setText(settings.getBufferSizeSec() + "sec");
 
+        /**
+         * logout
+         */
         logOut = (Button) base.findViewById(R.id.logOut);
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,7 +210,7 @@ public class SettingsFragment extends Fragment {
     }
 
     /**
-     *
+     * resets the resolution buttons to default color
      */
     private void resetButtonColors() {
         res_High.setTextColor(ContextCompat.getColor(getContext(), R.color.buttonColorDefault));
