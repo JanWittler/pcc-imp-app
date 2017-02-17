@@ -497,7 +497,9 @@ public class MemoryManager {
         return new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
     }
 
-    // todo add convenience method to delete all files associated with one video which will call deleteEncryptedSymmetricKeyFile, deleteEncryptedVideoFile, deleteEncryptedMetadataFile and deleteReadableMetadata
+    // todo add convenience method to delete all files associated with one video which will call
+    // deleteEncryptedSymmetricKeyFile, deleteEncryptedVideoFile, deleteEncryptedMetadataFile and
+    // deleteReadableMetadata (nice to have)
 
 
     /**

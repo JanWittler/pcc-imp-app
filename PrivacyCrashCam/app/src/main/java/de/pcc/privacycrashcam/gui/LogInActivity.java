@@ -52,6 +52,10 @@ public class LogInActivity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        manageUiFlow();
+    }
+
+    private void manageUiFlow() {
         if (!hasPermissions()) {
             replaceFragment(new WelcomeFragment());
         } else if (!LogInHelper.IsUserLoggedIn(getApplicationContext())) {
@@ -76,7 +80,8 @@ public class LogInActivity extends MainActivity {
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSIONS_REQUEST:
-                recreate();
+                manageUiFlow();
+                break;
         }
     }
 

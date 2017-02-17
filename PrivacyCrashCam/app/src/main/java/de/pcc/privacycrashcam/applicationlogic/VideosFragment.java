@@ -157,7 +157,6 @@ public class VideosFragment extends Fragment {
             }
         }
 
-        // todo following methods might throw a NPE untill the memory manager is implemented or mocked properly..
         // todo javadoc
 
         /**
@@ -215,7 +214,6 @@ public class VideosFragment extends Fragment {
             // set up the metadata content so that a user can read it easily
             Metadata videoMeta = videos.get(index).getReadableMetadata();
             String unformatted = getContext().getString(R.string.meta_info);
-            // todo format date according to localization  and print g force as a vector (maybe add a method to Metadata.java for this)
             String formatted = String.format(unformatted, getDate(videoMeta.getDate(), "dd.MM.yyyy HH:mm:ss"),
                     videoMeta.getTriggerType(), videoMeta.getgForce()[0] + ", " + videoMeta.getgForce()[1] + ", " + videoMeta.getgForce()[2]);
 

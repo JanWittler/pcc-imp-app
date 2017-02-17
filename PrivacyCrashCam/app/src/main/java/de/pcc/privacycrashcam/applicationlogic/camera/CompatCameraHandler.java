@@ -230,11 +230,12 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Sets up the media recorder with respect to the user's settings
      */
     private boolean prepareMediaRecorder() {
-        mediaRecorder = new MutedMediaRecorder();
+        mediaRecorder = new MediaRecorder(); // MutedMediaRecorder(); is not suitable for some devices
 
         camera.unlock();
         mediaRecorder.setCamera(camera);
 
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mediaRecorder.setProfile(camcorderProfile);
 
@@ -410,7 +411,9 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Restarts the media recorder.
      */
     private void restartMediaRecorder() {
-        // todo Synchronize this method. (Calls to this method will be made in a non predictable manner)
+        // Maybe we will need to synchronize this method. (Calls to this method will be made in a
+        // non predictable manner). Tough, all calls are stable and can be called safely in any
+        // state but we might get some warnings.
         if (!isHandlerRunning) return;
         releaseMediaRecorder();
         // start recording new chunk
