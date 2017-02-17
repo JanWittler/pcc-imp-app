@@ -52,6 +52,8 @@ public class SettingsFragment extends Fragment {
      * this is the size, the + and - which increase/decrease the buffer size change the value
      */
     private final int BUFFER_CHUNK_SIZE = 5;
+    private final int BUFFER_SIZE_MIN = 0;
+    private final int BUFFER_SIZE_MAX = 120;
 
     /* #############################################################################################
      *                                  methods
@@ -171,12 +173,14 @@ public class SettingsFragment extends Fragment {
                         bufferSize.setText(settings.getBufferSizeSec() + "sec");
                         break;
                     case R.id.b_decBuffer:
-                        if ((settings.getBufferSizeSec() - BUFFER_CHUNK_SIZE) > 0) {
+                        if ((settings.getBufferSizeSec() - BUFFER_CHUNK_SIZE) > BUFFER_SIZE_MIN &&
+                                (settings.getBufferSizeSec() -BUFFER_CHUNK_SIZE) <= BUFFER_SIZE_MAX)
+                            {
                             settings.setBufferSizeSec(settings.getBufferSizeSec() -
                                     BUFFER_CHUNK_SIZE);
                             bufferSize.setText(settings.getBufferSizeSec() + "sec");
                         } else {
-                            Log.d("SettingsFragment", "Buffer size cannot set under 0!");
+                            Log.d("SettingsFragment", "Buffer size exceed!");
                         }
                         break;
                     default:
