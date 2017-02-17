@@ -137,7 +137,7 @@ public class SettingsFragment extends Fragment {
          * frames handling
          */
         fpsBar = (SeekBar) base.findViewById(R.id.seekBar);
-        fpsBar.setProgress(settings.getFps());
+        fpsBar.setProgress(settings.getFps() - 10);
         fps = (TextView) base.findViewById(R.id.tv_frames);
         fps.setText(Integer.toString(settings.getFps()));
         fpsBar.requestLayout();
