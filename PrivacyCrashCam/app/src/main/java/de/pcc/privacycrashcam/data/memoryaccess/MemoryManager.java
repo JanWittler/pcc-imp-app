@@ -73,6 +73,12 @@ public class MemoryManager {
      * internal and external storage
      */
     private final boolean saveInInternalStorage = true;
+
+
+    /**
+     * this is the File of the Directory where the rootProjectDir should be in external storage
+     * in case, the boolean saveInInternalStorage is false
+     */
     private final File EXTERNAL_STORAGE_DIR_PICTURES = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES);
 
@@ -80,6 +86,10 @@ public class MemoryManager {
      *                                  constructors
      * ###########################################################################################*/
 
+    /**
+     * Constructor which assign local context, appPreferences and tempDirName
+     * @param context is the context
+     */
     public MemoryManager(Context context) {
         this.context = context;
 
@@ -398,7 +408,7 @@ public class MemoryManager {
 
     /**
      * Adds a suiting prefix to the video name and uses that String to create a new file inside the
-     * key folder on the external memory. The file may be used to write the encrypted symmetric
+     * key folder. The file may be used to write the encrypted symmetric
      * key.
      * <p>
      * <p>The file name will be key_<@param videoTag> where the tag resembles the ending of the file
@@ -421,7 +431,7 @@ public class MemoryManager {
 
     /**
      * Adds a suiting prefix to the video name and uses that String to create a new file inside the
-     * video folder on the external memory. The file may be used to write the encrypted video data.
+     * video folder. The file may be used to write the encrypted video data.
      * <p>
      * <p>The file name will be {@link Video#PREFIX VIDEO_}<@param videoTag> where the tag resembles
      * the ending of the file name, e.g. a date</p>
@@ -443,7 +453,7 @@ public class MemoryManager {
 
     /**
      * Adds a suiting prefix to the video name and uses that String to create a new file inside the
-     * metadata folder on the external memory. The file may be used to write the encrypted metadata.
+     * metadata folder. The file may be used to write the encrypted metadata.
      * <p>
      * <p>
      * The file name will be {@link Metadata#PREFIX META_}<@param videoTag> where the tag
@@ -466,7 +476,7 @@ public class MemoryManager {
 
     /**
      * Adds a suiting prefix to the video name and appends "_readable". Uses that String to create
-     * a new file inside the metadata folder on the external memory. The file may be used to write
+     * a new file inside the metadata folder. The file may be used to write
      * the readable metadata.
      * <p>
      * <p>The file name will be {@link Metadata#PREFIX_READABLE META_READABLE_}<@param videoTag>
@@ -491,8 +501,7 @@ public class MemoryManager {
 
 
     /**
-     * Creates and returns a list containing all encrypted videos saved in the video directory on
-     * the external memory.
+     * Creates and returns a list containing all encrypted videos saved in the video directory
      * <p>
      * <p>See {@link Video}</p>
      *
@@ -526,8 +535,7 @@ public class MemoryManager {
     }
 
     /**
-     * Gets the file containing the encrypted symmetric key from the key directory located on the
-     * external memory.
+     * Gets the file containing the encrypted symmetric key from the key directory
      *
      * @param videoTag Tag of the video the file is associated with
      * @return the encrypted symmetric key as a file or null if there is none
@@ -548,8 +556,7 @@ public class MemoryManager {
     }
 
     /**
-     * Gets the file containing the encrypted video from the video directory located on the
-     * external memory.
+     * Gets the file containing the encrypted video from the video directory
      * <p>
      * <p>If you know the video name but not the tag use {@link Video#extractTagFromName(String)}</p>
      *
@@ -610,8 +617,10 @@ public class MemoryManager {
     }
 
     /**
-     * @param parentDir
-     * @return
+     * creates a ArrayList of files in a directory recursively.
+     * So all Files in this directory will be added, the dirs in a folder as well.
+     * @param parentDir the directory which the files are in
+     * @return the Files of the given directory
      */
     private ArrayList<File> getListFiles(File parentDir) {
         ArrayList<File> inFiles = new ArrayList<File>();
@@ -627,6 +636,13 @@ public class MemoryManager {
         return inFiles;
     }
 
+    /**
+     * returns a directory rootProjectDir/additionalPath
+     * the rootProjectDir depends on the boolean saveInternalStorage, so if the boolean is
+     * true: the path is in internalStorage, false: the path is in externalStorage
+     * @param additionalPath is the additional Path after the rootProjectDir
+     * @return the path as File
+     */
     private File getFilesDir(String additionalPath) {
         File file;
         if (saveInInternalStorage) {
