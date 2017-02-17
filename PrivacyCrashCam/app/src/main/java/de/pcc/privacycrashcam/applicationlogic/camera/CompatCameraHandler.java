@@ -119,13 +119,12 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Sets all presets and settings applying to the camcorder profile. Camcorder profile needs to
      * be set up only once and can be reused later.
      */
-    private void setUpCamcorderProfile() {
+    private void setUpCamcorderProfile()  {
         camcorderProfile = CamcorderProfile.get(settings.getQuality());
 
         // Set camcorder profile's video width, height, fps which will be applied to the
         // mediaRecorder by MediaRecorder.setProfile(..);
         camcorderProfile.fileFormat = MediaRecorder.OutputFormat.MPEG_4;
-        camcorderProfile.videoFrameRate = settings.getFps();
     }
 
     /**
@@ -150,6 +149,20 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
         // set up camera parameters
         cameraParameters = camera.getParameters();
+
+        // choose suitable fps rate
+        int desiredFps = settings.getFps();
+        List<int []> fpsRanges = cameraParameters.getSupportedPreviewFpsRange();
+        camcorderProfile.videoFrameRate = fpsRanges.get(0)[Camera.Parameters.PREVIEW_FPS_MAX_INDEX];
+        for(int[] range : fpsRanges) {
+            int min = (int) Math.ceil((double) range[Camera.Parameters.PREVIEW_FPS_MIN_INDEX] / (double) 1000);
+            int max = (int) Math.floor((double) range[Camera.Parameters.PREVIEW_FPS_MAX_INDEX] / (double) 1000);
+            if(min <= desiredFps && max >= desiredFps) {
+                camcorderProfile.videoFrameRate = desiredFps;
+                break;
+            }
+        }
+
         // choose best video preview size
         List<Camera.Size> mSupportedPreviewSizes = cameraParameters.getSupportedPreviewSizes();
         List<Camera.Size> mSupportedVideoSizes = cameraParameters.getSupportedVideoSizes();
