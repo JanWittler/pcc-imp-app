@@ -415,7 +415,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             // No valid data was recorded as MediaRecorder.stop() was called before or right after
             // MediaRecorder.start(). Remove the incomplete file fro the buffer and delete it; a new
             // one will be allocated as soon as the Handler is resumed
-            currentOutputFile.delete();
+            if (currentOutputFile != null && currentOutputFile.exists()) currentOutputFile.delete();
             re.printStackTrace();
         }
     }
