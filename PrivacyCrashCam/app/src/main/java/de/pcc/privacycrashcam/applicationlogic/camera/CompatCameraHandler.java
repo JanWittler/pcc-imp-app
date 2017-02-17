@@ -119,7 +119,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Sets all presets and settings applying to the camcorder profile. Camcorder profile needs to
      * be set up only once and can be reused later.
      */
-    private void setUpCamcorderProfile()  {
+    private void setUpCamcorderProfile() {
         camcorderProfile = CamcorderProfile.get(settings.getQuality());
 
         // Set camcorder profile's video width, height, fps which will be applied to the
@@ -152,12 +152,12 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
         // choose suitable fps rate
         int desiredFps = settings.getFps();
-        List<int []> fpsRanges = cameraParameters.getSupportedPreviewFpsRange();
+        List<int[]> fpsRanges = cameraParameters.getSupportedPreviewFpsRange();
         camcorderProfile.videoFrameRate = (int) Math.floor((double) fpsRanges.get(0)[Camera.Parameters.PREVIEW_FPS_MAX_INDEX] / (double) 1000);
-        for(int[] range : fpsRanges) {
+        for (int[] range : fpsRanges) {
             int min = (int) Math.ceil((double) range[Camera.Parameters.PREVIEW_FPS_MIN_INDEX] / (double) 1000);
             int max = (int) Math.floor((double) range[Camera.Parameters.PREVIEW_FPS_MAX_INDEX] / (double) 1000);
-            if(min <= desiredFps && max >= desiredFps) {
+            if (min <= desiredFps && max >= desiredFps) {
                 camcorderProfile.videoFrameRate = desiredFps;
                 break;
             }
@@ -271,6 +271,11 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             e.printStackTrace();
             recordCallback.onError(context.getResources().getString(R.string.error_recorder));
             return false;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            recordCallback.onError(context.getResources().getString(R.string.error_undefined));
+            pauseHandler();
+            return false;
         }
         return true;
     }
@@ -294,9 +299,21 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     /**
      * Starts recording and writing into buffer
+     *
+     * @return true if starting succeeded
      */
-    private void startRecordingChunk() {
-        mediaRecorder.start();
+    private boolean startRecordingChunk() {
+        try {
+            mediaRecorder.start();
+            return true;
+        } catch (RuntimeException e) {
+            // Unexpected exception was thrown. This will make sure that our app doesn't bother
+            // other apps if it crashes as we ensure by this routine to release the camera on crash
+            e.printStackTrace();
+            recordCallback.onError(context.getResources().getString((R.string.error_undefined)));
+            pauseHandler();
+            return false;
+        }
     }
 
     /**
@@ -334,22 +351,10 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         if (!canOperate || isHandlerRunning) return;
 
         // take care of setting up camera, media recorder and recording
-        try {
-            if (!prepareCamera() || !prepareMediaRecorder()) {
-                pauseHandler();
-                return;
-            }
-        } catch (RuntimeException e) {
-            // Unexpected exception was thrown. This will make sure that our app doesn't bother
-            // other apps if it crashes as we ensure by this routine to release the camera on crash
-            e.printStackTrace();
-            recordCallback.onError(context.getResources().getString((R.string.error_undefined)));
+        if (!prepareCamera() || !prepareMediaRecorder() || !startRecordingChunk()) {
             pauseHandler();
             return;
         }
-
-        // all set ups were successful. Start recording and buffering
-        startRecordingChunk();
         isHandlerRunning = true;
     }
 
@@ -375,7 +380,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void pauseHandler() {
-        if(isHandlerRunning) {
+        if (isHandlerRunning) {
             // take care of stopping recording
             forceStopMediaRecorder();
         }
@@ -431,10 +436,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         if (!isHandlerRunning) return;
         releaseMediaRecorder();
         // start recording new chunk
-        if (!prepareMediaRecorder()) { // will allocate also a new output file
+        if (!prepareMediaRecorder() || !startRecordingChunk()) { // will allocate also a new output file
             pauseHandler();
-            return;
         }
-        startRecordingChunk();
     }
 }
