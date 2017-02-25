@@ -28,6 +28,8 @@ import de.pcc.privacycrashcam.data.serverconnection.RequestState;
 import de.pcc.privacycrashcam.data.serverconnection.ServerProxy;
 import de.pcc.privacycrashcam.data.serverconnection.ServerResponseCallback;
 
+import static de.pcc.privacycrashcam.data.serverconnection.RequestState.SUCCESS;
+
 /**
  * Shows all videos which were recorded by the user.
  *
@@ -40,28 +42,19 @@ public class VideosFragment extends Fragment {
      *                                  attributes
      * ###########################################################################################*/
 
-    private RelativeLayout base;
-    private ListView videosListView;
     private VideoListAdapter videoListAdapter;
-
 
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
 
-    /**
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
-     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // get the main layout describing the content and init view components
-        base = (RelativeLayout) inflater.inflate(R.layout.content_videos, container, false);
-        videosListView = (ListView) base.findViewById(R.id.lv_videos);
+        RelativeLayout base = (RelativeLayout) inflater.inflate(R.layout.content_videos, container, false);
+        ListView videosListView = (ListView) base.findViewById(R.id.lv_videos);
 
         // set up content
         MemoryManager memoryManager = new MemoryManager(getContext());
@@ -85,6 +78,7 @@ public class VideosFragment extends Fragment {
     }
 
     private class VideoListAdapter extends BaseAdapter {
+        private boolean isUploading = false;
         private MemoryManager memoryManager;
         private LayoutInflater inflater;
         private ArrayList<Video> videos;
@@ -129,12 +123,15 @@ public class VideosFragment extends Fragment {
             }
 
             mHolder.title.setText(videos.get(position).getName());
-            mHolder.caption.setText(String.format(getDate(videos.get(position).getReadableMetadata().getDate(), "dd.MM.yyyy HH:mm:ss")));
+            mHolder.caption.setText(getDate(
+                    videos.get(position).getReadableMetadata().getDate(), "dd.MM.yyyy HH:mm:ss"));
 
             mHolder.upload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    upload(position, mHolder);
+                    if (!isUploading) upload(position, mHolder);
+                    else
+                        Toast.makeText(getContext(), getString(R.string.upload_wait), Toast.LENGTH_SHORT).show();
                 }
             });
             mHolder.delete.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +145,7 @@ public class VideosFragment extends Fragment {
         }
 
         private void toggleProgressBar(VideoViewHolder mHolder) {
-            if(mHolder.progressUpload.getVisibility() == View.VISIBLE) {
+            if (mHolder.progressUpload.getVisibility() == View.VISIBLE) {
                 mHolder.progressUpload.setVisibility(View.GONE);
                 mHolder.upload.setVisibility(View.VISIBLE);
             } else {
@@ -160,11 +157,13 @@ public class VideosFragment extends Fragment {
         // todo javadoc
 
         /**
-         * @param index
+         * Deletes the video at the passed index and updates the list
+         *
+         * @param index video index
          */
         private void delete(int index) {
             Video item = videos.get(index);
-            String videoTag = item.extractTagFromName(item.getName());
+            String videoTag = Video.ExtractTagFromName(item.getName());
             memoryManager.deleteEncryptedVideoFile(videoTag);
             memoryManager.deleteEncryptedMetadataFile(videoTag);
             memoryManager.deleteReadableMetadata(videoTag);
@@ -175,11 +174,14 @@ public class VideosFragment extends Fragment {
         }
 
         /**
-         * @param index
-         * @param mHolder
+         * Uploads the video at the passed index
+         *
+         * @param index   video index in the video list
+         * @param mHolder View Holder to be updated
          */
         private void upload(int index, final VideoViewHolder mHolder) {
             toggleProgressBar(mHolder);
+            isUploading = true;
 
             Video item = videos.get(index);
             ServerProxy proxy = new ServerProxy(getContext());
@@ -188,9 +190,26 @@ public class VideosFragment extends Fragment {
                     new ServerResponseCallback<RequestState>() {
                         @Override
                         public void onResponse(RequestState response) {
-                            Toast.makeText(getContext(), getString(R.string.video_upload_success),
-                                    Toast.LENGTH_SHORT).show();
+                            switch (response) {
+                                case SUCCESS:
+                                    Toast.makeText(getContext(), getString(R.string.video_upload_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    break;
+                                case ACCOUNT_FAILURE:
+                                    Toast.makeText(getContext(), getString(R.string.error_account),
+                                            Toast.LENGTH_SHORT).show();
+                                    break;
+                                case NETWORK_FAILURE:
+                                    Toast.makeText(getContext(), getString(R.string.error_no_connection),
+                                            Toast.LENGTH_SHORT).show();
+                                    break;
+                                default:
+                                    Toast.makeText(getContext(), getString(R.string.error_undefined),
+                                            Toast.LENGTH_SHORT).show();
+
+                            }
                             toggleProgressBar(mHolder);
+                            isUploading = false;
                         }
 
                         @Override
@@ -203,12 +222,16 @@ public class VideosFragment extends Fragment {
                             Toast.makeText(getContext(), getString(R.string.error_no_connection),
                                     Toast.LENGTH_SHORT).show();
                             toggleProgressBar(mHolder);
+
+                            isUploading = false;
                         }
                     });
         }
 
         /**
-         * @param index
+         * Show video info.
+         *
+         * @param index video index
          */
         private void info(int index) {
             // set up the metadata content so that a user can read it easily
@@ -223,12 +246,12 @@ public class VideosFragment extends Fragment {
 
         /**
          * Return date in specified format.
+         *
          * @param milliSeconds Date in milliseconds
-         * @param dateFormat Date format
+         * @param dateFormat   Date format
          * @return String representing date in specified format
          */
-        public String getDate(long milliSeconds, String dateFormat)
-        {
+        private String getDate(long milliSeconds, String dateFormat) {
             // Create a DateFormatter object for displaying date in specified format.
             SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
