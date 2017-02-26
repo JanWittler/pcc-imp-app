@@ -55,7 +55,7 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     @Override
     protected AuthenticationState doInBackground(String... params) {
-        if (!ServerHelper.IsNetworkAvailable(context))
+        if (!ServerHelper.IsNetworkAvailable())
             return AuthenticationState.FAILURE_NETWORK;
 
         AuthenticationState resultState;

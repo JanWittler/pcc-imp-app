@@ -34,16 +34,15 @@ public class SettingsFragment extends Fragment {
     private MemoryManager memoryManager;
     private Settings settings;
 
-
-    TextView fps;
-    TextView bufferSize;
-    SeekBar fpsBar;
-    Button res_High;
-    Button res_Med;
-    Button res_Low;
-    Button b_incBuffer;
-    Button b_decBuffer;
-    Button logOut;
+    private TextView fps;
+    private TextView bufferSize;
+    private SeekBar fpsBar;
+    private Button res_High;
+    private Button res_Med;
+    private Button res_Low;
+    private Button b_incBuffer;
+    private Button b_decBuffer;
+    private Button logOut;
 
     /**
      * this is the size, the + and - which increase/decrease the buffer size change the value

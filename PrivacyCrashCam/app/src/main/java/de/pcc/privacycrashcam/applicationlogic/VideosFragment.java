@@ -238,8 +238,11 @@ public class VideosFragment extends Fragment {
             // set up the metadata content so that a user can read it easily
             Metadata videoMeta = videos.get(index).getReadableMetadata();
             String unformatted = getContext().getString(R.string.meta_info);
-            String formatted = String.format(unformatted, getDate(videoMeta.getDate(), "dd.MM.yyyy HH:mm:ss"),
-                    videoMeta.getTriggerType(), videoMeta.getgForce()[0] + ", " + videoMeta.getgForce()[1] + ", " + videoMeta.getgForce()[2]);
+            String formatted = String.format(unformatted,
+                    getDate(videoMeta.getDate(), "dd.MM.yyyy HH:mm:ss") + "<br>",
+                    videoMeta.getTriggerType() + "<br>",
+                    videoMeta.getgForce()[0] + ", " + videoMeta.getgForce()[1] + ", "
+                            + videoMeta.getgForce()[2]);
 
             // show a dialog
             new HTMLDialogViewer(getContext(), inflater, getContext().getResources().getString(R.string.meta_info_title), formatted).showDialog();

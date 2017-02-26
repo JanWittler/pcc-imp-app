@@ -36,9 +36,9 @@
     <string name="meta_info">
         Date:%1$s
         Trigger Type:%2$s
-        G-Force:%3$s</string>
+        G-Force (x,y,z):%3$s</string>
     <string name="video_upload_success">Video uploaded :)</string>
-    <string name="upload_wait">Please wait untill pending uploads have finished</string>
+    <string name="upload_wait">Please wait until pending uploads have finished</string>
 
     <!-- ERROR MESSAGES -->
     <string name="error_no_camera">Your device has no camera</string>
