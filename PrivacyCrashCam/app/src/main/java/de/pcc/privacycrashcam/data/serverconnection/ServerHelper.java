@@ -6,13 +6,13 @@ package de.pcc.privacycrashcam.data.serverconnection;
  * @author Giorgio Gross
  */
 
-class ServerHelper {
+public class ServerHelper {
     private final static String TAG = ServerHelper.class.getName();
     /**
      * Domain to connect to the API
      */
     static final String PORT = ":2222";
-    static final String HOST = "http://laubenstone.de";
+    public static final String HOST = "http://laubenstone.de";
     static final String URL = HOST + PORT + "/webservice/";
 
     /**

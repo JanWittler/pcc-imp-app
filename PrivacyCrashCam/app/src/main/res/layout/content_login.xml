@@ -59,6 +59,14 @@
         android:layout_alignStart="@+id/et_password"
         android:layout_marginTop="11dp" />
 
+    <Button
+        android:text="@string/register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/b_login"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/b_register" />
+
     <ProgressBar
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
@@ -66,6 +74,15 @@
         android:id="@+id/pb_login"
         android:visibility="invisible"
         android:layout_alignTop="@+id/b_login"
+        android:layout_alignStart="@+id/pb_register" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pb_register"
+        android:visibility="invisible"
+        android:layout_below="@+id/b_login"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

@@ -1,5 +1,7 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.data.serverconnection.AuthenticationState;
+import de.pcc.privacycrashcam.data.serverconnection.ServerHelper;
 import de.pcc.privacycrashcam.data.serverconnection.ServerProxy;
 import de.pcc.privacycrashcam.data.serverconnection.ServerResponseCallback;
 import de.pcc.privacycrashcam.gui.CameraActivity;
@@ -26,10 +29,25 @@ import de.pcc.privacycrashcam.gui.CameraActivity;
  * @author Giorgio Gross, David Laubenstein
  */
 public class LogInFragment extends Fragment {
+
+    private final static String URL_REGISTER = ServerHelper.HOST + ":9999";
+
     private EditText et_mail;
     private EditText et_password;
     private ProgressBar loginProgress;
+    private ProgressBar registerProgress;
     private Button login;
+    private Button register;
+
+    private View.OnClickListener mRegisterListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            toggleVisibility(register, registerProgress);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_REGISTER));
+            startActivity(browserIntent);
+        }
+
+    };
 
     private View.OnClickListener mLogInistener = new View.OnClickListener() {
 
@@ -102,6 +120,10 @@ public class LogInFragment extends Fragment {
         loginProgress = (ProgressBar) base.findViewById(R.id.pb_login);
         login = (Button) base.findViewById(R.id.b_login);
         login.setOnClickListener(mLogInistener);
+
+        registerProgress = (ProgressBar) base.findViewById(R.id.pb_register);
+        register = (Button) base.findViewById(R.id.b_register);
+        register.setOnClickListener(mRegisterListener);
         return base;
     }
 
