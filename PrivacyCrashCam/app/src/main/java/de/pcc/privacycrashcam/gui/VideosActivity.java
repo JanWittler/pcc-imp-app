@@ -9,11 +9,18 @@ import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.VideosFragment;
 
 /**
+ * Shows a list of all persisted videos. Includes functionality to vuew the metadata of each video
+ * and to upload or delete a video.
+ * <p>
+ * Sets the {@link VideosFragment} as content of the
+ * {@link ContainerActivity ContainerActivity}
+ * </p>
+ *
  * @author David Laubenstein
  *         Created by David Laubenstein on 1/27/17.
  */
 
-public class VideosActivity extends ContainerActivity{
+public class VideosActivity extends ContainerActivity {
 
     /* #############################################################################################
      *                                  attributes
@@ -30,7 +37,7 @@ public class VideosActivity extends ContainerActivity{
      *
      * @param calling the activity which is doing this call
      */
-    public static void Launch(Activity calling){
+    public static void Launch(Activity calling) {
         Intent intent = new Intent(calling, VideosActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);

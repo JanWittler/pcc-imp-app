@@ -32,8 +32,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
-        // deprecated setting, but required on Android versions prior to 3.0
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     }
 
     /* #############################################################################################

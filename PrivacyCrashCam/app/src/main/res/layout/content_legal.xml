@@ -30,7 +30,7 @@
         android:textColor="@color/colorPrimaryDark"
         android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
-    <!-- Add other Buttons here -->
+    <!-- Add other Buttons like privacy policy here when needed -->
 
 
 </LinearLayout>

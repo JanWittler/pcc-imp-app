@@ -14,9 +14,9 @@ public enum RequestState {
     SUCCESS,
 
     /**
-     * Netowrk not reachable
+     * Network not reachable
      */
-    FAILURE_NETWORK,
+    NETWORK_FAILURE,
 
     /**
      * The MultiPartForm had not the right input for this kind of request.
@@ -27,6 +27,11 @@ public enum RequestState {
      * An error occurred editing the video.
      */
     EDITING_FAILURE,
+
+    /**
+     * Account data outdated.
+     */
+    ACCOUNT_FAILURE,
 
     /**
      * Something unexpected went wrong.

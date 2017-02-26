@@ -3,8 +3,9 @@ package de.pcc.privacycrashcam.data;
 import java.io.File;
 
 /**
- * @author David Laubenstein
- * Created by David Laubenstein on 1/24/17.
+ * Encapsulates a video object.
+ *
+ * @author David Laubenstein, Giorgio Gross
  */
 
 public class Video {
@@ -45,7 +46,14 @@ public class Video {
         return name;
     }
 
-    public static String extractTagFromName(String name) {
+    /**
+     * Get the tag from the passed video name
+     * @param name video name
+     * @return the video tag or the passed string if the name does not match the Video RegEx
+     */
+    public static String ExtractTagFromName(String name) {
+        if(!name.matches(PREFIX + ".*\\." + SUFFIX)) return name;
+
         String tmp = "";
         if(name.startsWith(PREFIX)) {
             tmp = name.replaceFirst(PREFIX, "");

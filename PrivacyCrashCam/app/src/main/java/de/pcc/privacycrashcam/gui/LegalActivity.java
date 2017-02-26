@@ -9,17 +9,20 @@ import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.LegalFragment;
 
 /**
+ * Shows legal information and copyright notice.
+ * <p>
+ * Sets the {@link LegalFragment} as content of the
+ * {@link ContainerActivity ContainerActivity}
+ * </p>
+ *
  * @author David Laubenstein
  *         Created by David Laubenstein on 1/27/17.
  */
-
 public class LegalActivity extends ContainerActivity {
 
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-
-    private Fragment legalFragment;
 
     /* #############################################################################################
      *                                  methods
@@ -30,7 +33,7 @@ public class LegalActivity extends ContainerActivity {
      *
      * @param calling the activity which is doing this call
      */
-    public static void Launch(Activity calling){
+    public static void Launch(Activity calling) {
         Intent intent = new Intent(calling, LegalActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
@@ -38,8 +41,7 @@ public class LegalActivity extends ContainerActivity {
 
     @Override
     protected Fragment selectFragment() {
-        legalFragment = new LegalFragment();
-        return legalFragment;
+        return new LegalFragment();
     }
 
     @Override

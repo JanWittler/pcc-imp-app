@@ -11,6 +11,7 @@ import android.view.View;
 
 import java.io.FileNotFoundException;
 
+import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 
 /**
@@ -22,9 +23,6 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
     private final static String TAG = "TRG_CMP_CAM_HANDLER";
     private final static float MAX_G_FORCE = 2.3f;
     private final static float GRAVITY_CONSTANT = 10.0f;
-
-    private Sensor accelSensor;
-    private SensorManager sensorManager;
 
     private float[] accelValues = {0f, 0f, 0f};
     private long lastTap = 0;
@@ -42,9 +40,10 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
                                          RecordCallback recordCallback) {
         super(context, previewView, recordCallback);
 
-        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        Sensor accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if(!sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_FASTEST))
+            recordCallback.onError(context.getString(R.string.error_sensor));
     }
 
     /**
@@ -66,9 +65,11 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
         if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
         if (event.values == null) return;
 
-        /*Log.i(TAG, "VAL at 0: " + event.values[0]);
+        /*
+        Log.i(TAG, "VAL at 0: " + event.values[0]);
         Log.i(TAG, "VAL at 1: " + event.values[1]);
-        Log.i(TAG, "VAL at 2: " + event.values[2]);*/
+        Log.i(TAG, "VAL at 2: " + event.values[2]);
+        */
 
         this.accelValues = event.values;
 
@@ -95,6 +96,7 @@ public class TriggeringCompatCameraHandler extends CompatCameraHandler implement
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // ignored
     }
 
     /**

@@ -37,7 +37,7 @@ import de.pcc.privacycrashcam.data.Video;
  * <p>For file organisation, we use prefixes and tags:
  * <ul>
  * <li>A prefix indicates the type of file, like META_* or VIDEO_*</li>
- * <li>A tag marks a certain video and probably consists of the date the video was captured.
+ * <li>A tag marks a certain video and consists of the date the video was captured.
  * All  data related to that video will have the same tag appended after their prefix</li>
  * <p>
  * <li>Also note that files containing JSON Strings solely will have the suffix .json</li>
@@ -387,7 +387,7 @@ public class MemoryManager {
     /**
      * Deletes the file containing the encrypted video associated with the passed video tag.
      * <p>
-     * <p>If you know the video name but not the tag use {@link Video#extractTagFromName(String)}</p>
+     * <p>If you know the video name but not the tag use {@link Video#ExtractTagFromName(String)}</p>
      *
      * @param videoTag Tag of the video
      */
@@ -517,19 +517,19 @@ public class MemoryManager {
         List<File> videosInDir = getListFiles(videosDir);
         for (File video : videosInDir) {
             // access to Metadata
-            File metaDataFile = getEncryptedMetadata(Video.extractTagFromName(video.getName()));
+            File metaDataFile = getEncryptedMetadata(Video.ExtractTagFromName(video.getName()));
             //File metaDataFile = new File(context.getFilesDir() + File.separator + META_DIR +
              //       video.getName().replaceFirst(Video.PREFIX, Metadata.PREFIX).replaceFirst(Video.SUFFIX, Metadata.SUFFIX));
             Metadata readableMetadata = null;
             try {
-                readableMetadata = new Metadata(getReadableMetadata(Video.extractTagFromName(video.getName())));
+                readableMetadata = new Metadata(getReadableMetadata(Video.ExtractTagFromName(video.getName())));
             } catch (JSONException|IOException e) {
                 Log.d(TAG, "Error reading metadata file!");
             }
             // add video to arrayList
             allVideos.add(new Video(video.getName(), video,
                     metaDataFile,
-                    getEncryptedSymmetricKey(Video.extractTagFromName(video.getName())),
+                    getEncryptedSymmetricKey(Video.ExtractTagFromName(video.getName())),
                     readableMetadata
                     ));
         }
@@ -560,7 +560,7 @@ public class MemoryManager {
     /**
      * Gets the file containing the encrypted video from the video directory
      * <p>
-     * <p>If you know the video name but not the tag use {@link Video#extractTagFromName(String)}</p>
+     * <p>If you know the video name but not the tag use {@link Video#ExtractTagFromName(String)}</p>
      *
      * @param videoTag Tag of the video the file is associated with
      * @return the encrypted video as a file or null if there is none

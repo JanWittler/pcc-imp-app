@@ -31,5 +31,5 @@ public enum AuthenticationState {
     /**
      * Something unexpected went wrong
      */
-    FAILURE_OTHER;
+    FAILURE_OTHER
 }

@@ -2,8 +2,9 @@ package de.pcc.privacycrashcam.utils.dataprocessing;
 
 /**
  * Observes persisting of files. Gets notified about state changes of persisting.
+ *
+ * @author Giorgio Gross
  */
-
 public interface PersistCallback {
 
     /**
@@ -17,4 +18,5 @@ public interface PersistCallback {
      * @param status true if video was persisted, false if there was an error
      */
     void onPersistingStopped(boolean status);
+
 }

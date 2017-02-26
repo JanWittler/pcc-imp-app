@@ -3,14 +3,10 @@ package de.pcc.privacycrashcam.applicationlogic;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import de.pcc.privacycrashcam.R;
@@ -49,6 +45,9 @@ public class LegalFragment extends Fragment {
         return base;
     }
 
+    /**
+     * Show licenses in a dialog
+     */
     public void showLicenses () {
         new HTMLDialogViewer(getContext(), getLayoutInflater(null),
                 getString(R.string.legal_title), R.raw.legal).showDialog();

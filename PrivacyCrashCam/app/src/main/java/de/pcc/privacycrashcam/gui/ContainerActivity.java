@@ -8,17 +8,17 @@ import de.pcc.privacycrashcam.R;
 
 /**
  * Activity for simple views which have a toolbar and some content inside of a fragment.
+ * <p>
+ * Sets the fragment specified by the subclass as content of the {@link MainActivity}
+ * </p>
  *
  * @author Giorgio
  */
-
 public abstract class ContainerActivity extends MainActivity {
 
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-
-    private Fragment fragment;
 
     /* #############################################################################################
      *                                  methods
@@ -52,10 +52,10 @@ public abstract class ContainerActivity extends MainActivity {
 
     /**
      * Replaces the content_container with the passed fragment
+     *
      * @param fragment new fragment
      */
-    private void replaceFragment(Fragment fragment){
-        this.fragment = fragment;
+    private void replaceFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment,

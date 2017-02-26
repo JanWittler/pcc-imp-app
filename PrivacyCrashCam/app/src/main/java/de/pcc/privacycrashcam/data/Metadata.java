@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Datacontainer storing the metadata to the videorecording.
+ * Data container storing the metadata to the video recording.
  *
  * @author David Laubenstein, Giorgio Groß, Josh Romanowski
  */
@@ -94,7 +94,7 @@ public class Metadata {
     }
 
     public Metadata(File metaFile) throws JSONException, IOException {
-        String json = null;
+        String json;
         // read file
         if (metaFile != null) {
             InputStream inputStream = new FileInputStream(metaFile);

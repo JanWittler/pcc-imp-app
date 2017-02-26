@@ -208,6 +208,7 @@ public class VideosFragment extends Fragment {
                                             Toast.LENGTH_SHORT).show();
 
                             }
+
                             toggleProgressBar(mHolder);
                             isUploading = false;
                         }
@@ -221,8 +222,8 @@ public class VideosFragment extends Fragment {
                         public void onError(String error) {
                             Toast.makeText(getContext(), getString(R.string.error_no_connection),
                                     Toast.LENGTH_SHORT).show();
-                            toggleProgressBar(mHolder);
 
+                            toggleProgressBar(mHolder);
                             isUploading = false;
                         }
                     });

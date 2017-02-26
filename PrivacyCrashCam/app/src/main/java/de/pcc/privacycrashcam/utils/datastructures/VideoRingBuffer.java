@@ -4,6 +4,8 @@ import android.os.FileObserver;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import junit.framework.Assert;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Queue;
@@ -47,6 +49,7 @@ public class VideoRingBuffer {
     public VideoRingBuffer(int capacity, final File directory, final String suffix) {
         this.queue = new ArrayBlockingQueue<>(capacity);
         this.fileSavedLookupTable = new HashMap<>();
+        Assert.assertTrue(capacity > 0);
         this.capacity = capacity;
         this.directoryObserver = new FileObserver(directory.getAbsolutePath(),
                 FileObserver.CLOSE_WRITE) {
@@ -74,14 +77,19 @@ public class VideoRingBuffer {
      *
      * @param file element to be added
      */
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
     public void put(File file) {
         if (!queue.offer(file)) {
             // Queue reached its capacity. Remove head and retry.
+
+            // NPE warning for pop.delete() can be disabled as capacity is asserted to be greater
+            // than 0
             pop().delete();
+
             queue.add(file);
         }
 
-        // no need to add file to lookup table
+        // no need to add file to lookup table here
     }
 
     /**
@@ -124,6 +132,7 @@ public class VideoRingBuffer {
     /**
      * Removes all files from the buffer and deletes them.
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void flushAll() {
         fileSavedLookupTable.clear();
 

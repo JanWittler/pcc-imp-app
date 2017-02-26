@@ -20,14 +20,15 @@ import javax.crypto.SecretKey;
 
 /**
  * Class that takes an asymmetric RSA key and encrypts symmetric keys with it.
- *
- * <p>Specifically uses RSA/ECB/PKCS5Padding version of the RSA algorithm as standard RSA algorithms
- * vary between Android and desktop JRE's. Therefore be careful when changing the algorithms.</p>
+ * <p>
+ * Specifically uses RSA/ECB/PKCS5Padding version of the RSA algorithm as standard RSA algorithms
+ * vary between Android and desktop JRE's. Therefore be careful when changing the algorithms.
+ * </p>
  *
  * @author Josh Romanowski
  */
 
-public class RSAEncryptor implements IKeyEncryptor {
+class RSAEncryptor implements IKeyEncryptor {
 
     /* #############################################################################################
      *                                  attributes

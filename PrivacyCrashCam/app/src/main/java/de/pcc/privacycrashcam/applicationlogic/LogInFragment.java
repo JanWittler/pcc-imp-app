@@ -22,80 +22,91 @@ import de.pcc.privacycrashcam.gui.CameraActivity;
 
 /**
  * Shows the log in fragment.
- * @author Giorgio
+ *
+ * @author Giorgio Gross, David Laubenstein
  */
-
 public class LogInFragment extends Fragment {
-    private RelativeLayout base;
+    private EditText et_mail;
+    private EditText et_password;
+    private ProgressBar loginProgress;
+    private Button login;
+
+    private View.OnClickListener mLogInistener = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            toggleVisibility(login, loginProgress);
+
+            final String mail = et_mail.getText().toString();
+            final String pw = et_password.getText().toString();
+            Account account = new Account(mail, pw);
+
+            ServerResponseCallback<AuthenticationState> mCallback
+                    = new ServerResponseCallback<AuthenticationState>() {
+                @Override
+                public void onResponse(AuthenticationState response) {
+                    switch (response) {
+                        case SUCCESS:
+                            LogInHelper.SaveAccountData(mail, pw, getContext());
+                            CameraActivity.Launch(getActivity());
+                            getActivity().finish();
+                            break;
+                        case FAILURE_MISMATCH:
+                            Toast.makeText(getContext(), "Mail and password are not matching",
+                                    Toast.LENGTH_SHORT).show();
+                            toggleVisibility(login, loginProgress);
+                            break;
+                        case FAILURE_MISSING:
+                            Toast.makeText(getContext(), "Account not existing",
+                                    Toast.LENGTH_SHORT).show();
+                            toggleVisibility(login, loginProgress);
+                            break;
+                        case FAILURE_OTHER:
+                            Toast.makeText(getContext(), "Account error!",
+                                    Toast.LENGTH_SHORT).show();
+                            toggleVisibility(login, loginProgress);
+                            break;
+                        default:
+                            Toast.makeText(getContext(), getString(R.string.error_no_connection),
+                                    Toast.LENGTH_SHORT).show();
+                            toggleVisibility(login, loginProgress);
+                            break;
+                    }
+                }
+
+                @Override
+                public void onProgress(int percent) {
+                    // ignore this case
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), getString(R.string.error_no_connection),
+                            Toast.LENGTH_SHORT).show();
+                    toggleVisibility(login, loginProgress);
+                }
+            };
+            new ServerProxy(getContext()).authenticateUser(account, mCallback);
+        }
+    };
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // get the main layout describing the content
-        base = (RelativeLayout) inflater.inflate(R.layout.content_login, container, false);
+        RelativeLayout base = (RelativeLayout) inflater.inflate(R.layout.content_login, container, false);
 
         // init view components
-        final EditText et_mail = (EditText) base.findViewById(R.id.et_mail);
-        final EditText et_password = (EditText) base.findViewById(R.id.et_password);
-        final ProgressBar loginProgress = (ProgressBar) base.findViewById(R.id.pb_login);
-        final Button login = (Button) base.findViewById(R.id.b_login);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeVisibility(login, loginProgress);
-                final Account account = new Account(et_mail.getText().toString(),
-                        et_password.getText().toString());
-                new ServerProxy(getContext()).authenticateUser(account, new ServerResponseCallback<AuthenticationState>() {
-                    @Override
-                    public void onResponse(AuthenticationState response) {
-                        switch (response) {
-                           case SUCCESS:
-                               MemoryManager memoryManager = new MemoryManager(getContext());
-                               memoryManager.saveAccountData(account);
-                               CameraActivity.Launch(getActivity());
-                               getActivity().finish();
-                               break;
-                           case FAILURE_MISMATCH:
-                               Toast.makeText(getContext(), "Mail and password are not matching",
-                                Toast.LENGTH_SHORT).show();
-                               changeVisibility(login, loginProgress);
-                               break;
-                           case FAILURE_MISSING:
-                               Toast.makeText(getContext(), "Account not existing",
-                                Toast.LENGTH_SHORT).show();
-                               changeVisibility(login, loginProgress);
-                               break;
-                           case FAILURE_OTHER:
-                               Toast.makeText(getContext(), "Account error!",
-                                Toast.LENGTH_SHORT).show();
-                               changeVisibility(login, loginProgress);
-                               break;
-                           default:
-                               Toast.makeText(getContext(), getString(R.string.error_no_connection),
-                                Toast.LENGTH_SHORT).show();
-                               changeVisibility(login, loginProgress);
-                               break;
-                       }
-                    }
-
-                    @Override
-                    public void onProgress(int percent) {
-                        // ignore this case
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(getContext(), getString(R.string.error_no_connection),
-                                Toast.LENGTH_SHORT).show();
-                        changeVisibility(login, loginProgress);
-                    }
-                });
-            }
-        });
+        et_mail = (EditText) base.findViewById(R.id.et_mail);
+        et_password = (EditText) base.findViewById(R.id.et_password);
+        loginProgress = (ProgressBar) base.findViewById(R.id.pb_login);
+        login = (Button) base.findViewById(R.id.b_login);
+        login.setOnClickListener(mLogInistener);
         return base;
     }
-    private void changeVisibility(Button  button, ProgressBar progressBar) {
-        if(button.getVisibility() == View.VISIBLE) {
+
+    private void toggleVisibility(Button button, ProgressBar progressBar) {
+        if (button.getVisibility() == View.VISIBLE) {
             button.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
         } else {

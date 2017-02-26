@@ -39,10 +39,8 @@ import de.pcc.privacycrashcam.utils.encryption.Encryptor;
  * First it saves the metadata of the recording to a json file.
  * Then it takes all recorded video snippets and creates one coherent file.
  * After that all data gets encrypted and save to the app's data storage.
- * <p>
- * The process of persisting is asynchronous to the app's main thread.
- * Therefore callbacks are used to inform the app about the persisting's progress.
- * </p>
+ * <p>The process of persisting is asynchronous to the app's main thread.
+ * Therefore callbacks are used to inform the app about the persisting's progress.</p>
  *
  * @author Josh Romanowski, Giorgio Groß
  */

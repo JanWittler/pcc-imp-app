@@ -39,7 +39,6 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private final static int VIDEO_CHUNK_LENGTH = 5; // length of video chunks in seconds
 
     private Camera camera = null;
-    private Camera.Parameters cameraParameters = null;
     private CamcorderProfile camcorderProfile = null;
     private MediaRecorder mediaRecorder = null;
 
@@ -148,7 +147,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         }
 
         // set up camera parameters
-        cameraParameters = camera.getParameters();
+        Camera.Parameters cameraParameters = camera.getParameters();
 
         // choose suitable fps rate
         int desiredFps = settings.getFps();
@@ -243,7 +242,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * Sets up the media recorder with respect to the user's settings
      */
     private boolean prepareMediaRecorder() {
-        mediaRecorder = new MediaRecorder(); // MutedMediaRecorder(); is not suitable for some devices
+        // MutedMediaRecorder(); is not suitable for some devices
+        mediaRecorder = new MediaRecorder();
 
         camera.unlock();
         mediaRecorder.setCamera(camera);
@@ -262,9 +262,8 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         mediaRecorder.setOrientationHint(90);
         mediaRecorder.setOnInfoListener(this);
 
-        Log.d(TAG, "Media Recorder is set up");
         try {
-            // maybe put this in an async task if performance turns out to be poor
+            // this can be put in an async task if performance turns out to be poor
             mediaRecorder.prepare();
             Log.d(TAG, "Media Recorder is prepared");
         } catch (IOException e) {
@@ -305,15 +304,17 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
     private boolean startRecordingChunk() {
         try {
             mediaRecorder.start();
-            return true;
         } catch (RuntimeException e) {
-            // Unexpected exception was thrown. This will make sure that our app doesn't bother
+            // On some devices this exception is unexpectedly thrown when the user selected a
+            // certain fps value. The catch block will make sure that our app doesn't bother
             // other apps if it crashes as we ensure by this routine to release the camera on crash
             e.printStackTrace();
-            recordCallback.onError(context.getResources().getString((R.string.error_undefined)));
             pauseHandler();
+            recordCallback.onError(context.getResources().getString((R.string.error_undefined)));
             return false;
         }
+
+        return true;
     }
 
     /**
@@ -337,7 +338,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
         try {
             setUpBuffer();
         } catch (FileNotFoundException e) {
-            recordCallback.onError(context.getResources().getString(R.string.memory_error));
+            recordCallback.onError(context.getResources().getString(R.string.error_memory));
             canOperate = false;
         }
         setUpCamcorderProfile();
@@ -413,6 +414,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
      * invalid state (e.g. immediately after starting the media recorder) the output file will be
      * deleted.
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void forceStopMediaRecorder() {
         try {
             stopRecordingChunk(); // try to stop recording BEFORE inserting file into buffer

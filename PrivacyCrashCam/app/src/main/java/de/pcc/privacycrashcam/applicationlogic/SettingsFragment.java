@@ -1,6 +1,5 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,7 +24,6 @@ import static android.content.ContentValues.TAG;
  * Shows the settings view along with its view components and handles user input.
  *
  * @author Giorgio Gross, David Laubenstein
- *         Created by Giorgio Gross at 01/20/2017
  */
 public class SettingsFragment extends Fragment {
 
@@ -33,7 +31,6 @@ public class SettingsFragment extends Fragment {
      *                                  attributes
      * ###########################################################################################*/
 
-    private RelativeLayout base;
     private MemoryManager memoryManager;
     private Settings settings;
 
@@ -64,7 +61,7 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // get the main layout describing the content
-        base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
+        RelativeLayout base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
 
         memoryManager = new MemoryManager(getContext());
         settings = memoryManager.getSettings();
@@ -103,7 +100,6 @@ public class SettingsFragment extends Fragment {
         };
 
 
-
         res_High = (Button) base.findViewById(R.id.tv_resHigh);
         res_High.setOnClickListener(resHandler);
         res_Med = (Button) base.findViewById(R.id.tv_resMed);
@@ -117,16 +113,16 @@ public class SettingsFragment extends Fragment {
         // button in the view
         switch (settings.getQuality()) {
             case Settings.QUALITY_DEFAULT:
-                 res_Med.setTextColor(
-                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                res_Med.setTextColor(
+                        ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case Settings.QUALITY_HIGH:
                 res_High.setTextColor(
-                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                        ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case Settings.QUALITY_LOW:
                 res_Low.setTextColor(
-                                ContextCompat.getColor(getContext(), R.color.colorAccent));
+                        ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             default:
                 Log.d(TAG, "No default Quality set");
@@ -166,27 +162,26 @@ public class SettingsFragment extends Fragment {
          */
 
         View.OnClickListener bufferHandler = new View.OnClickListener() {
+
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.b_incBuffer:
-                        settings.setBufferSizeSec(settings.getBufferSizeSec() + BUFFER_CHUNK_SIZE);
-                        bufferSize.setText(settings.getBufferSizeSec() + "sec");
+                        if ((settings.getBufferSizeSec() + BUFFER_CHUNK_SIZE) <= BUFFER_SIZE_MAX) {
+                            settings.setBufferSizeSec(settings.getBufferSizeSec() + BUFFER_CHUNK_SIZE);
+                        }
                         break;
                     case R.id.b_decBuffer:
-                        if ((settings.getBufferSizeSec() - BUFFER_CHUNK_SIZE) > BUFFER_SIZE_MIN &&
-                                (settings.getBufferSizeSec() -BUFFER_CHUNK_SIZE) <= BUFFER_SIZE_MAX)
-                            {
+                        if ((settings.getBufferSizeSec() - BUFFER_CHUNK_SIZE) > BUFFER_SIZE_MIN) {
                             settings.setBufferSizeSec(settings.getBufferSizeSec() -
                                     BUFFER_CHUNK_SIZE);
-                            bufferSize.setText(settings.getBufferSizeSec() + "sec");
-                        } else {
-                            Log.d("SettingsFragment", "Buffer size exceed!");
                         }
                         break;
                     default:
                         System.out.println("default");
                         break;
                 }
+                bufferSize.setText(String.format(
+                        getString(R.string.bufferSizeValue), settings.getBufferSizeSec()));
             }
         };
 
@@ -197,11 +192,10 @@ public class SettingsFragment extends Fragment {
 
         // get the actual buffer size saved in the settings and set this value in the view
         bufferSize = (TextView) base.findViewById(R.id.tv_bufferSize);
-        bufferSize.setText(settings.getBufferSizeSec() + "sec");
+        bufferSize.setText(
+                String.format(getString(R.string.bufferSizeValue), settings.getBufferSizeSec()));
 
-        /**
-         * logout
-         */
+        // logout
         logOut = (Button) base.findViewById(R.id.logOut);
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override

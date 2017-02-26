@@ -1,6 +1,8 @@
 package de.pcc.privacycrashcam.data;
 
 /**
+ * Keys for accessing shared preferences.
+ *
  * @author Giorgio Gsross
  */
 public final class MemoryKeys {

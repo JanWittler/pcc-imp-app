@@ -20,6 +20,9 @@ import de.pcc.privacycrashcam.applicationlogic.WelcomeFragment;
 /**
  * Log In Activity which handles requesting permission, authenticating the user or starting the
  * {@link CameraActivity}.
+ * <p>
+ * Sets the {@link LogInFragment} as content of the {@link MainActivity}
+ * </p>
  *
  * @author Giorgio Armani or better known as the one and only G.I.Giorgio, David Laubenstein
  */
@@ -33,7 +36,7 @@ public class LogInActivity extends MainActivity {
      *
      * @param calling the activity which is doing this call
      */
-    public static void Launch(Activity calling){
+    public static void Launch(Activity calling) {
         Intent intent = new Intent(calling, LogInActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
@@ -66,6 +69,11 @@ public class LogInActivity extends MainActivity {
         }
     }
 
+    /**
+     * Requests the permissions from Android. Called after clicking the grant permissions button.
+     *
+     * @param v Clicked View
+     */
     public void grantPermissions(View v) {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.CAMERA,

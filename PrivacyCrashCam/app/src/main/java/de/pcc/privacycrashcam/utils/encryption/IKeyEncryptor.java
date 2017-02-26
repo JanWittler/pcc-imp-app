@@ -12,7 +12,7 @@ import javax.crypto.SecretKey;
  * @author Josh Romanowski
  */
 
-public interface IKeyEncryptor {
+interface IKeyEncryptor {
 
     /* #############################################################################################
      *                                  methods
@@ -29,5 +29,5 @@ public interface IKeyEncryptor {
      * @param output    Output file for the encrypted symmetric key.
      * @return Returns whether encrypting the secret key was successful or not.
      */
-    public boolean encrypt(SecretKey input, InputStream publicKey, File output);
+    boolean encrypt(SecretKey input, InputStream publicKey, File output);
 }

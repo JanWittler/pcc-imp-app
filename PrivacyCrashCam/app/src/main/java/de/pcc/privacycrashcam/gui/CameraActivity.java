@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -18,6 +17,15 @@ import de.pcc.privacycrashcam.applicationlogic.camera.CameraHandler;
 import de.pcc.privacycrashcam.applicationlogic.camera.RecordCallback;
 import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
 
+/**
+ * Activity showing the camera preview and starting all components necessary to record videos.
+ * <p>
+ * Sets the {@link CameraView} as content of the
+ * {@link MainActivity}
+ * </p>
+ *
+ * @author Giorgio Gross
+ */
 public class CameraActivity extends MainActivity {
 
     /* #############################################################################################
@@ -31,8 +39,6 @@ public class CameraActivity extends MainActivity {
     private CameraHandler mCamHandler;
     private View decorView;
 
-    private RecordCallback recordCallback;
-
     /* #############################################################################################
      *                                  methods
      * ###########################################################################################*/
@@ -42,7 +48,7 @@ public class CameraActivity extends MainActivity {
      *
      * @param calling the activity which is doing this call
      */
-    public static void Launch(Activity calling){
+    public static void Launch(Activity calling) {
         Intent intent = new Intent(calling, CameraActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
@@ -61,6 +67,12 @@ public class CameraActivity extends MainActivity {
         return R.layout.activity_main_drawer_transparenttoolbar;
     }
 
+    /**
+     * Get the menu entry which will be highlighted in the drawer. Pass -1 if you don't want to
+     * highlight any navigation menu entry.
+     *
+     * @return R.id.[menu_entry_id]
+     */
     @Override
     public int getMenuEntryId() {
         return R.id.nav_camera;
@@ -75,10 +87,11 @@ public class CameraActivity extends MainActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
+        // set camera view as content
         FrameLayout container = (FrameLayout) findViewById(R.id.content_container);
         getLayoutInflater().inflate(R.layout.content_camera, container, true);
 
-        recordCallback = new RecordCallback() {
+        RecordCallback recordCallback = new RecordCallback() {
             @Override
             public void onRecordingStarted() {
                 showRecordingSymbol();
@@ -100,7 +113,7 @@ public class CameraActivity extends MainActivity {
                 cameraPreview, recordCallback);
         mCamHandler.createHandler();
         cameraPreview.setOnClickListener((View.OnClickListener) mCamHandler);
-                cameraPreview.setCameraHandler(mCamHandler);
+        cameraPreview.setCameraHandler(mCamHandler);
 
         statusSymbol = (ImageView) findViewById(R.id.statusSymbol);
         showViewingSymbol();

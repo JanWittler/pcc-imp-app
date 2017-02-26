@@ -10,9 +10,10 @@ import de.pcc.privacycrashcam.applicationlogic.SettingsFragment;
 
 /**
  * Activity showing the settings of the app.
- *
- * <p>Sets the {@link SettingsFragment SettingsFragment} as content of the
- * {@link ContainerActivity ContainerActivity}</p>
+ * <p>
+ * Sets the {@link SettingsFragment SettingsFragment} as content of the
+ * {@link ContainerActivity ContainerActivity}
+ * </p>
  *
  * @author Giorgio Gross, David Laubenstein
  */
@@ -21,8 +22,6 @@ public class SettingsActivity extends ContainerActivity {
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
-
-    private Fragment settingsFragment;
 
     /* #############################################################################################
      *                                  methods
@@ -33,7 +32,7 @@ public class SettingsActivity extends ContainerActivity {
      *
      * @param calling the activity which is doing this call
      */
-    public static void Launch(Activity calling){
+    public static void Launch(Activity calling) {
         Intent intent = new Intent(calling, SettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         calling.startActivity(intent);
@@ -41,8 +40,7 @@ public class SettingsActivity extends ContainerActivity {
 
     @Override
     protected Fragment selectFragment() {
-        settingsFragment = new SettingsFragment();
-        return settingsFragment;
+        return new SettingsFragment();
     }
 
     @Override

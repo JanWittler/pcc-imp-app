@@ -1,5 +1,6 @@
 package de.pcc.privacycrashcam.applicationlogic;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,29 +17,35 @@ import java.util.Scanner;
 import de.pcc.privacycrashcam.R;
 
 /**
+ * Displays a dialog which shows an html file. Loading of the html file is done asynchronously.
+ *
  * @author Giorgio Gross
  */
-public class HTMLDialogViewer {
+class HTMLDialogViewer {
     private Context context;
     private WebView wv_licenses;
     private ProgressBar pb_licenseLoader;
     private View layout;
 
     private String title;
-    private @RawRes int rawRes;
+    private
+    @RawRes
+    int rawRes;
     private String content;
 
     /**
      * Creates and shows a web view displaying the passed html file.
      *
-     * @param context application context
-     * @param inflater a layout inflater
-     * @param title the title of the dialog
+     * @param context     application context
+     * @param inflater    a layout inflater
+     * @param title       the title of the dialog
      * @param rawResource the resource id of the html content
      */
-    public HTMLDialogViewer(Context context, LayoutInflater inflater, String title, @RawRes int rawResource){
+    @SuppressLint("InflateParams")
+    HTMLDialogViewer(Context context, LayoutInflater inflater, String title,
+                     @RawRes int rawResource) {
         this.context = context;
-        this.layout = inflater.inflate(R.layout.htmldialog, null);
+        this.layout = inflater.inflate(R.layout.htmldialog, null); // pass null as we show a dialog
         this.title = title;
         this.content = "";
         this.rawRes = rawResource;
@@ -47,12 +54,12 @@ public class HTMLDialogViewer {
     /**
      * Creates and shows a web view displaying the passed string inside an html file.
      *
-     * @param context application context
+     * @param context  application context
      * @param inflater a layout inflater
-     * @param title the title of the dialog
-     * @param content the content as a string to be shown
+     * @param title    the title of the dialog
+     * @param content  the content as a string to be shown
      */
-    public HTMLDialogViewer(Context context, LayoutInflater inflater, String title, String content){
+    HTMLDialogViewer(Context context, LayoutInflater inflater, String title, String content) {
         this.context = context;
         this.layout = inflater.inflate(R.layout.htmldialog, null);
         this.title = title;
@@ -63,13 +70,13 @@ public class HTMLDialogViewer {
     /**
      * Loads the specified raw resources and shows it in a dialog
      */
-    public void showDialog() {
+    void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         wv_licenses = (WebView) layout.findViewById(R.id.wv_licenses);
         pb_licenseLoader = (ProgressBar) layout.findViewById(R.id.pb_licenseLoader);
 
-        new HTMLfileLoader().execute();
+        new HTMLFileLoader().execute();
 
         builder.setTitle(title)
                 .setView(layout)
@@ -80,7 +87,10 @@ public class HTMLDialogViewer {
 
     }
 
-    private class HTMLfileLoader extends AsyncTask<Void, Void, Void> {
+    /**
+     * Async file loader for the html document.
+     */
+    private class HTMLFileLoader extends AsyncTask<Void, Void, Void> {
         StringBuilder sBuilder;
 
         @Override
@@ -91,7 +101,7 @@ public class HTMLDialogViewer {
         protected Void doInBackground(Void... params) {
             sBuilder = new StringBuilder();
 
-            if(rawRes != 0) {
+            if (rawRes != 0) {
                 InputStream rawResource = context.getResources().openRawResource(rawRes);
                 if (rawResource != null) {
                     Scanner scan = new Scanner(rawResource);
@@ -110,7 +120,7 @@ public class HTMLDialogViewer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if(wv_licenses != null && sBuilder != null && !isCancelled()) {
+            if (wv_licenses != null && sBuilder != null && !isCancelled()) {
                 wv_licenses.loadDataWithBaseURL(null, sBuilder.toString(), "text/html", "utf-8", null);
                 wv_licenses.getSettings().setUseWideViewPort(true);
                 pb_licenseLoader.setVisibility(View.GONE);

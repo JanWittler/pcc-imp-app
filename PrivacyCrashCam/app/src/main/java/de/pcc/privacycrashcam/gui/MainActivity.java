@@ -30,8 +30,12 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
 
     private int activeMenuItemId = R.id.nav_legal; // default is legal info
 
-    private @Nullable DrawerLayout drawer;
-    private @Nullable NavigationView navigationView;
+    private
+    @Nullable
+    DrawerLayout drawer;
+    private
+    @Nullable
+    NavigationView navigationView;
 
     /* #############################################################################################
      *                                  methods
@@ -45,11 +49,14 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
      *
      * @return resource id for this activity
      */
-    public abstract @LayoutRes int getLayoutRes();
+    public abstract
+    @LayoutRes
+    int getLayoutRes();
 
     /**
      * Get the menu entry which will be highlighted in the drawer. Pass -1 if you don't want to
      * highlight any navigation menu entry.
+     *
      * @return R.id.[menu_entry_id]
      */
     public abstract int getMenuEntryId();
@@ -78,7 +85,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
                     redrawNavigationView();
 
                     // make sure that we will redraw the nav view next time we move the drawer
-                    if(slideOffset == 1f) hasRequestedLayout = false;
+                    if (slideOffset == 1f) hasRequestedLayout = false;
                 }
 
                 @Override
@@ -101,7 +108,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
                 rendering right.
                  */
                 private void redrawNavigationView() {
-                    if(!hasRequestedLayout) {
+                    if (!hasRequestedLayout) {
                         assert navigationView != null;
                         navigationView.requestLayout();
                         hasRequestedLayout = true;
@@ -134,7 +141,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
         } else if (id == R.id.nav_settings) {
             // show settings
             SettingsActivity.Launch(this);
-        } else if (id == R.id.nav_legal){
+        } else if (id == R.id.nav_legal) {
             // show legal information
             LegalActivity.Launch(this);
         }
@@ -146,7 +153,7 @@ public abstract class MainActivity extends AppCompatActivity implements Navigati
      * Removes the drawer shadow by setting it transparent. Can be called by subclasses.
      */
     protected void removeDrawerShadow() {
-        if(drawer != null) drawer.setScrimColor(ContextCompat.getColor(getApplicationContext(),
+        if (drawer != null) drawer.setScrimColor(ContextCompat.getColor(getApplicationContext(),
                 android.R.color.transparent));
     }
 

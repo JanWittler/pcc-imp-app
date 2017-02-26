@@ -10,8 +10,7 @@ import javax.crypto.SecretKey;
  *
  * @author Josh Romanowski
  */
-
-public interface IFileEncryptor {
+interface IFileEncryptor {
 
     /* #############################################################################################
      *                                  methods
@@ -27,7 +26,7 @@ public interface IFileEncryptor {
      * @param output Output file for the created crypt.
      * @return Returns whether encrypting the file was successful or not.
      */
-    public boolean encrypt(File input, SecretKey key, File output);
+    boolean encrypt(File input, SecretKey key, File output);
 
     /**
      * Creates a new symmetric SecretKey. The created key matches the used
@@ -36,5 +35,5 @@ public interface IFileEncryptor {
      *
      * @return Returns a newly generated symmetric key.
      */
-    public SecretKey generateKey();
+    SecretKey generateKey();
 }
