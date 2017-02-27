@@ -4,8 +4,6 @@ import android.os.FileObserver;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import junit.framework.Assert;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Queue;
@@ -49,7 +47,7 @@ public class VideoRingBuffer {
     public VideoRingBuffer(int capacity, final File directory, final String suffix) {
         this.queue = new ArrayBlockingQueue<>(capacity);
         this.fileSavedLookupTable = new HashMap<>();
-        Assert.assertTrue(capacity > 0);
+        if (capacity < 0) throw new IllegalArgumentException();
         this.capacity = capacity;
         this.directoryObserver = new FileObserver(directory.getAbsolutePath(),
                 FileObserver.CLOSE_WRITE) {
