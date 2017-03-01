@@ -35,14 +35,12 @@ public class LogInFragment extends Fragment {
     private EditText et_mail;
     private EditText et_password;
     private ProgressBar loginProgress;
-    private ProgressBar registerProgress;
     private Button login;
     private Button register;
 
     private View.OnClickListener mRegisterListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            toggleVisibility(register, registerProgress);
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_REGISTER));
             startActivity(browserIntent);
         }
@@ -121,7 +119,6 @@ public class LogInFragment extends Fragment {
         login = (Button) base.findViewById(R.id.b_login);
         login.setOnClickListener(mLogInistener);
 
-        registerProgress = (ProgressBar) base.findViewById(R.id.pb_register);
         register = (Button) base.findViewById(R.id.b_register);
         register.setOnClickListener(mRegisterListener);
         return base;
