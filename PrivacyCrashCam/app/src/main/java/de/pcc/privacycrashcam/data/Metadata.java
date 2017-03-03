@@ -108,6 +108,7 @@ public class Metadata {
             }
 
             inputStream.close();
+            inputStreamReader.close();
             json = stringBuilder.toString();
             JSONObject metadata = new JSONObject(json);
 

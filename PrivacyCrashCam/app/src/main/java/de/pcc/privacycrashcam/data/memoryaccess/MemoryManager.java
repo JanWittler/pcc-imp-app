@@ -345,12 +345,13 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video the file is associated with
      */
-    public void deleteEncryptedMetadataFile(String videoTag) {
+    public boolean deleteEncryptedMetadataFile(String videoTag) {
         File dir = getFilesDir(File.separator + META_DIR);
         if(dir.exists()) {
             File file = new File(dir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
             if (file.exists()) {
                 file.delete();
+                return true;
             } else {
                 Log.d(TAG, "File: " + Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX + " in dir: " +
                         META_DIR + "does not exist!");
@@ -358,6 +359,7 @@ public class MemoryManager {
         } else {
             Log.d(TAG, META_DIR + " dir not existing");
         }
+        return false;
     }
 
 
@@ -369,12 +371,13 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video the file is associated with
      */
-    public void deleteReadableMetadata(String videoTag) {
+    public boolean deleteReadableMetadata(String videoTag) {
         File dir = getFilesDir(File.separator + META_DIR);
         if(dir.exists()) {
             File file = new File(dir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
             if (file.exists()) {
                 file.delete();
+                return true;
             } else {
                 Log.d(TAG, "File: " + Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX + " in dir: " +
                         META_DIR + "does not exist!");
@@ -382,6 +385,7 @@ public class MemoryManager {
         } else {
             Log.d(TAG, META_DIR + " dir not existing");
         }
+        return false;
     }
 
     /**
@@ -391,19 +395,21 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video
      */
-    public void deleteEncryptedVideoFile(String videoTag) {
+    public boolean deleteEncryptedVideoFile(String videoTag) {
         File dir = getFilesDir(File.separator + VIDEO_DIR);
         if(dir.exists()) {
             File file = new File(dir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
             if (file.exists()) {
                 file.delete();
+                return true;
             } else {
                 Log.d(TAG, "File: " + Video.PREFIX + videoTag + "." + Video.SUFFIX + " in dir: " +
                         VIDEO_DIR + "does not exist!");
             }
         } else {
             Log.d(TAG, VIDEO_DIR + " dir not existing");
-        }
+        };
+        return false;
     }
 
     /**
