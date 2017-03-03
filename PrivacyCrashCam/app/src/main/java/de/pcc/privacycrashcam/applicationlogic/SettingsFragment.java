@@ -47,9 +47,9 @@ public class SettingsFragment extends Fragment {
     /**
      * this is the size, the + and - which increase/decrease the buffer size change the value
      */
-    private final int BUFFER_CHUNK_SIZE = 5;
-    private final int BUFFER_SIZE_MIN = 0;
-    private final int BUFFER_SIZE_MAX = 120;
+    private static final int BUFFER_CHUNK_SIZE = 5;
+    private static final int BUFFER_SIZE_MIN = 0;
+    private static final int BUFFER_SIZE_MAX = 120;
 
     /* #############################################################################################
      *                                  methods
