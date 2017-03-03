@@ -1,90 +1,172 @@
 package de.pcc.privacycrashcam.utils.dataprocessing;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
 
 import java.io.File;
-import java.util.concurrent.ArrayBlockingQueue;
 
+import de.pcc.privacycrashcam.BaseTest;
 import de.pcc.privacycrashcam.data.Metadata;
-import de.pcc.privacycrashcam.data.Video;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManagerTest;
-import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
-import static org.mockito.Mockito.*;
+import de.pcc.privacycrashcam.testUtils.FileUtils;
+
 import static org.junit.Assert.*;
 
 /**
+ * Tests the AsyncPersistor class
+ *
  * @author Giorgio Gross
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AsyncPersistorTest {
-    private static final int CAPACITY = 3;
-    private static final String VIDEO_TAG = "123456789";
-    private static final String TEST_DIRECTORY_NAME = "PersistorTestData";
-    private static final String TEST_METADATA_R = Metadata.PREFIX_READABLE + VIDEO_TAG + "." + Metadata.SUFFIX;
-    private static final String TEST_METADATA = Metadata.PREFIX + VIDEO_TAG + "." + Metadata.SUFFIX;
-    private static final String TEST_VIDEODATA = Video.PREFIX + VIDEO_TAG + "." + Video.SUFFIX;
+public class AsyncPersistorTest extends BaseTest {
+    private AsyncPersistor mPersistor;
+    private PersistCallback mCallback = new PersistCallback() {
+        @Override
+        public void onPersistingStarted() {
+            calledOnPersistingStarted = true;
 
-    private File persistorTestDirectory;
+            //noinspection StatementWithEmptyBody
+            while(!doProceed) {
+                // loop until doProceed is true
+            }
+        }
 
-    @Mock
-    private VideoRingBuffer buffer = mock(VideoRingBuffer.class);
-    @Mock
-    private MemoryManager memoryManager = mock(MemoryManager.class);
-    private ArrayBlockingQueue<File> files = new ArrayBlockingQueue<>(CAPACITY);
+        @Override
+        public void onPersistingStopped(boolean status) {
+            resultStoppedPersisting = status;
+        }
+    };
+    private Boolean resultStoppedPersisting = null;
+    private boolean calledOnPersistingStarted = false;
+    /**
+     * Set this to false in order to simulate that the UI threaad needs some time. This will cause
+     * the callback not to return immediately and thus the background task will have to wait for
+     * this event.
+     */
+    private boolean doProceed = true;
 
     @Before
     public void setUp() throws Exception {
-        persistorTestDirectory = InstrumentationRegistry.getTargetContext().getDir(TEST_DIRECTORY_NAME, Context.MODE_PRIVATE);
+        mPersistor = new AsyncPersistor(bufferMock, memoryManagerMock, mCallback, context);
+    }
 
-        for (int i = 0; i < CAPACITY; i++) {
-            files.add(MemoryManagerTest.CreateFile(persistorTestDirectory, Video.PREFIX + i + "." + Video.SUFFIX));
-        }
-        when(buffer.demandData()).thenReturn(files);
-        when(buffer.getCapacity()).thenReturn(CAPACITY);
+    @Test
+    public void sleepEven() throws Exception {
+        Mockito.when(settingsMock.getBufferSizeSec()).thenReturn(10); // even
+        mPersistor.execute(metadataMock);
+        Thread.sleep(settingsMock.getBufferSizeSec() * 1000 / 2 - 100);
+        mPersistor.cancel(true);
+        assertFalse(calledOnPersistingStarted);
+    }
 
-        when(memoryManager.createReadableMetadataFile(VIDEO_TAG)).thenReturn(MemoryManagerTest.CreateFile(persistorTestDirectory, TEST_METADATA_R));
-        when(memoryManager.createEncryptedMetaFile(VIDEO_TAG)).thenReturn(MemoryManagerTest.CreateFile(persistorTestDirectory, TEST_METADATA));
-        when(memoryManager.createEncryptedVideoFile(VIDEO_TAG)).thenReturn(MemoryManagerTest.CreateFile(persistorTestDirectory, TEST_VIDEODATA));
+    @Test
+    public void sleepUneven() throws Exception {
+        Mockito.when(settingsMock.getBufferSizeSec()).thenReturn(9); // uneven
+        mPersistor.execute(metadataMock);
+        Thread.sleep(settingsMock.getBufferSizeSec() * 1000 / 2 - 100);
+        mPersistor.cancel(true);
+        assertFalse(calledOnPersistingStarted);
+    }
 
+    @Test
+    public void waitForUI() throws Exception {
+        doProceed = false;
+        mPersistor.execute(metadataMock);
+        // sleep slightly longer than the persistor
+        Thread.sleep(settingsMock.getBufferSizeSec() * 1000 / 2 + 200);
+        // notified the ui
+        assertTrue(calledOnPersistingStarted);
+        // not ended yet
+        assertNull(resultStoppedPersisting);
 
+        Thread.sleep(1000);
+        // still not ended
+        assertNull(resultStoppedPersisting);
+
+        // release the persistor
+        doProceed = true;
+    }
+
+    @Test
+    public void noMeta() throws Exception {
+        Metadata[] array = {null};
+        assertFalse(mPersistor.doInBackground(array));
+    }
+
+    @Test
+    public void nonWritableReadableMetadata() throws Exception {
+        File meta = FileUtils.CreateFile(testDirectory, TEST_METADATA_R);
+        assertTrue(meta.setWritable(false, false));
+        Mockito.when(memoryManagerMock.createReadableMetadataFile(VIDEO_TAG))
+                .thenReturn(meta);
+        assertFalse(mPersistor.doInBackground(metadataMock));
+    }
+
+    @Test
+    public void nonWritableEncryptedMeta() throws Exception {
+        File meta = FileUtils.CreateFile(testDirectory, TEST_METADATA);
+        assertTrue(meta.setWritable(false, false));
+        Mockito.when(memoryManagerMock.createEncryptedMetaFile(VIDEO_TAG))
+                .thenReturn(meta);
+        assertFalse(mPersistor.doInBackground(metadataMock));
+    }
+
+    @Test
+    public void nonWritableSymmetricKey() throws Exception {
+        File key = FileUtils.CreateFile(testDirectory, TEST_ENC_SYMM_KEY);
+        assertTrue(key.setWritable(false, false));
+        Mockito.when(memoryManagerMock.createEncryptedSymmetricKeyFile(VIDEO_TAG))
+                .thenReturn(key);
+        assertFalse(mPersistor.doInBackground(metadataMock));
+    }
+
+    @Test
+    public void noVideoSnippets() throws Exception {
+        Mockito.when(bufferMock.demandData()).thenReturn(null);
+        assertFalse(mPersistor.doInBackground(metadataMock));
+    }
+
+    @Test
+    public void nonWritableTempVideo() throws Exception {
+        File vid = FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP);
+        assertTrue(vid.setWritable(false, false));
+        Mockito.when(memoryManagerMock.getTempVideoFile())
+                .thenReturn(vid);
+        assertFalse(mPersistor.doInBackground(metadataMock));
+    }
+
+    @Test
+    public void nonWritableEncryptedVideo() throws Exception {
+        File vid = FileUtils.CreateFile(testDirectory, TEST_VIDEO);
+        assertTrue(vid.setWritable(false, false));
+        Mockito.when(memoryManagerMock.createEncryptedVideoFile(VIDEO_TAG))
+                .thenReturn(vid);
+        assertFalse(mPersistor.doInBackground(metadataMock));
     }
 
     @Test
     public void doInBackground() throws Exception {
-
+        assertTrue(mPersistor.doInBackground(metadataMock));
+        assertTrue(calledOnPersistingStarted);
     }
 
     @Test
     public void onPostExecute() throws Exception {
+        // check if callback passes the value without modifying it
+        mPersistor.onPostExecute(true);
+        assertNotNull(resultStoppedPersisting);
+        assertTrue(resultStoppedPersisting);
 
+        mPersistor.onPostExecute(false);
+        assertFalse(resultStoppedPersisting);
     }
 
-    @Test
-    public void concatVideos() throws Exception {
-
-    }
-
-    @Test
-    public void saveMetadataToFile() throws Exception {
-
-
-    }
+    // todo maybe check the generated files (at least the json file?)
 
     @After
     public void tearDown() throws Exception {
-        for(File file : persistorTestDirectory.listFiles()) {
-            file.delete();
-        }
-
+        // reset
+        calledOnPersistingStarted = false;
+        resultStoppedPersisting = null;
     }
 }

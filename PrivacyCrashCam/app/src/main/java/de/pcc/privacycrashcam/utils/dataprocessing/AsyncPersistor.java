@@ -133,9 +133,9 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         Log.i(TAG, "Background task started");
 
         // wait half a buffer size
-        int timeToWait = settings.getBufferSizeSec() / 2;
+        int timeToWait = settings.getBufferSizeSec() * 1000 / 2;
         try {
-            Thread.sleep(timeToWait * 1000);
+            Thread.sleep(timeToWait);
         } catch (InterruptedException e) {
             e.printStackTrace();
             return false;

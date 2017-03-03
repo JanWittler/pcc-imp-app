@@ -1,13 +1,9 @@
 package de.pcc.privacycrashcam.utils.datastructures;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -15,7 +11,8 @@ import java.io.File;
 import java.util.Queue;
 
 import de.pcc.privacycrashcam.data.Video;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManagerTest;
+import de.pcc.privacycrashcam.BaseTest;
+import de.pcc.privacycrashcam.testUtils.FileUtils;
 
 import static org.junit.Assert.*;
 
@@ -25,30 +22,17 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class VideoRingBufferTest {
-    private static final int CAPACITY = 3;
-    /**
-     * Parent directory for all files needed for or created in this test
-     */
-    private static final String TEST_DIRECTORY_NAME = "bufferTestData";
-
+public class VideoRingBufferTest extends BaseTest {
     private File[] videoChunks;
     private VideoRingBuffer mBuffer;
 
-    @BeforeClass
-    public static void initialize() throws Exception {
-
-    }
-
     @Before
     public void setUp() throws Exception {
-        File bufferTestDirectory = InstrumentationRegistry.getTargetContext().getDir(TEST_DIRECTORY_NAME, Context.MODE_PRIVATE);
-
-        mBuffer = new VideoRingBuffer(CAPACITY, bufferTestDirectory, Video.SUFFIX);
+        mBuffer = new VideoRingBuffer(CAPACITY, testDirectory, Video.SUFFIX);
         // create test files
         videoChunks = new File[CAPACITY * 2];
         for (int i = 0; i < videoChunks.length; i++) {
-            videoChunks[i] = MemoryManagerTest.CreateFile(bufferTestDirectory, Video.PREFIX + i + "." + Video.SUFFIX);
+            videoChunks[i] = FileUtils.CreateFile(testDirectory, Video.PREFIX + i + "." + Video.SUFFIX);
         }
     }
 
@@ -131,11 +115,6 @@ public class VideoRingBufferTest {
         for (File file : videoChunks) {
             if (file != null) file.delete();
         }
-    }
-
-    @AfterClass
-    public static void shutDown() throws Exception {
-
     }
 
 }

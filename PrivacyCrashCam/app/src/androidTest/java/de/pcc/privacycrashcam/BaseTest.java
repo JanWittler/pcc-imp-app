@@ -61,6 +61,17 @@ public class BaseTest {
     protected static final String TEST_METADATA = Metadata.PREFIX + VIDEO_TAG + "." + Metadata.SUFFIX;
 
     /**
+     * Key
+     */
+    protected static final String TEST_ENC_SYMM_KEY = "KEY_" + VIDEO_TAG + ".key";
+
+    /**
+     * Settings
+     */
+    @Mock
+    protected Settings settingsMock;
+
+    /**
      * Memory manager
      */
     @Mock
@@ -85,6 +96,8 @@ public class BaseTest {
         when(bufferMock.getCapacity()).thenReturn(CAPACITY);
 
         // mock memory manager
+        when(memoryManagerMock.createEncryptedSymmetricKeyFile(VIDEO_TAG))
+                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_ENC_SYMM_KEY));
         when(memoryManagerMock.createReadableMetadataFile(VIDEO_TAG))
                 .thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_R));
         when(memoryManagerMock.createEncryptedMetaFile(VIDEO_TAG)).
@@ -95,7 +108,7 @@ public class BaseTest {
                 .thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_TEMP));
         when(memoryManagerMock.getTempVideoFile())
                 .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP));
-        when(memoryManagerMock.getSettings()).thenReturn(new Settings());
+        when(memoryManagerMock.getSettings()).thenReturn(settingsMock);
 
         // mock metadataMock
         when(metadataMock.getDate()).thenReturn(VIDEO_TAG_VAL);
@@ -109,6 +122,15 @@ public class BaseTest {
                 "  \"triggerForceZ\":0\n" +
                 "}");
 
+        // mock settings
+        when(settingsMock.getFps()).thenReturn(Settings.FPS_DEFAULT);
+        when(settingsMock.getBufferSizeSec()).thenReturn(Settings.BUFFER_SIZE_SEC_DEFAULT);
+        when(settingsMock.getQuality()).thenReturn(Settings.QUALITY_DEFAULT);
+        when(settingsMock.getAsJSON()).thenReturn("{\n" +
+                "  \"fps\": 10,\n" +
+                "  \"bufferSizeSec\": 10,\n" +
+                "  \"quality\": 4\n" +
+                "}");
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
