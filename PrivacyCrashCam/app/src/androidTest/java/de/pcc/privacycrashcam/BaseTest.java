@@ -1,22 +1,23 @@
-package de.pcc.privacycrashcam.utils;
+package de.pcc.privacycrashcam;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
+import de.pcc.privacycrashcam.testUtils.FileUtils;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
-import testUtils.FileUtils;
 
 import static org.mockito.Mockito.when;
 
@@ -31,7 +32,7 @@ public class BaseTest {
     protected Context context;
 
     /**
-     * Test files
+     * Parent directory for all files needed for or created in this test
      */
     protected File testDirectory;
     private static final String DEFAULT_TEST_DIRECTORY_NAME = "testData";
@@ -43,7 +44,10 @@ public class BaseTest {
      */
     protected static final String VIDEO_TAG = "123456789";
     protected static final long VIDEO_TAG_VAL = 123456789;
-    protected static final String TEST_VIDEO_DATA = Video.PREFIX + VIDEO_TAG + "." + Video.SUFFIX;
+    protected static final String TEST_VIDEO = Video.PREFIX + VIDEO_TAG + "." + Video.SUFFIX;
+    protected static final String VIDEO_TAG_TEMP = "1234567890";
+    protected static final long VIDEO_TAG_TMEP_VAL = 1234567890;
+    protected static final String TEST_VIDEO_TEMP = Video.PREFIX + VIDEO_TAG_TEMP + "." + Video.SUFFIX;
     @Mock
     protected VideoRingBuffer bufferMock;
 
@@ -52,6 +56,7 @@ public class BaseTest {
      */
     @Mock
     protected Metadata metadataMock;
+    protected static final String TEST_METADATA_TEMP = Metadata.PREFIX_READABLE + VIDEO_TAG_TEMP + "." + Metadata.SUFFIX;
     protected static final String TEST_METADATA_R = Metadata.PREFIX_READABLE + VIDEO_TAG + "." + Metadata.SUFFIX;
     protected static final String TEST_METADATA = Metadata.PREFIX + VIDEO_TAG + "." + Metadata.SUFFIX;
 
@@ -71,15 +76,25 @@ public class BaseTest {
 
         // mock ring bufferMock
         for (int i = 0; i < CAPACITY; i++) {
-            mFiles.add(FileUtils.CreateFile(testDirectory, Video.PREFIX + i + "." + Video.SUFFIX));
+            InputStream video = getClass().getClassLoader().getResourceAsStream("input_small.mp4");
+            File videoDest = FileUtils.CreateFile(testDirectory, Video.PREFIX + i + "." + Video.SUFFIX);
+            FileUtils.CopyInputStreamToFile(video, videoDest);
+            mFiles.add(videoDest);
         }
         when(bufferMock.demandData()).thenReturn(mFiles);
         when(bufferMock.getCapacity()).thenReturn(CAPACITY);
 
         // mock memory manager
-        when(memoryManagerMock.createReadableMetadataFile(VIDEO_TAG)).thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_R));
-        when(memoryManagerMock.createEncryptedMetaFile(VIDEO_TAG)).thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA));
-        when(memoryManagerMock.createEncryptedVideoFile(VIDEO_TAG)).thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO_DATA));
+        when(memoryManagerMock.createReadableMetadataFile(VIDEO_TAG))
+                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_R));
+        when(memoryManagerMock.createEncryptedMetaFile(VIDEO_TAG)).
+                thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA));
+        when(memoryManagerMock.createEncryptedVideoFile(VIDEO_TAG))
+                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO));
+        when(memoryManagerMock.getTempMetadataFile())
+                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_TEMP));
+        when(memoryManagerMock.getTempVideoFile())
+                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP));
         when(memoryManagerMock.getSettings()).thenReturn(new Settings());
 
         // mock metadataMock
@@ -95,5 +110,15 @@ public class BaseTest {
                 "}");
 
     }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @After
+    public void cleanUp() throws Exception {
+        for (File file : testDirectory.listFiles()) {
+            if (file != null) file.delete();
+        }
+    }
+
+
 
 }
