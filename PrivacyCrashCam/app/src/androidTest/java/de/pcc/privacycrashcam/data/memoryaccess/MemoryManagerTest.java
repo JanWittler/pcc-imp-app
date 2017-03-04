@@ -8,10 +8,14 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.File;
 
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.Settings;
+import de.pcc.privacycrashcam.data.Video;
 
 /**
  * @author Giorgio Gross
@@ -80,45 +84,73 @@ public class MemoryManagerTest {
         Assert.assertTrue(memoryManager.getTempMetadataFile() != null);
     }
 
+    @Ignore
     @Test
     public void deleteEncryptedSymmetricKeyFileTest() {
+        Assert.assertTrue(memoryManager.deleteEncryptedSymmetricKeyFile(
+                memoryManager.createEncryptedSymmetricKeyFile("test").getName()
+        ));
     }
 
+    @Ignore
     @Test
     public void deleteEncryptedMetadataFileTest() {
-
+        Assert.assertTrue(memoryManager.deleteEncryptedMetadataFile(
+                memoryManager.createEncryptedMetaFile("test").getName()
+        ));
     }
 
+    @Ignore
     @Test
     public void deleteReadableMetadataTest() {
-
+        File test = memoryManager.createReadableMetadataFile("test");
+        Assert.assertTrue(memoryManager.deleteReadableMetadata("test"));
     }
 
+    @Ignore
     @Test
     public void deleteEncryptedVideoFileTest() {
-
+        File test = memoryManager.createEncryptedVideoFile("test");
+        Assert.assertTrue(memoryManager.deleteEncryptedVideoFile("test"));
     }
 
     @Test
     public void createEncryptedSymmetricKeyFileTest() {
-
+        Assert.assertTrue(
+                memoryManager.createEncryptedSymmetricKeyFile(
+                        "test").getName().equals("KEY_test.key")
+        );
+        memoryManager.deleteEncryptedSymmetricKeyFile("test");
     }
 
     @Test
     public void createEncryptedVideoFileTest() {
-
+        Assert.assertTrue(
+                memoryManager.createEncryptedVideoFile(
+                        "test").getName().equals("VIDEO_test.mp4")
+        );
+        memoryManager.createEncryptedVideoFile("test");
     }
 
     @Test
     public void createEncryptedMetaFileTest() {
-
+        Assert.assertTrue(
+                memoryManager.createEncryptedMetaFile(
+                        "test").getName().equals("META_test.json")
+        );
+        memoryManager.deleteEncryptedMetadataFile("test");
     }
 
     @Test
     public void createReadableMetadataFileTest() {
-
+        Assert.assertTrue(
+                memoryManager.createReadableMetadataFile(
+                        "test").getName().equals("META_R_test.json")
+        );
+        memoryManager.deleteReadableMetadata("test");
     }
 
+    @Ignore
     @Test
     public void getAllVideosTest() {
 

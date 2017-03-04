@@ -322,12 +322,13 @@ public class MemoryManager {
      *
      * @param videoTag Tag of the video the file is associated with
      */
-    public void deleteEncryptedSymmetricKeyFile(String videoTag) {
+    public boolean deleteEncryptedSymmetricKeyFile(String videoTag) {
         File dir = getFilesDir(File.separator + KEY_DIR);
         if(dir.exists()) {
             File file = new File(dir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
             if (file.exists()) {
                 file.delete();
+                return true;
             } else {
                 Log.d(TAG, "File: " + KEY_PREFIX + videoTag + "." + KEY_SUFFIX + " in dir: " +
                         KEY_DIR + "does not exist!");
@@ -335,6 +336,7 @@ public class MemoryManager {
         } else {
             Log.d(TAG, KEY_DIR + " dir not existing");
         }
+        return false;
     }
 
     /**
@@ -404,7 +406,7 @@ public class MemoryManager {
                 return true;
             } else {
                 Log.d(TAG, "File: " + Video.PREFIX + videoTag + "." + Video.SUFFIX + " in dir: " +
-                        VIDEO_DIR + "does not exist!");
+                        VIDEO_DIR + " does not exist!");
             }
         } else {
             Log.d(TAG, VIDEO_DIR + " dir not existing");
