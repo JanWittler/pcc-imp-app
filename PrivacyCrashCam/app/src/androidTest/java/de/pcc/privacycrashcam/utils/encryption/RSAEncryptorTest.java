@@ -1,33 +1,35 @@
 package de.pcc.privacycrashcam.utils.encryption;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 import javax.crypto.SecretKey;
 
-import de.pcc.privacycrashcam.R;
+import de.pcc.privacycrashcam.BaseTest;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 /**
  * Created by Josh Romanowski on 27.01.2017.
  */
-public class RSAEncryptorTest {
+public class RSAEncryptorTest extends BaseTest {
 
     private static final String PUBLIC_KEY = "publickey.key";
 
     private RSAEncryptor encryptor;
     private AESEncryptor keyGen;
     private SecretKey secretKey;
-    private File publicKey = null;
 
     @Before
     public void setUp() {
@@ -35,10 +37,6 @@ public class RSAEncryptorTest {
         keyGen = new AESEncryptor();
 
         secretKey = keyGen.generateKey();
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(PUBLIC_KEY);
-        publicKey = new File(resource.getPath());
     }
 
     @Test
@@ -46,20 +44,18 @@ public class RSAEncryptorTest {
         assertFalse(encryptor.encrypt(null, null, null));
     }
 
-    @Ignore
     @Test
     public void validTest() {
         InputStream publicKeyStream = null;
         try {
-            publicKeyStream = new FileInputStream(publicKey);
+            publicKeyStream = new FileInputStream(encKey);
         } catch (FileNotFoundException e) {
             fail();
         }
-        File output = new File("output.txt");
-        assertTrue(encryptor.encrypt(secretKey, publicKeyStream, output));
-        assertTrue(output.exists());
+        assertTrue(encryptor.encrypt(secretKey, publicKeyStream, encOutputTest));
+        assertTrue(encOutputTest.exists());
 
-        if (output.exists())
-            output.delete();
+        if (encOutputTest.exists())
+            encOutputTest.delete();
     }
 }
