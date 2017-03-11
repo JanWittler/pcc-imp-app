@@ -2,6 +2,7 @@ package de.pcc.privacycrashcam.utils.dataprocessing;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -26,14 +27,14 @@ public class AsyncPersistorTest extends BaseTest {
             calledOnPersistingStarted = true;
 
             //noinspection StatementWithEmptyBody
-            while(!doProceed) {
+            while (!doProceed) {
                 // loop until doProceed is true
             }
         }
 
         @Override
-        public void onPersistingStopped(boolean status) {
-            resultStoppedPersisting = status;
+        public void onPersistingStopped(boolean success) {
+            resultStoppedPersisting = success;
         }
     };
     private Boolean resultStoppedPersisting = null;

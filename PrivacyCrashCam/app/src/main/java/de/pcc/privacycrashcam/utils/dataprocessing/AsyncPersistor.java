@@ -23,6 +23,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -302,7 +303,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
 
             fc.close();
             raf.close();
-        } catch (IOException e) {
+        } catch (IOException|NoSuchElementException e) {
             Log.w(TAG, "Error while writing concat video");
             return false;
         }
