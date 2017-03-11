@@ -1,7 +1,12 @@
 package de.pcc.privacycrashcam;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 import android.support.test.InstrumentationRegistry;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import org.junit.After;
 import org.junit.Before;
@@ -10,8 +15,11 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import de.pcc.privacycrashcam.applicationlogic.camera.CompatCameraHandler;
+import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
@@ -19,6 +27,7 @@ import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.testUtils.FileUtils;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 /**
@@ -30,6 +39,12 @@ import static org.mockito.Mockito.when;
  */
 public class BaseTest {
     protected Context context;
+
+    /**
+     * Encryptor
+     */
+    protected File encKey;
+    protected File encOutputTest;
 
     /**
      * Parent directory for all files needed for or created in this test
@@ -50,6 +65,22 @@ public class BaseTest {
     protected static final String TEST_VIDEO_TEMP = Video.PREFIX + VIDEO_TAG_TEMP + "." + Video.SUFFIX;
     @Mock
     protected VideoRingBuffer bufferMock;
+
+    /**
+     * Camera Handler
+     */
+    @Mock
+    protected SurfaceView surfaceViewMock;
+    @Mock
+    protected SurfaceHolder surfaceHolderMock;
+    protected CompatCameraHandler compatCameraHandlerMock; // don't sure if we will ever need them
+    protected TriggeringCompatCameraHandler triggeringCompatCameraHandlerMock;
+
+    /**
+     * SensorEvent mock in order to use test values
+     */
+    @Mock
+    protected SensorEvent event;
 
     /**
      * Metadata
@@ -77,13 +108,25 @@ public class BaseTest {
     @Mock
     protected MemoryManager memoryManagerMock;
 
+    /**
+     * Keep all mocks in this list
+     */
+    private ArrayList<Object> mocks;
+
     @Before
     public void init() throws Exception {
         context = InstrumentationRegistry.getTargetContext();
         testDirectory = context.getDir(DEFAULT_TEST_DIRECTORY_NAME, Context.MODE_PRIVATE);
 
+        mocks = new ArrayList<>();
         // init mocks is broken, so use the following line
         MockitoAnnotations.initMocks(this);
+
+        InputStream encKeyStream = getClass().getClassLoader().getResourceAsStream("publickey.key");
+        encKey = FileUtils.CreateFile(testDirectory, "publickey.key");
+        FileUtils.CopyInputStreamToFile(encKeyStream, encKey);
+
+        encOutputTest = FileUtils.CreateFile(testDirectory, "output.txt");
 
         // mock ring bufferMock
         for (int i = 0; i < CAPACITY; i++) {
@@ -94,6 +137,7 @@ public class BaseTest {
         }
         when(bufferMock.demandData()).thenReturn(mFiles);
         when(bufferMock.getCapacity()).thenReturn(CAPACITY);
+        mocks.add(bufferMock);
 
         // mock memory manager
         when(memoryManagerMock.createEncryptedSymmetricKeyFile(VIDEO_TAG))
@@ -109,6 +153,7 @@ public class BaseTest {
         when(memoryManagerMock.getTempVideoFile())
                 .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP));
         when(memoryManagerMock.getSettings()).thenReturn(settingsMock);
+        mocks.add(memoryManagerMock);
 
         // mock metadataMock
         when(metadataMock.getDate()).thenReturn(VIDEO_TAG_VAL);
@@ -121,6 +166,7 @@ public class BaseTest {
                 "  \"triggerForceY\":0,\n" +
                 "  \"triggerForceZ\":0\n" +
                 "}");
+        mocks.add(memoryManagerMock);
 
         // mock settings
         when(settingsMock.getFps()).thenReturn(Settings.FPS_DEFAULT);
@@ -131,6 +177,15 @@ public class BaseTest {
                 "  \"bufferSizeSec\": 10,\n" +
                 "  \"quality\": 4\n" +
                 "}");
+        mocks.add(settingsMock);
+
+        // mock camera handler
+        when(surfaceViewMock.getHolder()).thenReturn(surfaceHolderMock);
+        mocks.add(surfaceViewMock);
+        mocks.add(surfaceHolderMock);
+
+        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        event.sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -139,6 +194,8 @@ public class BaseTest {
         for (File file : testDirectory.listFiles()) {
             if (file != null) file.delete();
         }
+
+        reset(mocks.toArray());
     }
 
 
