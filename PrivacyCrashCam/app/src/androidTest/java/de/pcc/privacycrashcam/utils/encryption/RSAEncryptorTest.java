@@ -1,16 +1,11 @@
 package de.pcc.privacycrashcam.utils.encryption;
 
-import android.support.test.runner.AndroidJUnit4;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URL;
 
 import javax.crypto.SecretKey;
 
@@ -21,12 +16,11 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 /**
- * Created by Josh Romanowski on 27.01.2017.
+ * Testes the RSAEncryptor test
+ *
+ * @author Josh Romanowski, Giorgio Gross
  */
 public class RSAEncryptorTest extends BaseTest {
-
-    private static final String PUBLIC_KEY = "publickey.key";
-
     private RSAEncryptor encryptor;
     private AESEncryptor keyGen;
     private SecretKey secretKey;
