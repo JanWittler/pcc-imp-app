@@ -37,7 +37,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     private static final String API_CALL = "videoUpload";
 
     private static final String API_RESPONSE_SUCCESS = "Finished editing video";
-    private static final String API_RESPONSE_INPUT_FAILURE = "Not all inputs were given correctly";
+    private static final String API_RESPONSE_INPUT_FAILURE = "Uploaded data was not received correctly";
     private static final String API_RESPONSE_EDITING_FAILURE = "Setting up for editing video failed. Processing aborted";
     private Context context;
 

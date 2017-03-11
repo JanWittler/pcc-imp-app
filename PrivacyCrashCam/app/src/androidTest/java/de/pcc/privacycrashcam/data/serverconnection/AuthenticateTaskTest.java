@@ -1,6 +1,5 @@
 package de.pcc.privacycrashcam.data.serverconnection;
 
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -45,7 +44,6 @@ public class AuthenticateTaskTest extends BaseTest {
     @Before
     public void setUp() {
         authenticateTask = new AuthenticateTask(accountMock, serverResponseCallback, context);
-
     }
 
     @Test
