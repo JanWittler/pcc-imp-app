@@ -46,7 +46,7 @@ class RSAEncryptor implements IKeyEncryptor {
     @Override
     public boolean encrypt(SecretKey input, InputStream publicKey, File output) {
         if (input == null || publicKey == null || output == null) {
-            //Log.w(TAG, "Empty inputs");
+            Log.w(TAG, "Empty inputs");
             return false;
         }
 
@@ -60,7 +60,7 @@ class RSAEncryptor implements IKeyEncryptor {
             inputStream = new ObjectInputStream(publicKey);
             key = (PublicKey) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            //Log.w(TAG, "Reading public key failed");
+            Log.w(TAG, "Reading public key failed");
             return false;
         }
 
@@ -72,7 +72,7 @@ class RSAEncryptor implements IKeyEncryptor {
             cipherText = cipher.doFinal(encodedKey.getBytes());
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            //Log.w(TAG, "Encrypting the symmetric key failed");
+            Log.w(TAG, "Encrypting the symmetric key failed");
             return false;
         }
 
@@ -82,7 +82,7 @@ class RSAEncryptor implements IKeyEncryptor {
             fos.write(cipherText);
             fos.close();
         } catch (IOException e) {
-            //Log.w(TAG, "Writing encrypted symmetric key file failed");
+            Log.w(TAG, "Writing encrypted symmetric key file failed");
             return false;
         }
         return true;
