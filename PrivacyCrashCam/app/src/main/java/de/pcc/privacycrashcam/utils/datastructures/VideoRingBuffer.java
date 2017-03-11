@@ -45,9 +45,9 @@ public class VideoRingBuffer {
      * @param suffix    video file suffix
      */
     public VideoRingBuffer(int capacity, final File directory, final String suffix) {
+        if (capacity <= 0) throw new IllegalArgumentException();
         this.queue = new ArrayBlockingQueue<>(capacity);
         this.fileSavedLookupTable = new HashMap<>();
-        if (capacity < 0) throw new IllegalArgumentException();
         this.capacity = capacity;
         this.directoryObserver = new FileObserver(directory.getAbsolutePath(),
                 FileObserver.CLOSE_WRITE) {
