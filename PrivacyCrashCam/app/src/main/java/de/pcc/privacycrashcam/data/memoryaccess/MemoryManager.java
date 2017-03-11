@@ -47,6 +47,7 @@ import de.pcc.privacycrashcam.data.Video;
  * @author David Laubenstein, Giorgio Gross
  *         Created by Giorgio Gross
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class MemoryManager {
     private static final String TAG = MemoryManager.class.getName();
     private static final String TEMP_PARENT_DIR_NAME = "temp";
@@ -292,7 +293,7 @@ public class MemoryManager {
      * Deletes all directories in internal memory inside the {@link #TEMP_PARENT_DIR_NAME}.
      */
     public void deleteAllTempData() {
-        File tempParentDir = getFilesDir(TEMP_PARENT_DIR_NAME);
+        File tempParentDir = getFilesDir(File.separator + TEMP_PARENT_DIR_NAME);
         if (!tempParentDir.exists()) return;
 
         for (File file : tempParentDir.listFiles()){
@@ -410,7 +411,7 @@ public class MemoryManager {
             }
         } else {
             Log.d(TAG, VIDEO_DIR + " dir not existing");
-        };
+        }
         return false;
     }
 
@@ -633,7 +634,7 @@ public class MemoryManager {
      * @return the Files of the given directory
      */
     private ArrayList<File> getListFiles(File parentDir) {
-        ArrayList<File> inFiles = new ArrayList<File>();
+        ArrayList<File> inFiles = new ArrayList<>();
         File[] files = parentDir.listFiles();
         if (files == null) return inFiles;
         for (File file : files) {

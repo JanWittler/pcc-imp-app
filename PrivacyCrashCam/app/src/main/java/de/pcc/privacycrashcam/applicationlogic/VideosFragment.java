@@ -154,8 +154,6 @@ public class VideosFragment extends Fragment {
             }
         }
 
-        // todo javadoc
-
         /**
          * Deletes the video at the passed index and updates the list
          *

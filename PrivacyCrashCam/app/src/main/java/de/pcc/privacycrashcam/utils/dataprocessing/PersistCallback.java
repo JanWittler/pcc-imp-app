@@ -15,8 +15,8 @@ public interface PersistCallback {
     /**
      * Called when persisting stops.
      *
-     * @param status true if video was persisted, false if there was an error
+     * @param success true if video was persisted, false if there was an error
      */
-    void onPersistingStopped(boolean status);
+    void onPersistingStopped(boolean success);
 
 }
