@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import de.pcc.privacycrashcam.applicationlogic.camera.CompatCameraHandler;
+import de.pcc.privacycrashcam.applicationlogic.camera.RecordCallback;
 import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.Metadata;
@@ -77,6 +78,8 @@ public class BaseTest {
     protected SurfaceHolder surfaceHolderMock;
     protected CompatCameraHandler compatCameraHandlerMock; // don't sure if we will ever need them
     protected TriggeringCompatCameraHandler triggeringCompatCameraHandlerMock;
+    @Mock
+    protected RecordCallback recordCallbackMock;
 
     /**
      * SensorEvent mock in order to use test values
