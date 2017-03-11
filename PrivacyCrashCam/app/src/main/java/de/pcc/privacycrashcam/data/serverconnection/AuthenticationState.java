@@ -14,7 +14,7 @@ public enum AuthenticationState {
     SUCCESS,
 
     /**
-     * Netowrk not reachable
+     * Network not reachable
      */
     FAILURE_NETWORK,
 

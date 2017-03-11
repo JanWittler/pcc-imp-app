@@ -3,6 +3,7 @@ package de.pcc.privacycrashcam;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
@@ -77,6 +79,13 @@ public class BaseTest {
     @Mock
     protected MemoryManager memoryManagerMock;
 
+    /**
+     * Account
+     */
+    @Mock
+    protected Account accountMock;
+
+
     @Before
     public void init() throws Exception {
         context = InstrumentationRegistry.getTargetContext();
@@ -110,6 +119,7 @@ public class BaseTest {
                 .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP));
         when(memoryManagerMock.getSettings()).thenReturn(settingsMock);
 
+
         // mock metadataMock
         when(metadataMock.getDate()).thenReturn(VIDEO_TAG_VAL);
         when(metadataMock.getgForce()).thenReturn(new float[3]);
@@ -123,6 +133,7 @@ public class BaseTest {
                 "}");
 
         // mock settings
+
         when(settingsMock.getFps()).thenReturn(Settings.FPS_DEFAULT);
         when(settingsMock.getBufferSizeSec()).thenReturn(Settings.BUFFER_SIZE_SEC_DEFAULT);
         when(settingsMock.getQuality()).thenReturn(Settings.QUALITY_DEFAULT);
