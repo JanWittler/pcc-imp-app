@@ -8,6 +8,7 @@ import android.support.test.InstrumentationRegistry;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -20,6 +21,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import de.pcc.privacycrashcam.applicationlogic.camera.CompatCameraHandler;
 import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
+import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
@@ -109,6 +111,12 @@ public class BaseTest {
     protected MemoryManager memoryManagerMock;
 
     /**
+     * Account
+     */
+    @Mock
+    protected Account accountMock;
+
+    /**
      * Keep all mocks in this list
      */
     private ArrayList<Object> mocks;
@@ -155,6 +163,7 @@ public class BaseTest {
         when(memoryManagerMock.getSettings()).thenReturn(settingsMock);
         mocks.add(memoryManagerMock);
 
+
         // mock metadataMock
         when(metadataMock.getDate()).thenReturn(VIDEO_TAG_VAL);
         when(metadataMock.getgForce()).thenReturn(new float[3]);
@@ -169,6 +178,7 @@ public class BaseTest {
         mocks.add(memoryManagerMock);
 
         // mock settings
+
         when(settingsMock.getFps()).thenReturn(Settings.FPS_DEFAULT);
         when(settingsMock.getBufferSizeSec()).thenReturn(Settings.BUFFER_SIZE_SEC_DEFAULT);
         when(settingsMock.getQuality()).thenReturn(Settings.QUALITY_DEFAULT);

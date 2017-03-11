@@ -28,8 +28,8 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
      */
     private static final String API_CALL = "authenticate";
     // responses to be expected
-    private static final String API_RESPONSE_FAILURE_MISSING = "NO ACCOUNTID";
-    private static final String API_RESPONSE_FAILURE_MISMATCH = "WRONG ACCOUNT";
+    private static final String API_RESPONSE_FAILURE_MISSING = "NOT EXISTING";
+    private static final String API_RESPONSE_FAILURE_MISMATCH = "WRONG PASSWORD";
     private static final String API_RESPONSE_SUCCESS = "SUCCESS";
     private Context context;
 
@@ -69,6 +69,7 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
         Response response = webTarget.request().post(Entity.entity(form,
                 MediaType.APPLICATION_FORM_URLENCODED_TYPE), Response.class);
         String responseContent = response.readEntity(String.class);
+        Log.d(responseContent, responseContent);
         Log.i(TAG, "response: " + responseContent);
 
         switch (responseContent) {
