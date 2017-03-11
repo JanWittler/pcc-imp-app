@@ -21,6 +21,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private CameraHandler cameraHandler;
 
+    private boolean hasBeenShownBefore = false; // set to true after view is shown first time
+
     /* #############################################################################################
      *                                  constructor
      * ###########################################################################################*/
@@ -51,7 +53,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         // pause camera handler before making changes
-        cameraHandler.pauseHandler();
+        if(hasBeenShownBefore) cameraHandler.pauseHandler();
 
         // ... do changes to surface here.
         // this will be necessary if we support landscape and portrait mode views
@@ -59,12 +61,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
         // resume camera handler. This will invalidate the camera.
         cameraHandler.resumeHandler();
+        hasBeenShownBefore = true;
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // Surface has been destroyed. Pause the camera handler
         cameraHandler.pauseHandler();
+        hasBeenShownBefore = false;
     }
 
     public void setCameraHandler(CameraHandler cameraHandler) {

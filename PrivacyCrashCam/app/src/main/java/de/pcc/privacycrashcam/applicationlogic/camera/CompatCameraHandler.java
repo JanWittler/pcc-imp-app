@@ -34,7 +34,7 @@ import static android.content.Context.WINDOW_SERVICE;
  * @author Giorgio Gross
  */
 @SuppressWarnings("deprecation")
-public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoListener {
+public class CompatCameraHandler extends CameraHandler implements MediaRecorder.OnInfoListener {
     private final static String TAG = "CMP_CAM_HANDLER";
     private final static int VIDEO_CHUNK_LENGTH = 5; // length of video chunks in seconds
 
@@ -97,7 +97,10 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
             }
 
             @Override
-            public void onPersistingStopped(boolean status) {
+            public void onPersistingStopped(boolean success) {
+                if (!success) CompatCameraHandler.this.recordCallback.onError(
+                        CompatCameraHandler.this.context.getString(R.string.error_recorder));
+
                 // allow user to save new video (Multiple async tasks are not allowed to run)
                 isRecording = false;
             }
@@ -326,6 +329,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void createHandler() {
+        super.createHandler();
         this.memoryManager = new MemoryManager(context);
 
         // clean up all temporary data which was not deleted when exiting the app. This happens
@@ -349,6 +353,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void resumeHandler() {
+        super.resumeHandler();
         if (!canOperate || isHandlerRunning) return;
 
         // take care of setting up camera, media recorder and recording
@@ -381,6 +386,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void pauseHandler() {
+        super.pauseHandler();
         if (isHandlerRunning) {
             // take care of stopping recording
             forceStopMediaRecorder();
@@ -393,6 +399,7 @@ public class CompatCameraHandler implements CameraHandler, MediaRecorder.OnInfoL
 
     @Override
     public void destroyHandler() {
+        super.destroyHandler();
         tearDownBuffer();
         memoryManager.deleteCurrentTempData();
     }
