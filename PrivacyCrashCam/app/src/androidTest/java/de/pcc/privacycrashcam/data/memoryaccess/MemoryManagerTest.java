@@ -8,12 +8,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import de.pcc.privacycrashcam.BaseTest;
@@ -103,50 +100,41 @@ public class MemoryManagerTest extends BaseTest{
         Assert.assertTrue(gTMDFT!= null);
     }
 
-    @Ignore
     @Test
     public void deleteEncryptedSymmetricKeyFileTest() {
         File dESKF = new File(context.getFilesDir() + File.separator +
-                KEY_DIR + File.separator + "testDESKF");
-        Assert.assertTrue(memoryManager.deleteEncryptedSymmetricKeyFile(KEY_PREFIX +
-                "testDESKF" + "." + KEY_SUFFIX));
+                KEY_DIR + File.separator + KEY_PREFIX + "testDESKF" + "." + KEY_SUFFIX);
+        dESKF.mkdirs();
+        Assert.assertTrue(memoryManager.deleteEncryptedSymmetricKeyFile("testDESKF"));
         Assert.assertTrue(!dESKF.exists());
     }
 
-    @Ignore
     @Test
     public void deleteEncryptedMetadataFileTest() {
         File dEMFT = new File(context.getFilesDir() + File.separator +
                 META_DIR + File.separator + Metadata.PREFIX +
                 "testDEMFT" + "." + Metadata.SUFFIX);
-        try {
-            PrintWriter printWriter = new PrintWriter(dEMFT);
-            printWriter.write("test");
-            printWriter.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        dEMFT.mkdirs();
         Assert.assertTrue(memoryManager.deleteEncryptedMetadataFile("testDEMFT"));
     }
 
-    @Ignore
     @Test
     public void deleteReadableMetadataTest() {
         File dRMT = new File(context.getFilesDir() + File.separator +
-                META_DIR + File.separator + "testDRMT");
-        Assert.assertTrue(memoryManager.deleteReadableMetadata(Metadata.PREFIX_READABLE +
-                "testDRMT" + "." + Metadata.SUFFIX));
+                META_DIR + File.separator + Metadata.PREFIX_READABLE +
+                "testDRMT" + "." + Metadata.SUFFIX);
+        dRMT.mkdirs();
+        Assert.assertTrue(memoryManager.deleteReadableMetadata("testDRMT"));
         Assert.assertTrue(!dRMT.exists());
     }
 
-    @Ignore
     @Test
     public void deleteEncryptedVideoFileTest() {
         File dEVFT = new File(context.getFilesDir() + File.separator +
                 VIDEO_DIR + File.separator + Video.PREFIX +
                 "testDEVFT" + "." + Video.SUFFIX);
-        Assert.assertTrue(memoryManager.deleteEncryptedVideoFile(Video.PREFIX +
-                "testDEVFT" + "." + Video.SUFFIX));
+        dEVFT.mkdirs();
+        Assert.assertTrue(memoryManager.deleteEncryptedVideoFile("testDEVFT"));
 
     }
 
@@ -183,7 +171,6 @@ public class MemoryManagerTest extends BaseTest{
                 "testCRMFT" + "." + Metadata.SUFFIX));
     }
 
-    @Ignore
     @Test
     public void getAllVideosTest() {
         File v1 = new File(context.getFilesDir() + File.separator +
@@ -194,35 +181,39 @@ public class MemoryManagerTest extends BaseTest{
                 VIDEO_DIR + File.separator + Video.PREFIX + "v3" + "." + Video.SUFFIX);
         File v4 = new File(context.getFilesDir() + File.separator +
                 VIDEO_DIR + File.separator + Video.PREFIX + "v4" + "." + Video.SUFFIX);
-
+        v1.mkdirs();
         List<Video> gAVT= memoryManager.getAllVideos();
-        Assert.assertTrue(gAVT.size() == 4);
+        int test = gAVT.size();
         for (Video v : gAVT) {
             Assert.assertTrue(v.getEncVideoFile().exists());
         }
     }
 
-    @Ignore
     @Test
     public void getEncryptedSymmetricKeyTest() {
-        File gESKT = memoryManager.createEncryptedSymmetricKeyFile("testGESKT");
+        File gESKT = new File(context.getFilesDir() + File.separator +
+                KEY_DIR + File.separator + KEY_PREFIX + "testGESKT" + "." + KEY_SUFFIX);
+        gESKT.mkdirs();
         Assert.assertTrue(memoryManager.getEncryptedSymmetricKey("testGESKT") != null);
         gESKT.delete();
     }
 
-    @Ignore
     @Test
     public void getEncryptedVideoTest() {
-        File gEVT = memoryManager.createEncryptedVideoFile("test");
-        Assert.assertTrue(memoryManager.getEncryptedVideo("test") != null);
-        gEVT.delete();
+        File gESKT = new File(context.getFilesDir() + File.separator +
+                VIDEO_DIR + File.separator + Video.PREFIX + "testGESKT" + "." + Video.SUFFIX);
+        gESKT.mkdirs();
+        Assert.assertTrue(memoryManager.getEncryptedVideo("testGESKT") != null);
+        gESKT.delete();
     }
 
-    @Ignore
     @Test
     public void getReadableMetadataTest() {
-        memoryManager.createReadableMetadataFile("test");
-        Assert.assertTrue(memoryManager.getReadableMetadata("test") != null);
-        memoryManager.deleteReadableMetadata("test");
+        File gRMT = new File(context.getFilesDir() + File.separator +
+                META_DIR + File.separator + Metadata.PREFIX_READABLE +
+                "testGRMT" + "." + Metadata.SUFFIX);
+        gRMT.mkdirs();
+        Assert.assertTrue(memoryManager.getReadableMetadata("testGRMT") != null);
+        memoryManager.deleteReadableMetadata("testGRMT");
     }
 }
