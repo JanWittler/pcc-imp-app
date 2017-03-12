@@ -39,6 +39,7 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
     private static final String API_RESPONSE_SUCCESS = "Finished editing video";
     private static final String API_RESPONSE_INPUT_FAILURE = "Uploaded data was not received correctly";
     private static final String API_RESPONSE_EDITING_FAILURE = "Setting up for editing video failed. Processing aborted";
+    private static final String API_RESPONSE_ACCOUNT_FAILURE = "Account data not valid";
     private Context context;
 
     private Account account;
@@ -106,7 +107,9 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
         try {
             Response response = futureResponse.get();
             responseContent = response.readEntity(String.class);
+            Log.i(TAG, "response: " + responseContent);
         } catch (InterruptedException | ExecutionException | ProcessingException e) {
+            e.printStackTrace();
             Log.i(TAG, "Failure on getting response!");
             client.close();
             return RequestState.FAILURE_OTHER;
@@ -126,6 +129,9 @@ public class VideoUploadTask extends AsyncTask<String, Integer, RequestState> {
                 break;
             case API_RESPONSE_INPUT_FAILURE:
                 requestState = RequestState.INPUT_FAILURE;
+                break;
+            case API_RESPONSE_ACCOUNT_FAILURE:
+                requestState = RequestState.ACCOUNT_FAILURE;
                 break;
             default:
                 requestState = RequestState.FAILURE_OTHER;

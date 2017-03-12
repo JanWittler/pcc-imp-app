@@ -120,6 +120,14 @@ public class BaseTest {
     protected Account accountMock;
 
     /**
+     * VideoUploadTaskTest files
+     */
+    protected File videoUpload;
+    protected File metadataUpload;
+    protected File keyUpload;
+
+
+    /**
      * Keep all mocks in this list
      */
     private ArrayList<Object> mocks;
@@ -138,6 +146,19 @@ public class BaseTest {
         FileUtils.CopyInputStreamToFile(encKeyStream, encKey);
 
         encOutputTest = FileUtils.CreateFile(testDirectory, "output.txt");
+
+        //VideoUploadTaskTest
+        InputStream keyStream = getClass().getClassLoader().getResourceAsStream("KEY_1487198226374.key");
+        keyUpload = FileUtils.CreateFile(testDirectory, "KEY_1487198226374.key");
+        FileUtils.CopyInputStreamToFile(keyStream, keyUpload);
+
+        InputStream videoStream = getClass().getClassLoader().getResourceAsStream("VIDEO_1487198226374.mp4");
+        videoUpload = FileUtils.CreateFile(testDirectory, "VIDEO_1487198226374.mp4");
+        FileUtils.CopyInputStreamToFile(videoStream, videoUpload);
+
+        InputStream metaStream = getClass().getClassLoader().getResourceAsStream("META_1487198226374.json");
+        metadataUpload = FileUtils.CreateFile(testDirectory, "META_1487198226374.json");
+        FileUtils.CopyInputStreamToFile(metaStream, metadataUpload);
 
         // mock ring bufferMock
         for (int i = 0; i < CAPACITY; i++) {
