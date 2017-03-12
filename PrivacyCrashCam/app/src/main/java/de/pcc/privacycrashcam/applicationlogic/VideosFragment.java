@@ -130,14 +130,16 @@ public class VideosFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if (!isUploading) upload(position, mHolder);
-                    else
-                        Toast.makeText(getContext(), getString(R.string.upload_wait), Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(getContext(), getString(R.string.upload_wait),
+                            Toast.LENGTH_SHORT).show();
                 }
             });
             mHolder.delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    delete(position);
+                    if(!isUploading) delete(position);
+                    else Toast.makeText(getContext(), getString(R.string.upload_wait),
+                            Toast.LENGTH_SHORT).show();
                 }
             });
 
