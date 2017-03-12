@@ -1,5 +1,6 @@
 package de.pcc.privacycrashcam.utils.datastructures;
 
+import android.support.test.espresso.core.deps.guava.io.Files;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
@@ -8,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Queue;
 
 import de.pcc.privacycrashcam.data.Video;
@@ -32,7 +34,9 @@ public class VideoRingBufferTest extends BaseTest {
         // create test files
         videoChunks = new File[CAPACITY * 2];
         for (int i = 0; i < videoChunks.length; i++) {
-            videoChunks[i] = FileUtils.CreateFile(testDirectory, Video.PREFIX + i + "." + Video.SUFFIX);
+            File mFile = FileUtils.CreateFile(testDirectory, Video.PREFIX + i + "." + Video.SUFFIX);
+            Files.write("", mFile, Charset.forName("UTF-8"));
+            videoChunks[i] = mFile;
         }
     }
 
@@ -84,6 +88,7 @@ public class VideoRingBufferTest extends BaseTest {
 
         assertNull(mBuffer.pop());
     }
+
 
     @Test
     public void destroy() throws Exception {
