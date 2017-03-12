@@ -25,9 +25,6 @@ public class VideoUploadTaskTest extends BaseTest {
     private final String JSON_KEY_MAIL = "mail";
     private final String JSON_KEY_PASSWORD = "password";
     private JSONObject json;
-    private File video;
-    private File metadata;
-    private File symKey;
 
     private RequestState onResponse;
     private String onError;
@@ -51,15 +48,15 @@ public class VideoUploadTaskTest extends BaseTest {
 
     @Before
     public void setUp() {
+        File video = null;
+        File metadata = null;
+        File symKey = null;
         videoUploadTask = new VideoUploadTask(video, metadata, symKey, accountMock, serverResponseCallback, context);
     }
 
     @Test
-    @Ignore
-    public void FailureOtherTest() {
-        video = new File("C:\\Informatik-Studium\\PSE\\git\\pcc-imp-app\\PrivacyCrashCam\\app\\src\\androidTest\\resources\\input.mp4");
-        metadata = new File("C:\\Informatik-Studium\\PSE\\git\\pcc-imp-app\\PrivacyCrashCam\\app\\src\\androidTest\\resources\\input.mp4");
-        symKey = new File("C:\\Informatik-Studium\\PSE\\git\\pcc-imp-app\\PrivacyCrashCam\\app\\src\\androidTest\\resources\\input.mp4");
+    //@IgnoreY
+    public void AccountDataInvalidTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "failMail@321.de");
@@ -68,18 +65,13 @@ public class VideoUploadTaskTest extends BaseTest {
             Assert.fail();
         }
         when(accountMock.getAsJSON()).thenReturn(json.toString());
-        videoUploadTask = new VideoUploadTask(video, metadata, symKey, accountMock, serverResponseCallback, context);
+        videoUploadTask = new VideoUploadTask(videoUpload, metadataUpload, keyUpload, accountMock, serverResponseCallback, context);
         RequestState requestState = videoUploadTask.doInBackground(ADDRESS);
-        Assert.assertTrue(requestState == RequestState.FAILURE_OTHER);
+        Assert.assertTrue(requestState == RequestState.ACCOUNT_FAILURE);
     }
 
     @Test
-    @Ignore
-    public void InputFailureTest() {
-        video = new File("");
-        metadata = new File("");
-        symKey = new File("");
-        videoUploadTask = new VideoUploadTask(video, metadata, symKey, accountMock, serverResponseCallback, context);
+    public void UploadValidTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "test123@321.de");
@@ -87,8 +79,19 @@ public class VideoUploadTaskTest extends BaseTest {
         } catch (JSONException e) {
             Assert.fail();
         }
+        when(accountMock.getAsJSON()).thenReturn(json.toString());
+        videoUploadTask = new VideoUploadTask(videoUpload, metadataUpload, keyUpload, accountMock, serverResponseCallback, context);
         RequestState requestState = videoUploadTask.doInBackground(ADDRESS);
-        Assert.assertTrue(requestState == RequestState.INPUT_FAILURE);
+        Assert.assertTrue(requestState == RequestState.SUCCESS);
+    }
+
+
+    @Test
+    public void FailureOtherTest() {
+        when(accountMock.getAsJSON()).thenReturn(null);
+        videoUploadTask = new VideoUploadTask(videoUpload, metadataUpload, keyUpload, accountMock, serverResponseCallback, context);
+        RequestState requestState = videoUploadTask.doInBackground(ADDRESS);
+        Assert.assertTrue(requestState == RequestState.FAILURE_OTHER);
     }
 
     @Test
