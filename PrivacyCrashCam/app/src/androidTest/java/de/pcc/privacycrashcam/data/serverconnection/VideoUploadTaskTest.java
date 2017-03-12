@@ -94,7 +94,7 @@ public class VideoUploadTaskTest extends BaseTest {
     }
 
     @Test
-    public void NoNetworkTest() {
+    public void onPostExecuteNoNetworkTest() {
         videoUploadTask.onPostExecute(RequestState.NETWORK_FAILURE);
         Assert.assertTrue(onError.equals("No network available"));
     }

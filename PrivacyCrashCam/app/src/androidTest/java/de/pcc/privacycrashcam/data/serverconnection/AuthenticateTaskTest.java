@@ -110,13 +110,13 @@ public class AuthenticateTaskTest extends BaseTest {
     }
 
     @Test
-    public void NoNetworkTest() {
+    public void onPostExecuteNoNetworkTest() {
         authenticateTask.onPostExecute(AuthenticationState.FAILURE_NETWORK);
         Assert.assertTrue(onError.equals("No network available"));
     }
 
     @Test
-    public void RequestTest() {
+    public void onPostExecuteSuccessTest() {
         authenticateTask.onPostExecute(AuthenticationState.SUCCESS);
         Assert.assertTrue(onResponse == AuthenticationState.SUCCESS);
     }
