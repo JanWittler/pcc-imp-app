@@ -233,10 +233,7 @@ public class BaseTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @After
     public void cleanUp() throws Exception {
-        for (File file : testDirectory.listFiles()) {
-            if (file != null) file.delete();
-        }
-
+        FileUtils.recDeleteDir(testDirectory);
         reset(mocks.toArray());
     }
 
