@@ -55,8 +55,7 @@ public class VideoUploadTaskTest extends BaseTest {
     }
 
     @Test
-    //@IgnoreY
-    public void AccountDataInvalidTest() {
+    public void AccountFailureTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "failMail@321.de");
