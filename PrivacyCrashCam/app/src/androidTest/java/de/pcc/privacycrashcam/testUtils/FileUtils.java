@@ -62,4 +62,16 @@ public class FileUtils {
         in.close();
     }
 
+    /**
+     * Recursively delete directory and files inside directory
+     * @param dir directory or file to be deleted
+     */
+    public static void recDeleteDir(File dir) {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                recDeleteDir(file);
+            }
+        }
+        dir.delete();
+    }
 }
