@@ -15,7 +15,7 @@ import java.io.OutputStream;
 public class FileUtils {
 
     /**
-     * Creates a file inside the apssed directory.
+     * Creates a file inside the passed directory.
      *
      * @param dir directory
      * @param name file name of the new file
@@ -27,6 +27,21 @@ public class FileUtils {
         File file = new File(dir, name);
         file.createNewFile();
         return file;
+    }
+
+    /**
+     * Gets a file inside the passed directory.
+     *
+     * @param dir directory
+     * @param name file name of the new file
+     * @return the file or null if it does not exist
+     * @throws IOException if the file cannot be created
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static File GetFile(File dir, String name) throws IOException {
+        File file = new File(dir, name);
+        if(file.exists()) return file;
+        return null;
     }
 
     /**

@@ -149,6 +149,12 @@ public class AsyncPersistorTest extends BaseTest {
     public void doInBackground() throws Exception {
         assertTrue(mPersistor.doInBackground(metadataMock));
         assertTrue(calledOnPersistingStarted);
+        // check if the files were created (if this is the case, AsyncPersistor has made appropriate
+        // calls to create these files)
+        assertNotNull(memoryManagerMock.getEncryptedMetadata(VIDEO_TAG));
+        assertNotNull(memoryManagerMock.getReadableMetadata(VIDEO_TAG));
+        assertNotNull(memoryManagerMock.getEncryptedVideo(VIDEO_TAG));
+        assertNotNull(memoryManagerMock.getEncryptedSymmetricKey(VIDEO_TAG));
     }
 
     @Test
