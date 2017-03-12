@@ -30,6 +30,7 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
     // responses to be expected
     private static final String API_RESPONSE_FAILURE_MISSING = "NOT EXISTING";
     private static final String API_RESPONSE_FAILURE_MISMATCH = "WRONG PASSWORD";
+    private static final String API_RESPONSE_NOT_VERIFIED = "NOT VERIFIED";
     private static final String API_RESPONSE_SUCCESS = "SUCCESS";
     private Context context;
 
@@ -78,6 +79,9 @@ public class AuthenticateTask extends AsyncTask<String, Integer, AuthenticationS
                 break;
             case API_RESPONSE_FAILURE_MISMATCH:
                 resultState = AuthenticationState.FAILURE_MISMATCH;
+                break;
+            case API_RESPONSE_NOT_VERIFIED:
+                resultState = AuthenticationState.NOT_VERIFIED;
                 break;
             case API_RESPONSE_SUCCESS:
                 resultState = AuthenticationState.SUCCESS;

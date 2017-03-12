@@ -29,6 +29,11 @@ public enum AuthenticationState {
     FAILURE_MISSING,
 
     /**
+     * Account is not verified
+     */
+    NOT_VERIFIED,
+
+    /**
      * Something unexpected went wrong
      */
     FAILURE_OTHER

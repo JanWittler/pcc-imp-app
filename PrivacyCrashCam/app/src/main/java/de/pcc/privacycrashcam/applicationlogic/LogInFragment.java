@@ -72,6 +72,11 @@ public class LogInFragment extends Fragment {
                                     Toast.LENGTH_SHORT).show();
                             toggleVisibility(login, loginProgress);
                             break;
+                        case NOT_VERIFIED:
+                            Toast.makeText(getContext(), "Account not verified",
+                                    Toast.LENGTH_SHORT).show();
+                            toggleVisibility(login, loginProgress);
+                            break;
                         case FAILURE_MISSING:
                             Toast.makeText(getContext(), "Account not existing",
                                     Toast.LENGTH_SHORT).show();
