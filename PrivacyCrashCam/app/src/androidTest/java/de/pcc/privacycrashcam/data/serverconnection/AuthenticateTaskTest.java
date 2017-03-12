@@ -47,7 +47,7 @@ public class AuthenticateTaskTest extends BaseTest {
     }
 
     @Test
-    public void MissingTest() {
+    public void missingTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "failMail@321.de");
@@ -61,7 +61,7 @@ public class AuthenticateTaskTest extends BaseTest {
     }
 
     @Test
-    public void SuccessTest() {
+    public void successTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "test123@321.de");
@@ -75,7 +75,7 @@ public class AuthenticateTaskTest extends BaseTest {
     }
 
     @Test
-    public void NotVerifiedTest() {
+    public void notVerifiedTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "notVerified@not.de");
@@ -89,7 +89,7 @@ public class AuthenticateTaskTest extends BaseTest {
     }
 
     @Test
-    public void MissmatchTest() {
+    public void missmatchTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "test123@321.de");
@@ -103,7 +103,7 @@ public class AuthenticateTaskTest extends BaseTest {
     }
 
     @Test
-    public void FailureOtherTest() {
+    public void failureOtherTest() {
         when(accountMock.getAsJSON()).thenReturn(null);
         AuthenticationState state = authenticateTask.doInBackground(ADDRESS);
         Assert.assertTrue(state == AuthenticationState.FAILURE_OTHER);

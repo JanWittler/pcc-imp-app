@@ -55,7 +55,7 @@ public class VideoUploadTaskTest extends BaseTest {
     }
 
     @Test
-    public void AccountFailureTest() {
+    public void accountFailureTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "failMail@321.de");
@@ -70,7 +70,7 @@ public class VideoUploadTaskTest extends BaseTest {
     }
 
     @Test
-    public void UploadValidTest() {
+    public void uploadValidTest() {
         try {
             json = new JSONObject("{}");
             json.put(JSON_KEY_MAIL, "test123@321.de");
@@ -86,7 +86,7 @@ public class VideoUploadTaskTest extends BaseTest {
 
 
     @Test
-    public void FailureOtherTest() {
+    public void failureOtherTest() {
         when(accountMock.getAsJSON()).thenReturn(null);
         videoUploadTask = new VideoUploadTask(videoUpload, metadataUpload, keyUpload, accountMock, serverResponseCallback, context);
         RequestState requestState = videoUploadTask.doInBackground(ADDRESS);
