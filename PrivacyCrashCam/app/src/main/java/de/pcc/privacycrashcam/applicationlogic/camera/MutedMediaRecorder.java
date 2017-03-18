@@ -8,7 +8,7 @@ import android.media.MediaRecorder;
  *
  * @author Giorgio
  */
-public class MutedMediaRecorder extends MediaRecorder {
+public class MutedMediaRecorder extends StorableMediaRecorder {
 
     /**
      * Behaves like {@link MediaRecorder MediaRecorder} setProfile Method but does not set audio

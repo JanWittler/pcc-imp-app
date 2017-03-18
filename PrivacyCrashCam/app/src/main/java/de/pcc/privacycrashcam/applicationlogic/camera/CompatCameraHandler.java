@@ -40,7 +40,8 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
     private Camera camera = null;
     private CamcorderProfile camcorderProfile = null;
-    private MediaRecorder mediaRecorder = null;
+    private StorableMediaRecorder mediaRecorder = null;
+    private MediaRecorderPool mediaRecorderPool = null;
 
     private boolean isHandlerRunning = false;
     private boolean isRecording = false;
@@ -54,7 +55,6 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     private MemoryManager memoryManager;
 
     private RecordCallback recordCallback;
-    private File currentOutputFile;
     private VideoRingBuffer videoRingBuffer;
 
     private PersistCallback persistCallback;
@@ -93,7 +93,8 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
                     return;
                 }
                 // restart media recorder to force the use of a new file
-                restartMediaRecorder();
+                mediaRecorderPool = null;
+                restartMediaRecorder(false);
             }
 
             @Override
@@ -236,6 +237,8 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         Log.d(TAG, "releasing camera");
         if (camera == null) return;
 
+        Log.d(TAG, "LOCKING CAMERA");
+        camera.lock();
         camera.stopPreview();
         camera.release();
         camera = null;
@@ -245,58 +248,44 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
      * Sets up the media recorder with respect to the user's settings
      */
     private boolean prepareMediaRecorder() {
-        // MutedMediaRecorder(); is not suitable for some devices
-        mediaRecorder = new MediaRecorder();
-
-        camera.unlock();
-        mediaRecorder.setCamera(camera);
-
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mediaRecorder.setProfile(camcorderProfile);
-
-        // get new file and add it to buffer and media recorder
-        currentOutputFile = memoryManager.getTempVideoFile();
-        if (currentOutputFile == null)
-            return false;
-        mediaRecorder.setOutputFile(currentOutputFile.getPath());
-
-        mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
-        mediaRecorder.setOrientationHint(90);
-        mediaRecorder.setOnInfoListener(this);
-
         try {
-            // this can be put in an async task if performance turns out to be poor
-            mediaRecorder.prepare();
-            Log.d(TAG, "Media Recorder is prepared");
-        } catch (IOException e) {
+            // some devices just don't like some camera settings. Give the user the possibility to
+            // get to the menu by taking care of that.
+            camera.unlock();
+        } catch (RuntimeException e) {
             e.printStackTrace();
-            recordCallback.onError(context.getResources().getString(R.string.error_recorder));
-            return false;
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            recordCallback.onError(context.getResources().getString(R.string.error_undefined));
-            pauseHandler();
             return false;
         }
-        return true;
+        if (mediaRecorderPool == null) {
+            // when this is called the first time it might need some time to process
+            mediaRecorderPool = new MediaRecorderPool(2, camera, this, camcorderProfile, memoryManager);
+            mediaRecorderPool.preparePool();
+        }
+        if (mediaRecorder != null) {
+            mediaRecorderPool.suspendMediaRecorder(mediaRecorder);
+        }
+
+        mediaRecorder = mediaRecorderPool.obtainActiveMediaRecorder();
+        return mediaRecorder != null;
     }
 
     /**
-     * Releases the media recorder and locks the camera
+     * Releases the media recorder when we are done with it
      */
     private void releaseMediaRecorder() {
-        if (mediaRecorder != null) {
-            // Clear recorder configuration.
-            mediaRecorder.reset();
-            // Release the recorder object
-            mediaRecorder.release();
-            mediaRecorder = null;
+        if (mediaRecorderPool != null) {
+            if (mediaRecorder != null) {
+                mediaRecorderPool.suspendMediaRecorder(mediaRecorder);
+            }
+            mediaRecorderPool.dropPool();
+        } else {
+            if (mediaRecorder != null) {
+                mediaRecorder.release();
+            }
         }
-        if (camera != null) {
-            Log.d(TAG, "LOCKING CAMERA");
-            camera.lock();
-        }
+        mediaRecorder = null;
+        mediaRecorderPool = null;
+
     }
 
     /**
@@ -312,7 +301,6 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
             // certain fps value. The catch block will make sure that our app doesn't bother
             // other apps if it crashes as we ensure by this routine to release the camera on crash
             e.printStackTrace();
-            pauseHandler();
             recordCallback.onError(context.getResources().getString((R.string.error_undefined)));
             return false;
         }
@@ -367,7 +355,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     @Override
     public void schedulePersisting() {
         // don't start recording if we already record
-        if (isRecording) return;
+        if (isRecording || !isHandlerRunning) return;
         isRecording = true;
 
         recordCallback.onRecordingStarted();
@@ -411,9 +399,12 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
         // Video is saved automatically, no need to call stopRecordingChunk() here.
-        videoRingBuffer.put(currentOutputFile);
+        Log.d("PROF", "onInfo :         "+System.currentTimeMillis());
+        videoRingBuffer.put(mediaRecorder.getOutputFile());
+        Log.d("PROF", "put :            "+System.currentTimeMillis());
         // Just clean up last recording and restart recording
-        restartMediaRecorder();
+        restartMediaRecorder(true);
+        Log.d("PROF", "restartedRec :   "+System.currentTimeMillis());
     }
 
     /**
@@ -423,6 +414,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void forceStopMediaRecorder() {
+        File currentOutputFile = mediaRecorder.getOutputFile();
         try {
             stopRecordingChunk(); // try to stop recording BEFORE inserting file into buffer
             videoRingBuffer.put(currentOutputFile);
@@ -438,15 +430,20 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     /**
      * Restarts the media recorder.
      */
-    private void restartMediaRecorder() {
+    private void restartMediaRecorder(boolean stopMediaRecorder) {
         // Maybe we will need to synchronize this method. (Calls to this method will be made in a
         // non predictable manner). Tough, all calls are stable and can be called safely in any
         // state but we might get some warnings.
         if (!isHandlerRunning) return;
-        releaseMediaRecorder();
-        // start recording new chunk
-        if (!prepareMediaRecorder() || !startRecordingChunk()) { // will allocate also a new output file
+
+        if (stopMediaRecorder) mediaRecorder.stop();
+        Log.d("PROF", "stopped :        "+System.currentTimeMillis());
+
+        // start recording new chunk after preparing the media recorder (will allocate a new output
+        // file and obtain a media recorder from the pool)
+        if (!prepareMediaRecorder() || !startRecordingChunk()) {
             pauseHandler();
         }
+        Log.d("PROF", "started :        "+System.currentTimeMillis());
     }
 }

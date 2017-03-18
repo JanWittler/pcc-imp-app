@@ -73,7 +73,7 @@ public class MemoryManager {
      * if we test, we need access to the files, so here is a boolean to change between
      * internal and external storage
      */
-    private final boolean saveInInternalStorage = true;
+    private final boolean saveInInternalStorage = false;
 
 
     /**

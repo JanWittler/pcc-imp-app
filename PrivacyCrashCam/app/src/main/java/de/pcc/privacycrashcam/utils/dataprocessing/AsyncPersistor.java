@@ -186,13 +186,13 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
             return false;
         Log.i(TAG, "All files to be concatenated were written");
 
-        File concatVid = memoryManager.getTempVideoFile();
+        File concatVid = memoryManager.createEncryptedVideoFile(videoTag);
         if (!concatVideos(vidSnippets, concatVid))
             return false;
 
         // encryptAndPersist files
-        if (!encryptAndPersist(videoTag, concatVid, metaLocation))
-            return false;
+        /*if (!encryptAndPersist(videoTag, concatVid, metaLocation))
+            return false;*/
 
         // delete temporary files
         memoryManager.deleteCurrentTempData();
