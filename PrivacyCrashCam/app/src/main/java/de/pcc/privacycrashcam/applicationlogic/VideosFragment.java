@@ -16,6 +16,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,11 +28,9 @@ import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Video;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
-import de.pcc.privacycrashcam.data.serverconnection.RequestState;
-import de.pcc.privacycrashcam.data.serverconnection.ServerProxy;
-import de.pcc.privacycrashcam.data.serverconnection.ServerResponseCallback;
-
-import static de.pcc.privacycrashcam.data.serverconnection.RequestState.SUCCESS;
+import edu.kit.informatik.pcc.android.Client;
+import edu.kit.informatik.pcc.android.network.IClientVideoUpload;
+import edu.kit.informatik.pcc.android.network.IRequestCompletion;
 
 /**
  * Shows all videos which were recorded by the user.
@@ -184,49 +186,52 @@ public class VideosFragment extends Fragment {
             isUploading = true;
 
             Video item = videos.get(index);
-            ServerProxy proxy = new ServerProxy(getContext());
-            proxy.videoUpload(item.getEncVideoFile(), item.getEncMetaFile(),
-                    item.getEncSymKeyFile(), memoryManager.getAccountData(),
-                    new ServerResponseCallback<RequestState>() {
-                        @Override
-                        public void onResponse(RequestState response) {
-                            switch (response) {
-                                case SUCCESS:
-                                    Toast.makeText(getContext(), getString(R.string.video_upload_success),
-                                            Toast.LENGTH_SHORT).show();
-                                    break;
-                                case ACCOUNT_FAILURE:
-                                    Toast.makeText(getContext(), getString(R.string.error_account),
-                                            Toast.LENGTH_SHORT).show();
-                                    break;
-                                case NETWORK_FAILURE:
-                                    Toast.makeText(getContext(), getString(R.string.error_no_connection),
-                                            Toast.LENGTH_SHORT).show();
-                                    break;
-                                default:
-                                    Toast.makeText(getContext(), getString(R.string.error_undefined),
-                                            Toast.LENGTH_SHORT).show();
 
-                            }
-
-                            toggleProgressBar(mHolder);
-                            isUploading = false;
-                        }
-
-                        @Override
-                        public void onProgress(int percent) {
-                            // ignored
-                        }
-
-                        @Override
-                        public void onError(String error) {
+            IRequestCompletion<IClientVideoUpload.UploadResult> completion = new IRequestCompletion<IClientVideoUpload.UploadResult>() {
+                @Override
+                public void onResponse(IClientVideoUpload.UploadResult response) {
+                    switch (response) {
+                        case SUCCESS:
+                            Toast.makeText(getContext(), getString(R.string.video_upload_success),
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case ACCOUNT_FAILURE:
+                            Toast.makeText(getContext(), getString(R.string.error_account),
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case NETWORK_FAILURE:
                             Toast.makeText(getContext(), getString(R.string.error_no_connection),
                                     Toast.LENGTH_SHORT).show();
+                            break;
+                        default:
+                            Toast.makeText(getContext(), getString(R.string.error_undefined),
+                                    Toast.LENGTH_SHORT).show();
 
-                            toggleProgressBar(mHolder);
-                            isUploading = false;
-                        }
-                    });
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), getString(R.string.error_no_connection),
+                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.error_no_connection),
+                            Toast.LENGTH_SHORT).show();
+
+                    toggleProgressBar(mHolder);
+                    isUploading = false;
+                }
+            };
+
+            File encKey = item.getEncSymKeyFile();
+            byte[] keyData = new byte[0];
+            try {
+                keyData = FileUtils.readFileToByteArray(encKey);
+            } catch (IOException e) {
+                e.printStackTrace();
+                completion.onError("Failed to load key data");
+                return;
+            }
+            Client.getGlobal().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, Client.getGlobal().loadAuthenticationToken(), completion);
         }
 
         /**
