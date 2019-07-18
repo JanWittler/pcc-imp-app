@@ -16,12 +16,11 @@ import android.widget.Toast;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Account;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
-import de.pcc.privacycrashcam.data.serverconnection.AuthenticationState;
 import de.pcc.privacycrashcam.data.serverconnection.ServerHelper;
-import de.pcc.privacycrashcam.data.serverconnection.ServerProxy;
-import de.pcc.privacycrashcam.data.serverconnection.ServerResponseCallback;
 import de.pcc.privacycrashcam.gui.CameraActivity;
+import edu.kit.informatik.pcc.android.Client;
+import edu.kit.informatik.pcc.android.network.IRequestCompletion;
+import edu.kit.informatik.pcc.android.network.IUserManagement;
 
 /**
  * Shows the log in fragment.
@@ -57,23 +56,18 @@ public class LogInFragment extends Fragment {
             final String pw = et_password.getText().toString();
             Account account = new Account(mail, pw);
 
-            ServerResponseCallback<AuthenticationState> mCallback
-                    = new ServerResponseCallback<AuthenticationState>() {
+            IRequestCompletion<IUserManagement.LoginResult> completion = new IRequestCompletion<IUserManagement.LoginResult>() {
                 @Override
-                public void onResponse(AuthenticationState response) {
-                    switch (response) {
+                public void onResponse(IUserManagement.LoginResult response) {
+                    switch (response.result) {
                         case SUCCESS:
                             LogInHelper.SaveAccountData(mail, pw, getContext());
+                            Client.getGlobal().storeAuthenticationToken(response.authenticationToken);
                             CameraActivity.Launch(getActivity());
                             getActivity().finish();
                             break;
                         case FAILURE_MISMATCH:
                             Toast.makeText(getContext(), "Mail and password are not matching",
-                                    Toast.LENGTH_SHORT).show();
-                            toggleVisibility(login, loginProgress);
-                            break;
-                        case NOT_VERIFIED:
-                            Toast.makeText(getContext(), "Account not verified",
                                     Toast.LENGTH_SHORT).show();
                             toggleVisibility(login, loginProgress);
                             break;
@@ -96,18 +90,14 @@ public class LogInFragment extends Fragment {
                 }
 
                 @Override
-                public void onProgress(int percent) {
-                    // ignore this case
-                }
-
-                @Override
                 public void onError(String error) {
                     Toast.makeText(getContext(), getString(R.string.error_no_connection),
                             Toast.LENGTH_SHORT).show();
                     toggleVisibility(login, loginProgress);
                 }
             };
-            new ServerProxy(getContext()).authenticateUser(account, mCallback);
+
+            Client.getGlobal().login(mail, pw, completion);
         }
     };
 

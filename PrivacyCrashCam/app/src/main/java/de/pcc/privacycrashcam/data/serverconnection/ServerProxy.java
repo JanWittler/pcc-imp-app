@@ -31,39 +31,7 @@ public class ServerProxy {
     public void videoUpload(final File videoFile, final File metadata,
                             final File symKey, final Account account,
                             final ServerResponseCallback<RequestState> callback) {
-        // check if password and mail are still valid
-        authenticateUser(account, new ServerResponseCallback<AuthenticationState>() {
-            @Override
-            public void onResponse(AuthenticationState response) {
-                if (response == AuthenticationState.SUCCESS) {
-                    // we are logged in - proceed with file upload
-                    new VideoUploadTask(videoFile, metadata, symKey, account, callback, context)
-                            .execute(ServerHelper.URL);
-                } else {
-                    callback.onResponse(RequestState.ACCOUNT_FAILURE);
-                }
-            }
-
-            @Override
-            public void onProgress(int percent) {
-                // ignored
-            }
-
-            @Override
-            public void onError(String error) {
-                callback.onError(error);
-            }
-        });
-    }
-
-    /**
-     * Authenticate the user. This will check if the password and mail match.
-     *
-     * @param account  Account which needs to be authenticated.
-     * @param callback Observer which will be notified about state changes of the authentication
-     */
-    public void authenticateUser(Account account,
-                                 ServerResponseCallback<AuthenticationState> callback) {
-        new AuthenticateTask(account, callback, context).execute(ServerHelper.URL);
+        new VideoUploadTask(videoFile, metadata, symKey, account, callback, context)
+                .execute(ServerHelper.URL);
     }
 }

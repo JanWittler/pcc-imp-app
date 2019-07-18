@@ -22,7 +22,7 @@ public interface IUserManagement {
     }
 
     class LoginResult {
-        String authenticationToken;
-        AuthenticationResult result;
+        public String authenticationToken;
+        public AuthenticationResult result;
     }
 }
