@@ -10,10 +10,7 @@ import java.util.concurrent.Future;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-
-import de.pcc.privacycrashcam.data.serverconnection.RequestState;
 
 public abstract class AbstractMultipartPostRequest<Result> extends AbstractRequest<Result> {
     private MultiPart multiPart;

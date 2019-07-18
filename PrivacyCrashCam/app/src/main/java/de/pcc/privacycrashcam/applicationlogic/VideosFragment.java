@@ -29,6 +29,7 @@ import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Video;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import edu.kit.informatik.pcc.android.Client;
+import edu.kit.informatik.pcc.android.ServerProxy;
 import edu.kit.informatik.pcc.android.network.IClientVideoUpload;
 import edu.kit.informatik.pcc.android.network.IRequestCompletion;
 
@@ -223,7 +224,7 @@ public class VideosFragment extends Fragment {
             };
 
             File encKey = item.getEncSymKeyFile();
-            byte[] keyData = new byte[0];
+            byte[] keyData;
             try {
                 keyData = FileUtils.readFileToByteArray(encKey);
             } catch (IOException e) {
@@ -231,7 +232,7 @@ public class VideosFragment extends Fragment {
                 completion.onError("Failed to load key data");
                 return;
             }
-            Client.getGlobal().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, Client.getGlobal().loadAuthenticationToken(), completion);
+            ServerProxy.getGlobal().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, Client.getGlobal().loadAuthenticationToken(), completion);
         }
 
         /**

@@ -16,9 +16,9 @@ import android.widget.Toast;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Account;
-import de.pcc.privacycrashcam.data.serverconnection.ServerHelper;
 import de.pcc.privacycrashcam.gui.CameraActivity;
 import edu.kit.informatik.pcc.android.Client;
+import edu.kit.informatik.pcc.android.ServerProxy;
 import edu.kit.informatik.pcc.android.network.IRequestCompletion;
 import edu.kit.informatik.pcc.android.network.IUserManagement;
 
@@ -29,7 +29,7 @@ import edu.kit.informatik.pcc.android.network.IUserManagement;
  */
 public class LogInFragment extends Fragment {
 
-    private final static String URL_REGISTER = ServerHelper.HOST + ":9999";
+    private final static String URL_REGISTER = ServerProxy.getGlobal().host() + ":9999";
 
     private EditText et_mail;
     private EditText et_password;
@@ -97,7 +97,7 @@ public class LogInFragment extends Fragment {
                 }
             };
 
-            Client.getGlobal().login(mail, pw, completion);
+            ServerProxy.getGlobal().login(mail, pw, completion);
         }
     };
 
