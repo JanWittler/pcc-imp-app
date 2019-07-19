@@ -1,6 +1,8 @@
 package edu.kit.informatik.pcc.android;
 
 import edu.kit.informatik.pcc.android.account.ISessionManager;
+import edu.kit.informatik.pcc.android.network.IServerConfiguration;
+import edu.kit.informatik.pcc.android.network.IVideoUploadWrapper;
 import edu.kit.informatik.pcc.android.settings.ISettingsManager;
 import edu.kit.informatik.pcc.android.storage.video.ILocalVideoManager;
 import edu.kit.informatik.pcc.android.storage.video.IVideoDetailsProvider;
@@ -24,6 +26,8 @@ public class Client {
     private IVideoDetailsProvider videoDetailsProvider;
     private IFileManager temporaryFileManager;
     private ISettingsManager settingsManager;
+    private IVideoUploadWrapper videoUploadWrapper;
+    private IServerConfiguration serverConfiguration;
 
     public void setSessionManager(ISessionManager sessionManager) {
         assert this.sessionManager == null;
@@ -73,5 +77,25 @@ public class Client {
     public ISettingsManager getSettingsManager() {
         assert settingsManager != null;
         return settingsManager;
+    }
+
+    public void setVideoUploadWrapper(IVideoUploadWrapper videoUploadWrapper) {
+        assert this.videoUploadWrapper == null;
+        this.videoUploadWrapper = videoUploadWrapper;
+    }
+
+    public IVideoUploadWrapper getVideoUploadWrapper() {
+        assert videoUploadWrapper != null;
+        return videoUploadWrapper;
+    }
+
+    public void setServerConfiguration(IServerConfiguration serverConfiguration) {
+        assert this.serverConfiguration == null;
+        this.serverConfiguration = serverConfiguration;
+    }
+
+    public IServerConfiguration getServerConfiguration() {
+        assert this.serverConfiguration != null;
+        return serverConfiguration;
     }
 }

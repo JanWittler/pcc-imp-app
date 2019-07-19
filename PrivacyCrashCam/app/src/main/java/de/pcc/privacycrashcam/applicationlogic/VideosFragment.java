@@ -29,7 +29,6 @@ import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.gui.LogInActivity;
 import edu.kit.informatik.pcc.android.Client;
-import edu.kit.informatik.pcc.android.ServerProxy;
 import edu.kit.informatik.pcc.android.network.IClientVideoUpload;
 import edu.kit.informatik.pcc.android.network.IRequestCompletion;
 import edu.kit.informatik.pcc.android.storage.video.IVideoDetailsProvider;
@@ -239,17 +238,8 @@ public class VideosFragment extends Fragment {
                 }
             };
 
-            String authenticationToken = Client.getGlobal().getSessionManager().getAuthenticationToken();
-            if (authenticationToken == null) {
-                completion.onResponse(IClientVideoUpload.UploadResult.UNAUTHENTICATED);
-                return;
-            }
             int videoId = videos.get(index).getVideoId();
-            IVideoDetailsProvider videoDetailsProvider = Client.getGlobal().getVideoDetailsProvider();
-            File encryptedVideo = videoDetailsProvider.getEncryptedVideo(videoId);
-            File encryptedMetadata = videoDetailsProvider.getEncryptedMetadata(videoId);
-            byte[] encryptedKey = videoDetailsProvider.getEncryptedKey(videoId);
-            ServerProxy.getGlobal().getClientVideoUpload().uploadVideo(encryptedVideo, encryptedMetadata, encryptedKey, authenticationToken, completion);
+            Client.getGlobal().getVideoUploadWrapper().uploadVideo(videoId, completion);
         }
 
         /**

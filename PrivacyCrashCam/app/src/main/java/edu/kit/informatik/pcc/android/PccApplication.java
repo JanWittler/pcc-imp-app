@@ -10,6 +10,7 @@ import edu.kit.informatik.pcc.android.crypto.PublicKeyProvider;
 import edu.kit.informatik.pcc.android.network.ServerConfiguration;
 import edu.kit.informatik.pcc.android.network.UserNetworkAdapter;
 import edu.kit.informatik.pcc.android.network.VideoNetworkAdapter;
+import edu.kit.informatik.pcc.android.network.VideoUploadWrapper;
 import edu.kit.informatik.pcc.android.settings.SettingsManager;
 import edu.kit.informatik.pcc.android.storage.PreferencesStorage;
 import edu.kit.informatik.pcc.android.storage.video.LocalVideoManager;
@@ -56,24 +57,22 @@ public class PccApplication extends Application {
         settingsManager.setSimpleValueStorage(prefStorage);
         client.setSettingsManager(settingsManager);
 
-        Client.setGlobal(client);
-
-
-
-        ServerProxy serverProxy = new ServerProxy();
-
         ServerConfiguration serverConfiguration = new ServerConfiguration();
-        serverProxy.setServerConfiguration(serverConfiguration);
+        client.setServerConfiguration(serverConfiguration);
 
         UserNetworkAdapter userNetworkAdapter = new UserNetworkAdapter();
         userNetworkAdapter.setServerConfiguration(serverConfiguration);
         sessionManager.setUserManagement(userNetworkAdapter);
 
+        VideoUploadWrapper videoUploadWrapper = new VideoUploadWrapper();
+        videoUploadWrapper.setSessionManager(sessionManager);
+        videoUploadWrapper.setVideoDetailsProvider(localVideoManager);
+        client.setVideoUploadWrapper(videoUploadWrapper);
+
         VideoNetworkAdapter videoNetworkAdapter = new VideoNetworkAdapter();
         videoNetworkAdapter.setServerConfiguration(serverConfiguration);
-        serverProxy.setClientVideoUpload(videoNetworkAdapter);
 
-        ServerProxy.setGlobal(serverProxy);
+        Client.setGlobal(client);
     }
 
     private static void deleteDirectoryAndItsContent(File dir) {
