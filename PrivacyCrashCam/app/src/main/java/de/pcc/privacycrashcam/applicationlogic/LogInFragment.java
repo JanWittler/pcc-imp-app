@@ -61,7 +61,6 @@ public class LogInFragment extends Fragment {
                 public void onResponse(IUserManagement.LoginResult response) {
                     switch (response.result) {
                         case SUCCESS:
-                            LogInHelper.SaveAccountData(mail, pw, getContext());
                             Client.getGlobal().getSessionManager().storeAuthenticationToken(response.authenticationToken);
                             CameraActivity.Launch(getActivity());
                             getActivity().finish();

@@ -145,37 +145,6 @@ public class MemoryManager {
     }
 
     /**
-     * Saves an Account instance by overriding the previous Account values in memory.
-     *
-     * @param account the Settings instance to be saved
-     */
-    public void saveAccountData(Account account) {
-        SharedPreferences.Editor mAppPrefEditor = appPreferences.edit();
-        mAppPrefEditor.putString(Account.ACCOUNT_MAIN_KEY, account.getAsJSON());
-        mAppPrefEditor.apply();
-    }
-
-    /**
-     * Gets saved user account
-     *
-     * @return account of user containing user data or null if none was found
-     */
-    @Nullable
-    public Account getAccountData() {
-        try {
-            String account = appPreferences.getString(Account.ACCOUNT_MAIN_KEY, null);
-            if (account == null) {
-                return null;
-            } else {
-                return new Account(account);
-            }
-        } catch (JSONException e) {
-            Log.d(TAG, "No Account in Shared Preferences");
-        }
-        return null;
-    }
-
-    /**
      * Deletes all account data of the user
      */
     public void deleteAccountData() {

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
+import edu.kit.informatik.pcc.android.Client;
 
 /**
  * @author Giorgio Gross
@@ -17,18 +18,6 @@ public class LogInHelper {
      * @return true is log in data was found, false otherwise
      */
     public static boolean IsUserLoggedIn(Context context) {
-        return new MemoryManager(context).getAccountData() != null;
+        return Client.getGlobal().getSessionManager().loadAuthenticationToken() != null;
     }
-
-    /**
-     * Saves the user account data
-     *
-     * @param mail user mail
-     * @param pw user password
-     * @param context application context
-     */
-    public static void SaveAccountData(String mail, String pw, Context context) {
-        new MemoryManager(context).saveAccountData(new Account(mail, pw));
-    }
-
 }
