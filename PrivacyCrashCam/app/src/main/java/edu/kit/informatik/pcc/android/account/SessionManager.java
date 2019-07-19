@@ -23,6 +23,10 @@ public class SessionManager implements ISessionManager {
     public void storeAuthenticationToken(String authenticationToken) {
         assertCompletelySetup();
         File file = fileManager.file(tokenFileName);
+        if (authenticationToken == null) {
+            fileManager.deleteFile(file);
+            return;
+        }
         try {
             FileUtils.writeStringToFile(file, authenticationToken, encoding);
         } catch (IOException e) {

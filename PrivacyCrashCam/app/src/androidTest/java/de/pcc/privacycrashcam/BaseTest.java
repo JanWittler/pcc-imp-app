@@ -22,7 +22,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import de.pcc.privacycrashcam.applicationlogic.camera.CompatCameraHandler;
 import de.pcc.privacycrashcam.applicationlogic.camera.RecordCallback;
 import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
-import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
@@ -112,12 +111,6 @@ public class BaseTest {
      */
     @Mock
     protected MemoryManager memoryManagerMock;
-
-    /**
-     * Account
-     */
-    @Mock
-    protected Account accountMock;
 
     /**
      * VideoUploadTaskTest files

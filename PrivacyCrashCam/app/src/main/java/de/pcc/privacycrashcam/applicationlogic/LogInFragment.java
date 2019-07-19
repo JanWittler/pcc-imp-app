@@ -15,7 +15,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import de.pcc.privacycrashcam.R;
-import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.gui.CameraActivity;
 import edu.kit.informatik.pcc.android.Client;
 import edu.kit.informatik.pcc.android.ServerProxy;
@@ -54,7 +53,6 @@ public class LogInFragment extends Fragment {
 
             final String mail = et_mail.getText().toString();
             final String pw = et_password.getText().toString();
-            Account account = new Account(mail, pw);
 
             IRequestCompletion<IUserManagement.LoginResult> completion = new IRequestCompletion<IUserManagement.LoginResult>() {
                 @Override

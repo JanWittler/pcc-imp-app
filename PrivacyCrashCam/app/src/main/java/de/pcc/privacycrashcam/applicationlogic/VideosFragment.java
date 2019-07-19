@@ -196,8 +196,9 @@ public class VideosFragment extends Fragment {
                             Toast.makeText(getContext(), getString(R.string.video_upload_success),
                                     Toast.LENGTH_SHORT).show();
                             break;
-                        case ACCOUNT_FAILURE:
-                            Toast.makeText(getContext(), getString(R.string.error_account),
+                        case UNAUTHENTICATED:
+                            //TODO: log out
+                            Toast.makeText(getContext(), "Your session timed out. Please login again.",
                                     Toast.LENGTH_SHORT).show();
                             break;
                         case NETWORK_FAILURE:
@@ -234,7 +235,7 @@ public class VideosFragment extends Fragment {
             }
             String authenticationToken = Client.getGlobal().getSessionManager().loadAuthenticationToken();
             if (authenticationToken == null) {
-                completion.onResponse(IClientVideoUpload.UploadResult.ACCOUNT_FAILURE);
+                completion.onResponse(IClientVideoUpload.UploadResult.UNAUTHENTICATED);
                 return;
             }
             ServerProxy.getGlobal().getClientVideoUpload().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, authenticationToken, completion);

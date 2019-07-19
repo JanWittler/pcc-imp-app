@@ -19,8 +19,8 @@ public interface IClientVideoUpload {
         //! An error occurred editing the video.
         EDITING_FAILURE,
 
-        //! Account data outdated.
-        ACCOUNT_FAILURE,
+        //! Token invalid or not existing
+        UNAUTHENTICATED,
 
         //! Something unexpected went wrong.
         FAILURE_OTHER

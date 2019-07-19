@@ -2,8 +2,6 @@ package de.pcc.privacycrashcam.applicationlogic;
 
 import android.content.Context;
 
-import de.pcc.privacycrashcam.data.Account;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import edu.kit.informatik.pcc.android.Client;
 
 /**

@@ -16,11 +16,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import de.pcc.privacycrashcam.data.Account;
 import de.pcc.privacycrashcam.data.MemoryKeys;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.Video;
+import edu.kit.informatik.pcc.android.Client;
 
 /**
  * Handles access to the device storage.
@@ -148,9 +148,7 @@ public class MemoryManager {
      * Deletes all account data of the user
      */
     public void deleteAccountData() {
-        SharedPreferences.Editor mAppPrefEditor = appPreferences.edit();
-        mAppPrefEditor.remove(Account.ACCOUNT_MAIN_KEY);
-        mAppPrefEditor.apply();
+        Client.getGlobal().getSessionManager().storeAuthenticationToken(null);
     }
 
 
