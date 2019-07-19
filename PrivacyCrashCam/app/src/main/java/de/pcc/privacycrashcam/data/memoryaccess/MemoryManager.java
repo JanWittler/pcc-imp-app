@@ -145,6 +145,9 @@ public class MemoryManager {
      * Deletes all account data of the user
      */
     public void deleteAccountData() {
+        for (int videoId : Client.getGlobal().getLocalVideoManager().getLocallyStoredVideoIds()) {
+            Client.getGlobal().getLocalVideoManager().deleteContentForVideo(videoId);
+        }
         Client.getGlobal().getSessionManager().storeAuthenticationToken(null);
     }
 

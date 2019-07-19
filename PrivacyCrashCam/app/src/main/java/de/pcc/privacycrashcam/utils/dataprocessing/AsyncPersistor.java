@@ -14,10 +14,7 @@ import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
@@ -28,12 +25,11 @@ import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
-import de.pcc.privacycrashcam.utils.encryption.Encryptor;
+import edu.kit.informatik.pcc.android.Client;
 
 /**
  * The AsyncPersistor saves all data after recording gets invoked in the app.
@@ -70,10 +66,6 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      */
     private VideoRingBuffer ringbuffer;
     /**
-     * Encryptor used to encryptAndPersist files and keys.
-     */
-    private Encryptor encryptor;
-    /**
      * Settings used to determine the ringbuffer size.
      */
     private Settings settings;
@@ -98,7 +90,6 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         this.ringbuffer = ringbuffer;
         this.persistCallback = persistCallback;
         this.context = context;
-        this.encryptor = new Encryptor();
         this.settings = memoryManager.getSettings();
     }
 
@@ -121,7 +112,6 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         this.ringbuffer = ringbuffer;
         this.persistCallback = persistCallback;
         this.context = context;
-        this.encryptor = new Encryptor();
         this.settings = memoryManager.getSettings();
     }
 
@@ -190,9 +180,7 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         if (!concatVideos(vidSnippets, concatVid))
             return false;
 
-        // encryptAndPersist files
-        if (!encryptAndPersist(videoTag, concatVid, metaLocation))
-            return false;
+        Client.getGlobal().getLocalVideoManager().storeVideo(concatVid, metaLocation);
 
         // delete temporary files
         memoryManager.deleteCurrentTempData();
@@ -214,49 +202,6 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
                                         helper methods
 
      * ###########################################################################################*/
-
-    /**
-     * Encrypts metadata and video with a hybrid encryption algorithm.
-     * Saves the files on the app. Destination files will be created according to the MemoryManager.
-     *
-     * @param videoTag    Name added to the actual video name
-     * @param concatVideo Location of the video to encryptAndPersist.
-     * @param meta        Location of the metadata to encryptAndPersist.
-     * @return Returns whether encrypting was successful or not.
-     */
-    private boolean encryptAndPersist(String videoTag, File concatVideo, File meta) {
-        // encrypt
-        File[] input = new File[]{
-                concatVideo,
-                meta};
-        File[] output = new File[]{
-                memoryManager.getTempVideoFile(),
-                memoryManager.createEncryptedMetaFile(videoTag)};
-        File encKey = memoryManager.createEncryptedSymmetricKeyFile(videoTag);
-        InputStream publicKey = context.getResources().openRawResource(R.raw.publickey);
-        if (!encryptor.encrypt(input, output, publicKey, encKey))
-            return false;
-
-        // finally persist encrypted video
-        byte[] buffer = new byte[1024];
-        int read;
-        try {
-            FileInputStream fis = new FileInputStream(output[0]);
-            FileOutputStream fos = new FileOutputStream(memoryManager.createEncryptedVideoFile(videoTag));
-
-            while ((read = fis.read(buffer)) != -1) {
-                fos.write(buffer, 0, read);
-            }
-            fos.flush();
-            fis.close();
-            fos.close();
-        } catch (IOException e) {
-            Log.w(TAG, "Persisting encrypted video failed");
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * Takes a collection of videos and appends them in order.
