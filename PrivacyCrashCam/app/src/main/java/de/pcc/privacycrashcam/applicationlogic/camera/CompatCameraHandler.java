@@ -82,14 +82,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
                 // save current file and set up new one
                 forceStopMediaRecorder();
-                // use new ring buffer to avoid conflicts
-                try {
-                    setUpBuffer();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    pauseHandler();
-                    return;
-                }
+                setUpBuffer();
                 // restart media recorder to force the use of a new file
                 restartMediaRecorder();
             }
@@ -105,7 +98,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         };
     }
 
-    private void setUpBuffer() throws FileNotFoundException {
+    private void setUpBuffer() {
         // +1 capacity to record at least the desired video length
         int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH + 1;
 
@@ -329,12 +322,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
         // Load and apply settings
         this.settings = Client.getGlobal().getSettingsManager().loadSettings();
-        try {
-            setUpBuffer();
-        } catch (FileNotFoundException e) {
-            recordCallback.onError(context.getResources().getString(R.string.error_memory));
-            canOperate = false;
-        }
+        setUpBuffer();
         setUpCamcorderProfile();
 
         // avoid NPE's if a client forgets to set the metadata
@@ -391,11 +379,12 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     public void destroyHandler() {
         super.destroyHandler();
         tearDownBuffer();
-        //TODO: delete created video data
     }
 
     private void tearDownBuffer() {
         videoRingBuffer.destroy();
+        Client.getGlobal().getTemporaryFileManager().deleteFile(currentOutputFile);
+        currentOutputFile = null;
     }
 
     @Override

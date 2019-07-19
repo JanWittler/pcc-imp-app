@@ -141,14 +141,18 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         Log.i(TAG, "All files to be concatenated were written");
 
         File concatVideo = Client.getGlobal().getTemporaryFileManager().file(videoTag + "_video");
-        if (!concatVideos(vidSnippets, concatVideo))
+        if (!concatVideos(vidSnippets, concatVideo)) {
             return false;
+        }
 
         Client.getGlobal().getLocalVideoManager().storeVideo(concatVideo, metaLocation);
 
         // delete temporary files
         Client.getGlobal().getTemporaryFileManager().deleteFile(metaLocation);
         Client.getGlobal().getTemporaryFileManager().deleteFile(concatVideo);
+        for (File snippet: vidSnippets) {
+            Client.getGlobal().getTemporaryFileManager().deleteFile(snippet);
+        }
         ringbuffer.flushAll();
 
         Log.i(TAG, "Finished writing files");

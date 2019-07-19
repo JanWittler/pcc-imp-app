@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import edu.kit.informatik.pcc.android.Client;
+
 /**
  * Buffer which stores video files in a fifo queue and keeps a reference table for quick access of
  * each file through its file name.
@@ -136,7 +138,7 @@ public class VideoRingBuffer {
 
         File file;
         while ((file = queue.poll()) != null) {
-            file.delete();
+            Client.getGlobal().getTemporaryFileManager().deleteFile(file);
         }
     }
 
@@ -145,6 +147,9 @@ public class VideoRingBuffer {
      */
     public void destroy() {
         flushAll();
+        for (File file: queue) {
+            file.delete();
+        }
         directoryObserver.stopWatching();
     }
 
