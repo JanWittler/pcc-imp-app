@@ -6,12 +6,9 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.json.JSONException;
-
 import java.io.File;
 
 import de.pcc.privacycrashcam.data.MemoryKeys;
-import edu.kit.informatik.pcc.android.settings.Settings;
 import edu.kit.informatik.pcc.android.Client;
 
 /**

@@ -11,14 +11,17 @@ import edu.kit.informatik.pcc.core.data.FileSystemManager;
 import edu.kit.informatik.pcc.core.data.IFileManager;
 
 public class Client {
+    private static Client global;
+
     public static Client getGlobal() {
-        if (_global == null) {
-            setupClient();
-        }
-        return _global;
+        assert global != null;
+        return global;
     }
 
-    private static Client _global;
+    public static void setGlobal(Client client) {
+        assert global == null;
+        global = client;
+    }
 
     private ISessionManager sessionManager;
     private ILocalVideoManager localVideoManager;
@@ -74,18 +77,5 @@ public class Client {
     public ISettingsManager getSettingsManager() {
         assert settingsManager != null;
         return settingsManager;
-    }
-
-    public static void setupClient() {
-        FileSystemManager sessionFileManager = new FileSystemManager("session");
-
-        Client client = new Client();
-
-        SessionManager sessionManager = new SessionManager();
-        sessionManager.setFileManager(sessionFileManager);
-
-        client.setSessionManager(sessionManager);
-
-        _global = client;
     }
 }
