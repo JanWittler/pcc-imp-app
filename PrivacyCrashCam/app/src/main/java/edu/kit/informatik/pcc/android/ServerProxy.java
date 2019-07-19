@@ -19,19 +19,8 @@ public class ServerProxy {
 
     private static ServerProxy global;
 
-    private IUserManagement userManagement;
     private IClientVideoUpload clientVideoUpload;
     private IServerConfiguration serverConfiguration;
-
-    public void setUserManagement(IUserManagement userManagement) {
-        assert this.userManagement == null;
-        this.userManagement = userManagement;
-    }
-
-    public IUserManagement getUserManagement() {
-        assert userManagement != null;
-        return userManagement;
-    }
 
     public void setClientVideoUpload(IClientVideoUpload clientVideoUpload) {
         assert this.clientVideoUpload == null;

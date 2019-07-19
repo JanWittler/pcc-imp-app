@@ -213,7 +213,7 @@ public class VideosFragment extends Fragment {
                         case UNAUTHENTICATED:
                             Toast.makeText(getContext(), "Your session timed out. Please login again.",
                                     Toast.LENGTH_SHORT).show();
-                            Client.getGlobal().getSessionManager().deleteSession();
+                            Client.getGlobal().getSessionManager().logout();
                             LogInActivity.Launch(getActivity());
                             break;
                         case NETWORK_FAILURE:
@@ -239,7 +239,7 @@ public class VideosFragment extends Fragment {
                 }
             };
 
-            String authenticationToken = Client.getGlobal().getSessionManager().loadSessionToken();
+            String authenticationToken = Client.getGlobal().getSessionManager().getAuthenticationToken();
             if (authenticationToken == null) {
                 completion.onResponse(IClientVideoUpload.UploadResult.UNAUTHENTICATED);
                 return;

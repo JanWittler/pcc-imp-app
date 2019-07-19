@@ -54,12 +54,11 @@ public class LogInFragment extends Fragment {
             final String mail = et_mail.getText().toString();
             final String pw = et_password.getText().toString();
 
-            IRequestCompletion<IUserManagement.LoginResult> completion = new IRequestCompletion<IUserManagement.LoginResult>() {
+            IRequestCompletion<IUserManagement.AuthenticationResult> completion = new IRequestCompletion<IUserManagement.AuthenticationResult>() {
                 @Override
-                public void onResponse(IUserManagement.LoginResult response) {
-                    switch (response.result) {
+                public void onResponse(IUserManagement.AuthenticationResult response) {
+                    switch (response) {
                         case SUCCESS:
-                            Client.getGlobal().getSessionManager().storeSessionToken(response.authenticationToken);
                             CameraActivity.Launch(getActivity());
                             getActivity().finish();
                             break;
@@ -94,7 +93,7 @@ public class LogInFragment extends Fragment {
                 }
             };
 
-            ServerProxy.getGlobal().getUserManagement().login(mail, pw, completion);
+            Client.getGlobal().getSessionManager().login(mail, pw, completion);
         }
     };
 

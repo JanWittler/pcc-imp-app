@@ -1,44 +1,76 @@
 package edu.kit.informatik.pcc.android.account;
 
+import edu.kit.informatik.pcc.android.network.IRequestCompletion;
+import edu.kit.informatik.pcc.android.network.IUserManagement;
+import edu.kit.informatik.pcc.android.storage.ISimpleValueStorage;
 import edu.kit.informatik.pcc.android.storage.video.ILocalVideoManager;
 
 public class SessionManager implements ISessionManager {
-    private ISessionManager sessionStorage;
-    private ILocalVideoManager localVideoManager;
+    private static final String sessionTokenKey = SessionManager.class.getName() + ".sessiontoken";
 
-    public void setSessionStorage(ISessionManager sessionStorage) {
-        assert this.sessionStorage == null;
-        this.sessionStorage = sessionStorage;
-    }
+    private ILocalVideoManager localVideoManager;
+    private IUserManagement userManagement;
+    private ISimpleValueStorage simpleValueStorage;
 
     public void setLocalVideoManager(ILocalVideoManager localVideoManager) {
         assert this.localVideoManager == null;
         this.localVideoManager = localVideoManager;
     }
 
-    @Override
-    public void storeSessionToken(String sessionToken) {
-        assertCompletelySetup();
-        sessionStorage.storeSessionToken(sessionToken);
+    public void setUserManagement(IUserManagement userManagement) {
+        assert this.userManagement == null;
+        this.userManagement = userManagement;
+    }
+
+    public void setSimpleValueStorage(ISimpleValueStorage simpleValueStorage) {
+        assert this.simpleValueStorage == null;
+        this.simpleValueStorage = simpleValueStorage;
     }
 
     @Override
-    public String loadSessionToken() {
+    public void login(String email, String password, final IRequestCompletion<IUserManagement.AuthenticationResult> completion) {
         assertCompletelySetup();
-        return sessionStorage.loadSessionToken();
+        IRequestCompletion<IUserManagement.LoginResult> lCompletion = new IRequestCompletion<IUserManagement.LoginResult>() {
+            @Override
+            public void onResponse(IUserManagement.LoginResult response) {
+                if (response.result == IUserManagement.AuthenticationResult.SUCCESS) {
+                    simpleValueStorage.putString(sessionTokenKey, response.authenticationToken);
+                }
+                completion.onResponse(response.result);
+            }
+
+            @Override
+            public void onError(String error) {
+                completion.onError(error);
+            }
+        };
+        userManagement.login(email, password, lCompletion);
     }
 
     @Override
-    public void deleteSession() {
+    public Boolean hasActiveSession() {
+        assertCompletelySetup();
+        return getAuthenticationToken() != null;
+    }
+
+    @Override
+    public String getAuthenticationToken() {
+        assertCompletelySetup();
+        return simpleValueStorage.getString(sessionTokenKey);
+    }
+
+    @Override
+    public void logout() {
         assertCompletelySetup();
         for (int videoId: localVideoManager.getLocallyStoredVideoIds()) {
             localVideoManager.deleteContentForVideo(videoId);
         }
-        sessionStorage.deleteSession();
+        simpleValueStorage.putString(sessionTokenKey, null);
     }
 
     private void assertCompletelySetup() {
-        assert sessionStorage != null;
+        assert userManagement != null;
         assert localVideoManager != null;
+        assert simpleValueStorage != null;
     }
 }

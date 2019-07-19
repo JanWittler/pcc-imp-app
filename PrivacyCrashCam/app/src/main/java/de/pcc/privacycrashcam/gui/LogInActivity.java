@@ -14,8 +14,8 @@ import android.view.View;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.applicationlogic.LogInFragment;
-import de.pcc.privacycrashcam.applicationlogic.LogInHelper;
 import de.pcc.privacycrashcam.applicationlogic.WelcomeFragment;
+import edu.kit.informatik.pcc.android.Client;
 
 /**
  * Log In Activity which handles requesting permission, authenticating the user or starting the
@@ -61,7 +61,7 @@ public class LogInActivity extends MainActivity {
     private void manageUiFlow() {
         if (!hasPermissions()) {
             replaceFragment(new WelcomeFragment());
-        } else if (!LogInHelper.IsUserLoggedIn(getApplicationContext())) {
+        } else if (!Client.getGlobal().getSessionManager().hasActiveSession()) {
             replaceFragment(new LogInFragment());
         } else {
             CameraActivity.Launch(this);

@@ -6,7 +6,6 @@ import android.content.Context;
 import java.io.File;
 
 import edu.kit.informatik.pcc.android.account.SessionManager;
-import edu.kit.informatik.pcc.android.account.SessionStorage;
 import edu.kit.informatik.pcc.android.crypto.PublicKeyProvider;
 import edu.kit.informatik.pcc.android.network.ServerConfiguration;
 import edu.kit.informatik.pcc.android.network.UserNetworkAdapter;
@@ -35,11 +34,8 @@ public class PccApplication extends Application {
 
         Client client = new Client();
 
-        SessionStorage sessionStorage = new SessionStorage();
-        sessionStorage.setSimpleValueStorage(prefStorage);
-
         SessionManager sessionManager = new SessionManager();
-        sessionManager.setSessionStorage(sessionStorage);
+        sessionManager.setSimpleValueStorage(prefStorage);
         client.setSessionManager(sessionManager);
 
         LocalVideoManager localVideoManager = new LocalVideoManager();
@@ -71,7 +67,7 @@ public class PccApplication extends Application {
 
         UserNetworkAdapter userNetworkAdapter = new UserNetworkAdapter();
         userNetworkAdapter.setServerConfiguration(serverConfiguration);
-        serverProxy.setUserManagement(userNetworkAdapter);
+        sessionManager.setUserManagement(userNetworkAdapter);
 
         VideoNetworkAdapter videoNetworkAdapter = new VideoNetworkAdapter();
         videoNetworkAdapter.setServerConfiguration(serverConfiguration);
