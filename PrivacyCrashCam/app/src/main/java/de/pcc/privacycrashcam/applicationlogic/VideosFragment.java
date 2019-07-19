@@ -4,6 +4,7 @@ package de.pcc.privacycrashcam.applicationlogic;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import edu.kit.informatik.pcc.android.Client;
 import edu.kit.informatik.pcc.android.ServerProxy;
 import edu.kit.informatik.pcc.android.network.IClientVideoUpload;
 import edu.kit.informatik.pcc.android.network.IRequestCompletion;
+import edu.kit.informatik.pcc.android.storage.video.IVideoDetailsProvider;
 
 /**
  * Shows all videos which were recorded by the user.
@@ -40,7 +43,6 @@ import edu.kit.informatik.pcc.android.network.IRequestCompletion;
  */
 
 public class VideosFragment extends Fragment {
-
     /* #############################################################################################
      *                                  attributes
      * ###########################################################################################*/
@@ -61,7 +63,18 @@ public class VideosFragment extends Fragment {
 
         // set up content
         MemoryManager memoryManager = new MemoryManager(getContext());
-        videoListAdapter = new VideoListAdapter(memoryManager.getAllVideos(), memoryManager);
+        int[] videoIds = Client.getGlobal().getLocalVideoManager().getLocallyStoredVideoIds();
+        ArrayList<VideoInfo> videoInfos = new ArrayList<>();
+        for (int videoId: videoIds) {
+            Metadata metadata = null;
+            try {
+                metadata = new Metadata(Client.getGlobal().getLocalVideoManager().getMetadata(videoId));
+            } catch (JSONException | IOException e) {
+                Log.d("VideosFragment", "Error reading metadata file!");
+            }
+            videoInfos.add(new VideoInfo(videoId, metadata));
+        }
+        videoListAdapter = new VideoListAdapter(videoInfos, memoryManager);
         videosListView.setAdapter(videoListAdapter);
         videosListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -80,13 +93,26 @@ public class VideosFragment extends Fragment {
         TextView caption;
     }
 
+    private class VideoInfo {
+        private int videoId;
+        private Metadata metadata;
+
+        public VideoInfo(int videoId, Metadata metadata) {
+            this.videoId = videoId;
+            this.metadata = metadata;
+        }
+
+        public int getVideoId() { return videoId; }
+        public Metadata getMetadata() { return metadata; };
+    }
+
     private class VideoListAdapter extends BaseAdapter {
         private boolean isUploading = false;
         private MemoryManager memoryManager;
         private LayoutInflater inflater;
-        private ArrayList<Video> videos;
+        private ArrayList<VideoInfo> videos;
 
-        private VideoListAdapter(ArrayList<Video> videos, MemoryManager memoryManager) {
+        private VideoListAdapter(ArrayList<VideoInfo> videos, MemoryManager memoryManager) {
             this.inflater = LayoutInflater.from(getContext());
             this.videos = videos;
             this.memoryManager = memoryManager;
@@ -125,9 +151,9 @@ public class VideosFragment extends Fragment {
                 mHolder = (VideoViewHolder) view.getTag();
             }
 
-            mHolder.title.setText(videos.get(position).getName());
+            mHolder.title.setText(videos.get(position).getVideoId());
             mHolder.caption.setText(getDate(
-                    videos.get(position).getReadableMetadata().getDate(), "dd.MM.yyyy HH:mm:ss"));
+                    videos.get(position).getMetadata().getDate(), "dd.MM.yyyy HH:mm:ss"));
 
             mHolder.upload.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -165,13 +191,8 @@ public class VideosFragment extends Fragment {
          * @param index video index
          */
         private void delete(int index) {
-            Video item = videos.get(index);
-            String videoTag = Video.ExtractTagFromName(item.getName());
-            memoryManager.deleteEncryptedVideoFile(videoTag);
-            memoryManager.deleteEncryptedMetadataFile(videoTag);
-            memoryManager.deleteReadableMetadata(videoTag);
-            memoryManager.deleteEncryptedSymmetricKeyFile(videoTag);
-
+            VideoInfo item = videos.get(index);
+            Client.getGlobal().getLocalVideoManager().deleteContentForVideo(item.getVideoId());
             videos.remove(item);
             this.notifyDataSetChanged();
         }
@@ -185,8 +206,6 @@ public class VideosFragment extends Fragment {
         private void upload(int index, final VideoViewHolder mHolder) {
             toggleProgressBar(mHolder);
             isUploading = true;
-
-            Video item = videos.get(index);
 
             IRequestCompletion<IClientVideoUpload.UploadResult> completion = new IRequestCompletion<IClientVideoUpload.UploadResult>() {
                 @Override
@@ -224,21 +243,17 @@ public class VideosFragment extends Fragment {
                 }
             };
 
-            File encKey = item.getEncSymKeyFile();
-            byte[] keyData;
-            try {
-                keyData = FileUtils.readFileToByteArray(encKey);
-            } catch (IOException e) {
-                e.printStackTrace();
-                completion.onError("Failed to load key data");
-                return;
-            }
             String authenticationToken = Client.getGlobal().getSessionManager().loadAuthenticationToken();
             if (authenticationToken == null) {
                 completion.onResponse(IClientVideoUpload.UploadResult.UNAUTHENTICATED);
                 return;
             }
-            ServerProxy.getGlobal().getClientVideoUpload().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, authenticationToken, completion);
+            int videoId = videos.get(index).getVideoId();
+            IVideoDetailsProvider videoDetailsProvider = Client.getGlobal().getVideoDetailsProvider();
+            File encryptedVideo = videoDetailsProvider.getEncryptedVideo(videoId);
+            File encryptedMetadata = videoDetailsProvider.getEncryptedMetadata(videoId);
+            byte[] encryptedKey = videoDetailsProvider.getEncryptedKey(videoId);
+            ServerProxy.getGlobal().getClientVideoUpload().uploadVideo(encryptedVideo, encryptedMetadata, encryptedKey, authenticationToken, completion);
         }
 
         /**
@@ -248,7 +263,7 @@ public class VideosFragment extends Fragment {
          */
         private void info(int index) {
             // set up the metadata content so that a user can read it easily
-            Metadata videoMeta = videos.get(index).getReadableMetadata();
+            Metadata videoMeta = videos.get(index).getMetadata();
             String unformatted = getContext().getString(R.string.meta_info);
             String formatted = String.format(unformatted,
                     getDate(videoMeta.getDate(), "dd.MM.yyyy HH:mm:ss") + "<br>",

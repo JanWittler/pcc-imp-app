@@ -9,11 +9,8 @@ import android.util.Log;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import de.pcc.privacycrashcam.data.MemoryKeys;
@@ -238,16 +235,6 @@ public class MemoryManager {
     }
 
     /**
-     * Create new directory name to be used as temp directory. The directory will be created when
-     * you call {@link #getTempMetadataFile()} or {@link #getTempVideoFile()} next time. You cannot
-     * access the old directory anymore after calling this method, calls to
-     * {@link #deleteCurrentTempData()} will only affect the new temp directory.
-     */
-    public void rebaseTempDir() {
-        tempDirName = TEMP_DIR_PREFIX + System.currentTimeMillis();
-    }
-
-    /**
      * Deletes all temporary data located inside the {@link MemoryManager} instance's temp folder.
      */
     public void deleteCurrentTempData() {
@@ -279,107 +266,6 @@ public class MemoryManager {
             }
         }
         dir.delete();
-    }
-
-    /**
-     * Deletes the file containing the encrypted symmetric key associated with the passed video
-     * tag.
-     * <p>
-     * <p>The video tag is determined when creating the video file with
-     * {@link #createEncryptedVideoFile(String)}</p>
-     *
-     * @param videoTag Tag of the video the file is associated with
-     */
-    public boolean deleteEncryptedSymmetricKeyFile(String videoTag) {
-        File dir = getFilesDir(File.separator + KEY_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, KEY_PREFIX + videoTag + "." + KEY_SUFFIX);
-            if (file.exists()) {
-                file.delete();
-                return true;
-            } else {
-                Log.d(TAG, "File: " + KEY_PREFIX + videoTag + "." + KEY_SUFFIX + " in dir: " +
-                        KEY_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, KEY_DIR + " dir not existing");
-        }
-        return false;
-    }
-
-    /**
-     * Deletes the file containing the encrypted metadata associated with the passed video tag.
-     * <p>
-     * <p>The video tag is determined when creating the video file with
-     * {@link #createEncryptedVideoFile(String)}</p>
-     *
-     * @param videoTag Tag of the video the file is associated with
-     */
-    public boolean deleteEncryptedMetadataFile(String videoTag) {
-        File dir = getFilesDir(File.separator + META_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX);
-            if (file.exists()) {
-                file.delete();
-                return true;
-            } else {
-                Log.d(TAG, "File: " + Metadata.PREFIX + videoTag + "." + Metadata.SUFFIX + " in dir: " +
-                        META_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, META_DIR + " dir not existing");
-        }
-        return false;
-    }
-
-
-    /**
-     * Deletes the file containing the readable metadata associated with the passed video tag.
-     * <p>
-     * <p>The video tag is determined when creating the video file with
-     * {@link #createEncryptedVideoFile(String)}</p>
-     *
-     * @param videoTag Tag of the video the file is associated with
-     */
-    public boolean deleteReadableMetadata(String videoTag) {
-        File dir = getFilesDir(File.separator + META_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
-            if (file.exists()) {
-                file.delete();
-                return true;
-            } else {
-                Log.d(TAG, "File: " + Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX + " in dir: " +
-                        META_DIR + "does not exist!");
-            }
-        } else {
-            Log.d(TAG, META_DIR + " dir not existing");
-        }
-        return false;
-    }
-
-    /**
-     * Deletes the file containing the encrypted video associated with the passed video tag.
-     * <p>
-     * <p>If you know the video name but not the tag use {@link Video#ExtractTagFromName(String)}</p>
-     *
-     * @param videoTag Tag of the video
-     */
-    public boolean deleteEncryptedVideoFile(String videoTag) {
-        File dir = getFilesDir(File.separator + VIDEO_DIR);
-        if(dir.exists()) {
-            File file = new File(dir, Video.PREFIX + videoTag + "." + Video.SUFFIX);
-            if (file.exists()) {
-                file.delete();
-                return true;
-            } else {
-                Log.d(TAG, "File: " + Video.PREFIX + videoTag + "." + Video.SUFFIX + " in dir: " +
-                        VIDEO_DIR + " does not exist!");
-            }
-        } else {
-            Log.d(TAG, VIDEO_DIR + " dir not existing");
-        }
-        return false;
     }
 
     /**
@@ -477,41 +363,6 @@ public class MemoryManager {
     // deleteEncryptedSymmetricKeyFile, deleteEncryptedVideoFile, deleteEncryptedMetadataFile and
     // deleteReadableMetadata (nice to have)
 
-
-    /**
-     * Creates and returns a list containing all encrypted videos saved in the video directory
-     * <p>
-     * <p>See {@link Video}</p>
-     *
-     * @return Videos as an ArrayList<Video>
-     */
-    public ArrayList<Video> getAllVideos() {
-        ArrayList<Video> allVideos= new ArrayList<>();
-        //get video directory
-        File videosDir = getFilesDir(File.separator + VIDEO_DIR);
-        //Initialize all videos from folder as videos
-        List<File> videosInDir = getListFiles(videosDir);
-        for (File video : videosInDir) {
-            // access to Metadata
-            File metaDataFile = getEncryptedMetadata(Video.ExtractTagFromName(video.getName()));
-            //File metaDataFile = new File(context.getFilesDir() + File.separator + META_DIR +
-             //       video.getName().replaceFirst(Video.PREFIX, Metadata.PREFIX).replaceFirst(Video.SUFFIX, Metadata.SUFFIX));
-            Metadata readableMetadata = null;
-            try {
-                readableMetadata = new Metadata(getReadableMetadata(Video.ExtractTagFromName(video.getName())));
-            } catch (JSONException|IOException e) {
-                Log.d(TAG, "Error reading metadata file!");
-            }
-            // add video to arrayList
-            allVideos.add(new Video(video.getName(), video,
-                    metaDataFile,
-                    getEncryptedSymmetricKey(Video.ExtractTagFromName(video.getName())),
-                    readableMetadata
-                    ));
-        }
-        return allVideos;
-    }
-
     /**
      * Gets the file containing the encrypted symmetric key from the key directory
      *
@@ -592,34 +443,6 @@ public class MemoryManager {
         File metaFile = new File(metaDir, Metadata.PREFIX_READABLE + videoTag + "." + Metadata.SUFFIX);
         if (metaFile.exists()) return metaFile;
         return null;
-    }
-
-    /**
-     * creates a ArrayList of files in a directory recursively.
-     * So all Files in this directory will be added, the dirs in a folder as well.
-     * @param parentDir the directory which the files are in
-     * @return the Files of the given directory
-     */
-    private ArrayList<File> getListFiles(File parentDir) {
-        ArrayList<File> inFiles = new ArrayList<>();
-        File[] files = parentDir.listFiles();
-        if (files == null) return inFiles;
-        for (File file : files) {
-            if (file.isDirectory()) {
-                inFiles.addAll(getListFiles(file));
-            } else {
-                inFiles.add(file);
-            }
-        }
-        return inFiles;
-    }
-
-    /**
-     * returns a directory rootProjectDir without an additional path
-     * @return the path as File
-     */
-    private File getFilesDir() {
-        return getFilesDir("");
     }
 
     /**
