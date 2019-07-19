@@ -14,7 +14,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import de.pcc.privacycrashcam.R;
-import de.pcc.privacycrashcam.data.Settings;
+import edu.kit.informatik.pcc.android.Client;
+import edu.kit.informatik.pcc.android.settings.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.gui.LogInActivity;
 
@@ -63,7 +64,7 @@ public class SettingsFragment extends Fragment {
         RelativeLayout base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
 
         memoryManager = new MemoryManager(getContext());
-        settings = memoryManager.getSettings();
+        settings = Client.getGlobal().getSettingsManager().loadSettings();
         // init view components
 
         /**
@@ -222,6 +223,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        memoryManager.saveSettings(settings);
+        Client.getGlobal().getSettingsManager().storeSettings(settings);
     }
 }

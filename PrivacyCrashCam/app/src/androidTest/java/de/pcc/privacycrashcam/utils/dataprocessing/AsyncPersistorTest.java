@@ -48,7 +48,7 @@ public class AsyncPersistorTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        mPersistor = new AsyncPersistor(bufferMock, memoryManagerMock, mCallback);
+        mPersistor = new AsyncPersistor(bufferMock, mCallback);
     }
 
     @Test

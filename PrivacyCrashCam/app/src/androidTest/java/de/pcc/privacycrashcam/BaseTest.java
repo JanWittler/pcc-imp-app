@@ -8,7 +8,6 @@ import android.support.test.InstrumentationRegistry;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -23,7 +22,7 @@ import de.pcc.privacycrashcam.applicationlogic.camera.CompatCameraHandler;
 import de.pcc.privacycrashcam.applicationlogic.camera.RecordCallback;
 import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHandler;
 import de.pcc.privacycrashcam.data.Metadata;
-import de.pcc.privacycrashcam.data.Settings;
+import edu.kit.informatik.pcc.android.settings.Settings;
 import de.pcc.privacycrashcam.data.Video;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.testUtils.FileUtils;
@@ -163,11 +162,6 @@ public class BaseTest {
         when(bufferMock.demandData()).thenReturn(mFiles);
         when(bufferMock.getCapacity()).thenReturn(CAPACITY);
         mocks.add(bufferMock);
-
-        // mock memory manager
-        when(memoryManagerMock.getSettings()).thenReturn(settingsMock);
-        mocks.add(memoryManagerMock);
-
 
         // mock metadataMock
         when(metadataMock.getDate()).thenReturn(VIDEO_TAG_VAL);

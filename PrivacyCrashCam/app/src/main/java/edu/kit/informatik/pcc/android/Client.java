@@ -4,6 +4,7 @@ import java.io.File;
 
 import edu.kit.informatik.pcc.android.account.ISessionManager;
 import edu.kit.informatik.pcc.android.account.SessionManager;
+import edu.kit.informatik.pcc.android.settings.ISettingsManager;
 import edu.kit.informatik.pcc.android.storage.video.ILocalVideoManager;
 import edu.kit.informatik.pcc.android.storage.video.IVideoDetailsProvider;
 import edu.kit.informatik.pcc.core.data.FileSystemManager;
@@ -23,6 +24,7 @@ public class Client {
     private ILocalVideoManager localVideoManager;
     private IVideoDetailsProvider videoDetailsProvider;
     private IFileManager temporaryFileManager;
+    private ISettingsManager settingsManager;
 
     public void setSessionManager(ISessionManager sessionManager) {
         assert this.sessionManager == null;
@@ -62,6 +64,16 @@ public class Client {
     public IFileManager getTemporaryFileManager() {
         assert temporaryFileManager != null;
         return temporaryFileManager;
+    }
+
+    public void setSettingsManager(ISettingsManager settingsManager) {
+        assert this.settingsManager == null;
+        this.settingsManager = settingsManager;
+    }
+
+    public ISettingsManager getSettingsManager() {
+        assert settingsManager != null;
+        return settingsManager;
     }
 
     public static void setupClient() {

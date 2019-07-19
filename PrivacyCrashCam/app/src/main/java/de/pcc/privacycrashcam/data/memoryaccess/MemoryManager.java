@@ -11,7 +11,7 @@ import org.json.JSONException;
 import java.io.File;
 
 import de.pcc.privacycrashcam.data.MemoryKeys;
-import de.pcc.privacycrashcam.data.Settings;
+import edu.kit.informatik.pcc.android.settings.Settings;
 import edu.kit.informatik.pcc.android.Client;
 
 /**
@@ -106,35 +106,6 @@ public class MemoryManager {
                                                                             X   X         X   X
 
     ############################################################################################# */
-
-    /**
-     * Gets saved user settings. Returns default settings if reading settings from shared
-     * preferences failed.
-     *
-     * @return settings of user
-     */
-    public Settings getSettings() {
-        Settings settings;
-        String jSettings = appPreferences.getString(Settings.SETTINGS_MAIN_KEY, null);
-        if(jSettings == null) return new Settings();
-        try {
-            settings = new Settings(jSettings);
-        } catch (JSONException e) {
-            settings = new Settings();
-        }
-        return settings;
-    }
-
-    /**
-     * Saves a Settings instance by overriding the previous Settings values in memory.
-     *
-     * @param settings the Settings instance to be saved
-     */
-    public void saveSettings(Settings settings) {
-        SharedPreferences.Editor mAppPrefEditor = appPreferences.edit();
-        mAppPrefEditor.putString(Settings.SETTINGS_MAIN_KEY, settings.getAsJSON());
-        mAppPrefEditor.apply();
-    }
 
     /**
      * Deletes all account data of the user

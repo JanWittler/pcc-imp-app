@@ -19,7 +19,7 @@ import java.util.UUID;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
-import de.pcc.privacycrashcam.data.Settings;
+import edu.kit.informatik.pcc.android.settings.Settings;
 import de.pcc.privacycrashcam.data.Video;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
@@ -338,7 +338,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         memoryManager.deleteAllTempData();
 
         // Load and apply settings
-        this.settings = memoryManager.getSettings();
+        this.settings = Client.getGlobal().getSettingsManager().loadSettings();
         try {
             setUpBuffer();
         } catch (FileNotFoundException e) {
@@ -373,7 +373,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         recordCallback.onRecordingStarted();
 
         // create async task to persist the buffer
-        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, memoryManager,
+        AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer,
                 persistCallback);
         mPersistor.execute(metadata);
     }

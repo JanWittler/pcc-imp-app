@@ -2,11 +2,10 @@ package de.pcc.privacycrashcam.applicationlogic.camera;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.pcc.privacycrashcam.BaseTest;
-import de.pcc.privacycrashcam.data.Settings;
+import edu.kit.informatik.pcc.android.settings.Settings;
 
 import static org.junit.Assert.*;
 

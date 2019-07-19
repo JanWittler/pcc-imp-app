@@ -1,6 +1,5 @@
 package de.pcc.privacycrashcam.utils.dataprocessing;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,11 +25,10 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import de.pcc.privacycrashcam.data.Metadata;
-import de.pcc.privacycrashcam.data.Settings;
+import edu.kit.informatik.pcc.android.settings.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 import edu.kit.informatik.pcc.android.Client;
-import edu.kit.informatik.pcc.core.data.IFileManager;
 
 /**
  * The AsyncPersistor saves all data after recording gets invoked in the app.
@@ -72,14 +70,12 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * instance.
      *
      * @param ringbuffer      Buffer containing the recorded video snippets.
-     * @param memoryManager   MemoryManager instance to access temp files
      * @param persistCallback Callback used to give asynchronous response.
      */
-    public AsyncPersistor(VideoRingBuffer ringbuffer, MemoryManager memoryManager,
-                          PersistCallback persistCallback) {
+    public AsyncPersistor(VideoRingBuffer ringbuffer, PersistCallback persistCallback) {
         this.ringbuffer = ringbuffer;
         this.persistCallback = persistCallback;
-        this.settings = memoryManager.getSettings();
+        this.settings = Client.getGlobal().getSettingsManager().loadSettings();
     }
 
     /* #############################################################################################

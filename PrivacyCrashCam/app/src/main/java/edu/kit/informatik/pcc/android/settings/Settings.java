@@ -1,4 +1,4 @@
-package de.pcc.privacycrashcam.data;
+package edu.kit.informatik.pcc.android.settings;
 
 import android.media.CamcorderProfile;
 import android.util.Log;
