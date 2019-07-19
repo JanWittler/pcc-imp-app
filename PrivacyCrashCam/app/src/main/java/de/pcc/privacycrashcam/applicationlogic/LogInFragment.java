@@ -29,7 +29,7 @@ import edu.kit.informatik.pcc.android.network.IUserManagement;
  */
 public class LogInFragment extends Fragment {
 
-    private final static String URL_REGISTER = ServerProxy.getGlobal().host() + ":9999";
+    private final static String URL_REGISTER = ServerProxy.getGlobal().getServerConfiguration().host() + ":9999";
 
     private EditText et_mail;
     private EditText et_password;
@@ -62,7 +62,7 @@ public class LogInFragment extends Fragment {
                     switch (response.result) {
                         case SUCCESS:
                             LogInHelper.SaveAccountData(mail, pw, getContext());
-                            Client.getGlobal().storeAuthenticationToken(response.authenticationToken);
+                            Client.getGlobal().getSessionManager().storeAuthenticationToken(response.authenticationToken);
                             CameraActivity.Launch(getActivity());
                             getActivity().finish();
                             break;
@@ -97,7 +97,7 @@ public class LogInFragment extends Fragment {
                 }
             };
 
-            ServerProxy.getGlobal().login(mail, pw, completion);
+            ServerProxy.getGlobal().getUserManagement().login(mail, pw, completion);
         }
     };
 

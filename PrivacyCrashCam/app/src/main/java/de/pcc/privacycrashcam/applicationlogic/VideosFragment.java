@@ -232,7 +232,12 @@ public class VideosFragment extends Fragment {
                 completion.onError("Failed to load key data");
                 return;
             }
-            ServerProxy.getGlobal().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, Client.getGlobal().loadAuthenticationToken(), completion);
+            String authenticationToken = Client.getGlobal().getSessionManager().loadAuthenticationToken();
+            if (authenticationToken == null) {
+                completion.onResponse(IClientVideoUpload.UploadResult.ACCOUNT_FAILURE);
+                return;
+            }
+            ServerProxy.getGlobal().getClientVideoUpload().uploadVideo(item.getEncVideoFile(), item.getEncMetaFile(), keyData, authenticationToken, completion);
         }
 
         /**
