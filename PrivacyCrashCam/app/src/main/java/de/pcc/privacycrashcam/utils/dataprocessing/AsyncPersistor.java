@@ -30,6 +30,7 @@ import de.pcc.privacycrashcam.data.Settings;
 import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 import edu.kit.informatik.pcc.android.Client;
+import edu.kit.informatik.pcc.core.data.IFileManager;
 
 /**
  * The AsyncPersistor saves all data after recording gets invoked in the app.
@@ -42,7 +43,6 @@ import edu.kit.informatik.pcc.android.Client;
  * @author Josh Romanowski, Giorgio Groß
  */
 public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
-
     private final static String TAG = AsyncPersistor.class.getName();
 
     /* #############################################################################################
@@ -50,17 +50,9 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * ###########################################################################################*/
 
     /**
-     * Manager used to access the app's memory e.g. saving the video data.
-     */
-    private MemoryManager memoryManager;
-    /**
      * Callback used to inform the app about the progress of persisting.
      */
     private PersistCallback persistCallback;
-    /**
-     * Context of the persisting. Used to load resources.
-     */
-    private Context context;
     /**
      * Ringbuffer that contains the recorded video snippets
      */
@@ -75,43 +67,18 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
      * ###########################################################################################*/
 
     /**
-     * Creates a new persistor with the given parameters. The AsyncPersistor will use its own
-     * temporary directory.
-     *
-     * @param ringbuffer      Buffer containing the recorded video snippets.
-     * @param persistCallback Callback used to give asynchronous response.
-     * @param context         Android context of the recording.
-     */
-    public AsyncPersistor(VideoRingBuffer ringbuffer,
-                          PersistCallback persistCallback, Context context) {
-        // new mem manager will provide own temp directory for this operation
-        this.memoryManager = new MemoryManager(context);
-
-        this.ringbuffer = ringbuffer;
-        this.persistCallback = persistCallback;
-        this.context = context;
-        this.settings = memoryManager.getSettings();
-    }
-
-    /**
      * Creates a new persistor with the given parameters. The AsyncPersistor will use create
      * temporary data and operate on temporary files accessible to the passed {@link MemoryManager}
-     * instance. See {@link #AsyncPersistor(VideoRingBuffer, PersistCallback, Context)} if you
-     * want AsyncPersisort to use its own temp directory.
+     * instance.
      *
      * @param ringbuffer      Buffer containing the recorded video snippets.
      * @param memoryManager   MemoryManager instance to access temp files
      * @param persistCallback Callback used to give asynchronous response.
-     * @param context         Android context of the recording.
      */
     public AsyncPersistor(VideoRingBuffer ringbuffer, MemoryManager memoryManager,
-                          PersistCallback persistCallback, Context context) {
-        // new mem manager will provide own temp directory for this operation
-        this.memoryManager = memoryManager;
-
+                          PersistCallback persistCallback) {
         this.ringbuffer = ringbuffer;
         this.persistCallback = persistCallback;
-        this.context = context;
         this.settings = memoryManager.getSettings();
     }
 
@@ -166,24 +133,27 @@ public class AsyncPersistor extends AsyncTask<Metadata, Void, Boolean> {
         }
 
         String videoTag = String.valueOf(metaData.getDate());
-        File metaLocation = memoryManager.createReadableMetadataFile(videoTag);
-        if (!saveMetadataToFile(metaLocation, metaData))
+        File metaLocation = Client.getGlobal().getTemporaryFileManager().file(videoTag + "_metadata");
+        if (!saveMetadataToFile(metaLocation, metaData)) {
             return false;
+        }
 
         // concat video snippets
         Queue<File> vidSnippets = ringbuffer.demandData();
-        if (vidSnippets == null)
+        if (vidSnippets == null) {
             return false;
+        }
         Log.i(TAG, "All files to be concatenated were written");
 
-        File concatVid = memoryManager.getTempVideoFile();
-        if (!concatVideos(vidSnippets, concatVid))
+        File concatVideo = Client.getGlobal().getTemporaryFileManager().file(videoTag + "_video");
+        if (!concatVideos(vidSnippets, concatVideo))
             return false;
 
-        Client.getGlobal().getLocalVideoManager().storeVideo(concatVid, metaLocation);
+        Client.getGlobal().getLocalVideoManager().storeVideo(concatVideo, metaLocation);
 
         // delete temporary files
-        memoryManager.deleteCurrentTempData();
+        Client.getGlobal().getTemporaryFileManager().deleteFile(metaLocation);
+        Client.getGlobal().getTemporaryFileManager().deleteFile(concatVideo);
         ringbuffer.flushAll();
 
         Log.i(TAG, "Finished writing files");

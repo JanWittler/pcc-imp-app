@@ -165,26 +165,6 @@ public class BaseTest {
         mocks.add(bufferMock);
 
         // mock memory manager
-        when(memoryManagerMock.createEncryptedSymmetricKeyFile(VIDEO_TAG))
-                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_ENC_SYMM_KEY));
-        when(memoryManagerMock.getEncryptedSymmetricKey(VIDEO_TAG))
-                .thenReturn(FileUtils.GetFile(testDirectory, TEST_ENC_SYMM_KEY));
-        when(memoryManagerMock.createReadableMetadataFile(VIDEO_TAG))
-                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_R));
-        when(memoryManagerMock.getReadableMetadata(VIDEO_TAG))
-                .thenReturn(FileUtils.GetFile(testDirectory, TEST_METADATA_R));
-        when(memoryManagerMock.createEncryptedMetaFile(VIDEO_TAG)).
-                thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA));
-        when(memoryManagerMock.getEncryptedMetadata(VIDEO_TAG)).
-                thenReturn(FileUtils.GetFile(testDirectory, TEST_METADATA));
-        when(memoryManagerMock.createEncryptedVideoFile(VIDEO_TAG))
-                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO));
-        when(memoryManagerMock.getEncryptedVideo(VIDEO_TAG))
-                .thenReturn(FileUtils.GetFile(testDirectory, TEST_VIDEO));
-        when(memoryManagerMock.getTempMetadataFile())
-                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_METADATA_TEMP));
-        when(memoryManagerMock.getTempVideoFile())
-                .thenReturn(FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP));
         when(memoryManagerMock.getSettings()).thenReturn(settingsMock);
         mocks.add(memoryManagerMock);
 

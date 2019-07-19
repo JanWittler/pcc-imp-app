@@ -7,6 +7,7 @@ import edu.kit.informatik.pcc.android.account.SessionManager;
 import edu.kit.informatik.pcc.android.storage.video.ILocalVideoManager;
 import edu.kit.informatik.pcc.android.storage.video.IVideoDetailsProvider;
 import edu.kit.informatik.pcc.core.data.FileSystemManager;
+import edu.kit.informatik.pcc.core.data.IFileManager;
 
 public class Client {
     public static Client getGlobal() {
@@ -21,7 +22,7 @@ public class Client {
     private ISessionManager sessionManager;
     private ILocalVideoManager localVideoManager;
     private IVideoDetailsProvider videoDetailsProvider;
-    private ServerProxy serverProxy;
+    private IFileManager temporaryFileManager;
 
     public void setSessionManager(ISessionManager sessionManager) {
         assert this.sessionManager == null;
@@ -51,6 +52,16 @@ public class Client {
     public IVideoDetailsProvider getVideoDetailsProvider() {
         assert videoDetailsProvider != null;
         return videoDetailsProvider;
+    }
+
+    public void setTemporaryFileManager(IFileManager temporaryFileManager) {
+        assert this.temporaryFileManager == null;
+        this.temporaryFileManager = temporaryFileManager;
+    }
+
+    public IFileManager getTemporaryFileManager() {
+        assert temporaryFileManager != null;
+        return temporaryFileManager;
     }
 
     public static void setupClient() {

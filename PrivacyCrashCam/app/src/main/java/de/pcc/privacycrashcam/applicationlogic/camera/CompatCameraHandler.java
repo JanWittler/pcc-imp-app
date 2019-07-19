@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
@@ -24,6 +25,7 @@ import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
 import de.pcc.privacycrashcam.utils.dataprocessing.PersistCallback;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
+import edu.kit.informatik.pcc.android.Client;
 
 import static android.content.Context.WINDOW_SERVICE;
 
@@ -111,8 +113,8 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         // +1 capacity to record at least the desired video length
         int bufferCapacity = settings.getBufferSizeSec() / VIDEO_CHUNK_LENGTH + 1;
 
-        File someTempFile = memoryManager.getTempVideoFile();
-        if (someTempFile == null) throw new FileNotFoundException();
+
+        File someTempFile = Client.getGlobal().getTemporaryFileManager().file(UUID.randomUUID().toString());
         this.videoRingBuffer = new VideoRingBuffer(bufferCapacity,
                 someTempFile.getParentFile(), Video.SUFFIX);
     }
@@ -256,9 +258,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         mediaRecorder.setProfile(camcorderProfile);
 
         // get new file and add it to buffer and media recorder
-        currentOutputFile = memoryManager.getTempVideoFile();
-        if (currentOutputFile == null)
-            return false;
+        currentOutputFile = Client.getGlobal().getTemporaryFileManager().file(UUID.randomUUID().toString());
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
 
         mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);
@@ -374,7 +374,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
         // create async task to persist the buffer
         AsyncPersistor mPersistor = new AsyncPersistor(videoRingBuffer, memoryManager,
-                persistCallback, context);
+                persistCallback);
         mPersistor.execute(metadata);
     }
 

@@ -48,7 +48,7 @@ public class AsyncPersistorTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        mPersistor = new AsyncPersistor(bufferMock, memoryManagerMock, mCallback, context);
+        mPersistor = new AsyncPersistor(bufferMock, memoryManagerMock, mCallback);
     }
 
     @Test
@@ -96,66 +96,9 @@ public class AsyncPersistorTest extends BaseTest {
     }
 
     @Test
-    public void nonWritableReadableMetadata() throws Exception {
-        File meta = FileUtils.CreateFile(testDirectory, TEST_METADATA_R);
-        assertTrue(meta.setWritable(false, false));
-        Mockito.when(memoryManagerMock.createReadableMetadataFile(VIDEO_TAG))
-                .thenReturn(meta);
-        assertFalse(mPersistor.doInBackground(metadataMock));
-    }
-
-    @Test
-    public void nonWritableEncryptedMeta() throws Exception {
-        File meta = FileUtils.CreateFile(testDirectory, TEST_METADATA);
-        assertTrue(meta.setWritable(false, false));
-        Mockito.when(memoryManagerMock.createEncryptedMetaFile(VIDEO_TAG))
-                .thenReturn(meta);
-        assertFalse(mPersistor.doInBackground(metadataMock));
-    }
-
-    @Test
-    public void nonWritableSymmetricKey() throws Exception {
-        File key = FileUtils.CreateFile(testDirectory, TEST_ENC_SYMM_KEY);
-        assertTrue(key.setWritable(false, false));
-        Mockito.when(memoryManagerMock.createEncryptedSymmetricKeyFile(VIDEO_TAG))
-                .thenReturn(key);
-        assertFalse(mPersistor.doInBackground(metadataMock));
-    }
-
-    @Test
     public void noVideoSnippets() throws Exception {
         Mockito.when(bufferMock.demandData()).thenReturn(null);
         assertFalse(mPersistor.doInBackground(metadataMock));
-    }
-
-    @Test
-    public void nonWritableTempVideo() throws Exception {
-        File vid = FileUtils.CreateFile(testDirectory, TEST_VIDEO_TEMP);
-        assertTrue(vid.setWritable(false, false));
-        Mockito.when(memoryManagerMock.getTempVideoFile())
-                .thenReturn(vid);
-        assertFalse(mPersistor.doInBackground(metadataMock));
-    }
-
-    @Test
-    public void nonWritableEncryptedVideo() throws Exception {
-        File vid = FileUtils.CreateFile(testDirectory, TEST_VIDEO);
-        assertTrue(vid.setWritable(false, false));
-        Mockito.when(memoryManagerMock.createEncryptedVideoFile(VIDEO_TAG))
-                .thenReturn(vid);
-        assertFalse(mPersistor.doInBackground(metadataMock));
-    }
-
-    @Test
-    public void doInBackground() throws Exception {
-        assertTrue(mPersistor.doInBackground(metadataMock));
-        assertTrue(calledOnPersistingStarted);
-        // check if the files were created (if this is the case, AsyncPersistor has made appropriate
-        // calls to create these files)
-        assertNotNull(memoryManagerMock.getEncryptedMetadata(VIDEO_TAG));
-        assertNotNull(memoryManagerMock.getReadableMetadata(VIDEO_TAG));
-        assertNotNull(memoryManagerMock.getEncryptedVideo(VIDEO_TAG));
-        assertNotNull(memoryManagerMock.getEncryptedSymmetricKey(VIDEO_TAG));
     }
 
     @Test
