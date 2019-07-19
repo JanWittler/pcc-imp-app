@@ -1,55 +1,42 @@
 package edu.kit.informatik.pcc.android.settings;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.IOException;
-
-import edu.kit.informatik.pcc.core.data.IFileManager;
+import edu.kit.informatik.pcc.android.storage.ISimpleValueStorage;
 
 public class SettingsManager implements ISettingsManager {
-    private static final String settingsFileName = "settings.json";
-    private static final String settingsEncoding = "UTF-8";
+    private static final String settingsKey = SettingsManager.class.getName() + ".settings";
+    private ISimpleValueStorage simpleValueStorage;
 
-    private IFileManager fileManager;
-
-    public void setFileManager(IFileManager fileManager) {
-        assert this.fileManager == null;
-        this.fileManager = fileManager;
+    public void setSimpleValueStorage(ISimpleValueStorage simpleValueStorage) {
+        assert this.simpleValueStorage == null;
+        this.simpleValueStorage = simpleValueStorage;
     }
-
 
     @Override
     public void storeSettings(Settings settings) {
         assertCompletelySetup();
         String settingsJSON = settings.getAsJSON();
-        File settingsFile = fileManager.file(settingsFileName);
-        try {
-            FileUtils.writeStringToFile(settingsFile, settingsJSON, settingsEncoding);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        simpleValueStorage.putString(settingsKey, settingsJSON);
     }
 
     @Override
     public Settings loadSettings() {
         assertCompletelySetup();
         Settings settings = new Settings();
-        File settingsFile = fileManager.existingFile(settingsFileName);
-        if (settingsFile == null) {
+        String settingsJSON = simpleValueStorage.getString(settingsKey);
+        if (settingsJSON == null) {
             return settings;
         }
         try {
-            String settingsJSON = FileUtils.readFileToString(settingsFile, settingsEncoding);
             settings = new Settings(settingsJSON);
-        } catch (JSONException | IOException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return settings;
     }
 
     private void assertCompletelySetup() {
-        assert fileManager != null;
+        assert simpleValueStorage != null;
     }
 }

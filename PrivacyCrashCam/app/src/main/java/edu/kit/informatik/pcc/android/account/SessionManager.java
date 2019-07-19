@@ -1,57 +1,30 @@
 package edu.kit.informatik.pcc.android.account;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import edu.kit.informatik.pcc.core.data.IFileManager;
+import edu.kit.informatik.pcc.android.storage.ISimpleValueStorage;
 
 public class SessionManager implements ISessionManager {
-    private final static String tokenFileName = "token.txt";
-    private final static String encoding = "UTF-8";
+    private final static String tokenKey = SessionManager.class.getName() + ".token";
 
-    private IFileManager fileManager;
+    private ISimpleValueStorage simpleValueStorage;
 
-    public void setFileManager(IFileManager fileManager) {
-        assert this.fileManager == null;
-        this.fileManager = fileManager;
+    public void setSimpleValueStorage(ISimpleValueStorage simpleValueStorage) {
+        assert this.simpleValueStorage == null;
+        this.simpleValueStorage = simpleValueStorage;
     }
 
     @Override
     public void storeAuthenticationToken(String authenticationToken) {
         assertCompletelySetup();
-        File file = fileManager.file(tokenFileName);
-        if (authenticationToken == null) {
-            fileManager.deleteFile(file);
-            return;
-        }
-        try {
-            FileUtils.writeStringToFile(file, authenticationToken, encoding);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Logger.getGlobal().warning("Failed to store authentication token");
-        }
+        simpleValueStorage.putString(tokenKey, authenticationToken);
     }
 
     @Override
     public String loadAuthenticationToken() {
         assertCompletelySetup();
-        File file = fileManager.existingFile(tokenFileName);
-        if (file == null) {
-            return null;
-        }
-        try {
-            return FileUtils.readFileToString(file, encoding);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Logger.getGlobal().warning("Failed to load authentication token");
-            return null;
-        }
+        return simpleValueStorage.getString(tokenKey);
     }
 
     private void assertCompletelySetup() {
-        assert fileManager != null;
+        assert simpleValueStorage != null;
     }
 }
