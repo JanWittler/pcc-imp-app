@@ -16,7 +16,6 @@ import android.widget.TextView;
 import de.pcc.privacycrashcam.R;
 import edu.kit.informatik.pcc.android.Client;
 import edu.kit.informatik.pcc.android.settings.Settings;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.gui.LogInActivity;
 
 import static android.content.ContentValues.TAG;
@@ -32,7 +31,6 @@ public class SettingsFragment extends Fragment {
      *                                  attributes
      * ###########################################################################################*/
 
-    private MemoryManager memoryManager;
     private Settings settings;
 
     private TextView fps;
@@ -63,7 +61,6 @@ public class SettingsFragment extends Fragment {
         // get the main layout describing the content
         RelativeLayout base = (RelativeLayout) inflater.inflate(R.layout.content_settings, container, false);
 
-        memoryManager = new MemoryManager(getContext());
         settings = Client.getGlobal().getSettingsManager().loadSettings();
         // init view components
 
@@ -200,7 +197,7 @@ public class SettingsFragment extends Fragment {
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                memoryManager.deleteAccountData();
+                //TODO: delete all data
                 LogInActivity.Launch(getActivity());
             }
         });

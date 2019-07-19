@@ -24,7 +24,6 @@ import de.pcc.privacycrashcam.applicationlogic.camera.TriggeringCompatCameraHand
 import de.pcc.privacycrashcam.data.Metadata;
 import edu.kit.informatik.pcc.android.settings.Settings;
 import de.pcc.privacycrashcam.data.Video;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.testUtils.FileUtils;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 
@@ -106,12 +105,6 @@ public class BaseTest {
     protected Settings settingsMock;
 
     /**
-     * Memory manager
-     */
-    @Mock
-    protected MemoryManager memoryManagerMock;
-
-    /**
      * VideoUploadTaskTest files
      */
     protected File videoUpload;
@@ -174,7 +167,6 @@ public class BaseTest {
                 "  \"triggerForceY\":0,\n" +
                 "  \"triggerForceZ\":0\n" +
                 "}");
-        mocks.add(memoryManagerMock);
 
         // mock settings
 

@@ -29,7 +29,6 @@ import java.util.Calendar;
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 import de.pcc.privacycrashcam.data.Video;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import edu.kit.informatik.pcc.android.Client;
 import edu.kit.informatik.pcc.android.ServerProxy;
 import edu.kit.informatik.pcc.android.network.IClientVideoUpload;
@@ -62,7 +61,6 @@ public class VideosFragment extends Fragment {
         ListView videosListView = (ListView) base.findViewById(R.id.lv_videos);
 
         // set up content
-        MemoryManager memoryManager = new MemoryManager(getContext());
         int[] videoIds = Client.getGlobal().getLocalVideoManager().getLocallyStoredVideoIds();
         ArrayList<VideoInfo> videoInfos = new ArrayList<>();
         for (int videoId: videoIds) {
@@ -74,7 +72,7 @@ public class VideosFragment extends Fragment {
             }
             videoInfos.add(new VideoInfo(videoId, metadata));
         }
-        videoListAdapter = new VideoListAdapter(videoInfos, memoryManager);
+        videoListAdapter = new VideoListAdapter(videoInfos);
         videosListView.setAdapter(videoListAdapter);
         videosListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -108,14 +106,12 @@ public class VideosFragment extends Fragment {
 
     private class VideoListAdapter extends BaseAdapter {
         private boolean isUploading = false;
-        private MemoryManager memoryManager;
         private LayoutInflater inflater;
         private ArrayList<VideoInfo> videos;
 
-        private VideoListAdapter(ArrayList<VideoInfo> videos, MemoryManager memoryManager) {
+        private VideoListAdapter(ArrayList<VideoInfo> videos) {
             this.inflater = LayoutInflater.from(getContext());
             this.videos = videos;
-            this.memoryManager = memoryManager;
         }
 
         @Override

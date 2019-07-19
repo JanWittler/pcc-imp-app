@@ -21,7 +21,6 @@ import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
 import edu.kit.informatik.pcc.android.settings.Settings;
 import de.pcc.privacycrashcam.data.Video;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.dataprocessing.AsyncPersistor;
 import de.pcc.privacycrashcam.utils.dataprocessing.PersistCallback;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
@@ -53,7 +52,6 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
     private Settings settings;
     private Metadata metadata;
-    private MemoryManager memoryManager;
 
     private RecordCallback recordCallback;
     private File currentOutputFile;
@@ -84,8 +82,6 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
                 // save current file and set up new one
                 forceStopMediaRecorder();
-                // use new memory manager to access new temp directory
-                memoryManager = new MemoryManager(CompatCameraHandler.this.context);
                 // use new ring buffer to avoid conflicts
                 try {
                     setUpBuffer();
@@ -330,12 +326,6 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     @Override
     public void createHandler() {
         super.createHandler();
-        this.memoryManager = new MemoryManager(context);
-
-        // clean up all temporary data which was not deleted when exiting the app. This happens
-        // sometimes as onDestroy of the Activity is not called and we have no other option left
-        // to get notified when the app is closed.
-        memoryManager.deleteAllTempData();
 
         // Load and apply settings
         this.settings = Client.getGlobal().getSettingsManager().loadSettings();
@@ -401,7 +391,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
     public void destroyHandler() {
         super.destroyHandler();
         tearDownBuffer();
-        memoryManager.deleteCurrentTempData();
+        //TODO: delete created video data
     }
 
     private void tearDownBuffer() {

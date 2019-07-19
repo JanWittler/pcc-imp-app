@@ -3,8 +3,6 @@ package edu.kit.informatik.pcc.android.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import de.pcc.privacycrashcam.data.MemoryKeys;
-
 public class PreferencesStorage implements ISimpleValueStorage {
     private SharedPreferences preferences;
 

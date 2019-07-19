@@ -26,7 +26,6 @@ import java.util.concurrent.CyclicBarrier;
 
 import de.pcc.privacycrashcam.data.Metadata;
 import edu.kit.informatik.pcc.android.settings.Settings;
-import de.pcc.privacycrashcam.data.memoryaccess.MemoryManager;
 import de.pcc.privacycrashcam.utils.datastructures.VideoRingBuffer;
 import edu.kit.informatik.pcc.android.Client;
 
