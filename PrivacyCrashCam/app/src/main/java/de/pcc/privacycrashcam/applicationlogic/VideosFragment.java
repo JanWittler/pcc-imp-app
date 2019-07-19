@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 
 import java.io.File;
@@ -28,7 +27,7 @@ import java.util.Calendar;
 
 import de.pcc.privacycrashcam.R;
 import de.pcc.privacycrashcam.data.Metadata;
-import de.pcc.privacycrashcam.data.Video;
+import de.pcc.privacycrashcam.gui.LogInActivity;
 import edu.kit.informatik.pcc.android.Client;
 import edu.kit.informatik.pcc.android.ServerProxy;
 import edu.kit.informatik.pcc.android.network.IClientVideoUpload;
@@ -212,9 +211,10 @@ public class VideosFragment extends Fragment {
                                     Toast.LENGTH_SHORT).show();
                             break;
                         case UNAUTHENTICATED:
-                            //TODO: log out
                             Toast.makeText(getContext(), "Your session timed out. Please login again.",
                                     Toast.LENGTH_SHORT).show();
+                            Client.getGlobal().getSessionManager().deleteSession();
+                            LogInActivity.Launch(getActivity());
                             break;
                         case NETWORK_FAILURE:
                             Toast.makeText(getContext(), getString(R.string.error_no_connection),
@@ -239,7 +239,7 @@ public class VideosFragment extends Fragment {
                 }
             };
 
-            String authenticationToken = Client.getGlobal().getSessionManager().loadAuthenticationToken();
+            String authenticationToken = Client.getGlobal().getSessionManager().loadSessionToken();
             if (authenticationToken == null) {
                 completion.onResponse(IClientVideoUpload.UploadResult.UNAUTHENTICATED);
                 return;

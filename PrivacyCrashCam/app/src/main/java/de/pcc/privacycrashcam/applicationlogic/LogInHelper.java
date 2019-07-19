@@ -16,6 +16,6 @@ public class LogInHelper {
      * @return true is log in data was found, false otherwise
      */
     public static boolean IsUserLoggedIn(Context context) {
-        return Client.getGlobal().getSessionManager().loadAuthenticationToken() != null;
+        return Client.getGlobal().getSessionManager().loadSessionToken() != null;
     }
 }

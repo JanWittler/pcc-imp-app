@@ -6,6 +6,7 @@ import android.content.Context;
 import java.io.File;
 
 import edu.kit.informatik.pcc.android.account.SessionManager;
+import edu.kit.informatik.pcc.android.account.SessionStorage;
 import edu.kit.informatik.pcc.android.crypto.PublicKeyProvider;
 import edu.kit.informatik.pcc.android.network.ServerConfiguration;
 import edu.kit.informatik.pcc.android.network.UserNetworkAdapter;
@@ -34,14 +35,18 @@ public class PccApplication extends Application {
 
         Client client = new Client();
 
+        SessionStorage sessionStorage = new SessionStorage();
+        sessionStorage.setSimpleValueStorage(prefStorage);
+
         SessionManager sessionManager = new SessionManager();
-        sessionManager.setSimpleValueStorage(prefStorage);
+        sessionManager.setSessionStorage(sessionStorage);
         client.setSessionManager(sessionManager);
 
         LocalVideoManager localVideoManager = new LocalVideoManager();
         localVideoManager.setFileHierarchyManager(videoFilesManager);
         client.setLocalVideoManager(localVideoManager);
         client.setVideoDetailsProvider(localVideoManager);
+        sessionManager.setLocalVideoManager(localVideoManager);
 
         JavaRSA_AESFileEncryptor videoEncryptor = new JavaRSA_AESFileEncryptor();
         localVideoManager.setVideoEncryptor(videoEncryptor);

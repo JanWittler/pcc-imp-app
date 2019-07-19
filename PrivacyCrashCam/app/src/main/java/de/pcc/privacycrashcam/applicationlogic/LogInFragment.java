@@ -59,7 +59,7 @@ public class LogInFragment extends Fragment {
                 public void onResponse(IUserManagement.LoginResult response) {
                     switch (response.result) {
                         case SUCCESS:
-                            Client.getGlobal().getSessionManager().storeAuthenticationToken(response.authenticationToken);
+                            Client.getGlobal().getSessionManager().storeSessionToken(response.authenticationToken);
                             CameraActivity.Launch(getActivity());
                             getActivity().finish();
                             break;

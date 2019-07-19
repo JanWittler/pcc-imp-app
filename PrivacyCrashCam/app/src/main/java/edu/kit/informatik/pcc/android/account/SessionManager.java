@@ -1,30 +1,44 @@
 package edu.kit.informatik.pcc.android.account;
 
-import edu.kit.informatik.pcc.android.storage.ISimpleValueStorage;
+import edu.kit.informatik.pcc.android.storage.video.ILocalVideoManager;
 
 public class SessionManager implements ISessionManager {
-    private final static String tokenKey = SessionManager.class.getName() + ".token";
+    private ISessionManager sessionStorage;
+    private ILocalVideoManager localVideoManager;
 
-    private ISimpleValueStorage simpleValueStorage;
+    public void setSessionStorage(ISessionManager sessionStorage) {
+        assert this.sessionStorage == null;
+        this.sessionStorage = sessionStorage;
+    }
 
-    public void setSimpleValueStorage(ISimpleValueStorage simpleValueStorage) {
-        assert this.simpleValueStorage == null;
-        this.simpleValueStorage = simpleValueStorage;
+    public void setLocalVideoManager(ILocalVideoManager localVideoManager) {
+        assert this.localVideoManager == null;
+        this.localVideoManager = localVideoManager;
     }
 
     @Override
-    public void storeAuthenticationToken(String authenticationToken) {
+    public void storeSessionToken(String sessionToken) {
         assertCompletelySetup();
-        simpleValueStorage.putString(tokenKey, authenticationToken);
+        sessionStorage.storeSessionToken(sessionToken);
     }
 
     @Override
-    public String loadAuthenticationToken() {
+    public String loadSessionToken() {
         assertCompletelySetup();
-        return simpleValueStorage.getString(tokenKey);
+        return sessionStorage.loadSessionToken();
+    }
+
+    @Override
+    public void deleteSession() {
+        assertCompletelySetup();
+        for (int videoId: localVideoManager.getLocallyStoredVideoIds()) {
+            localVideoManager.deleteContentForVideo(videoId);
+        }
+        sessionStorage.deleteSession();
     }
 
     private void assertCompletelySetup() {
-        assert simpleValueStorage != null;
+        assert sessionStorage != null;
+        assert localVideoManager != null;
     }
 }

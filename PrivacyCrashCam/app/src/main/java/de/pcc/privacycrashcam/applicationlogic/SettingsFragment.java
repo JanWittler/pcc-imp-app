@@ -197,7 +197,7 @@ public class SettingsFragment extends Fragment {
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: delete all data
+                Client.getGlobal().getSessionManager().deleteSession();
                 LogInActivity.Launch(getActivity());
             }
         });
