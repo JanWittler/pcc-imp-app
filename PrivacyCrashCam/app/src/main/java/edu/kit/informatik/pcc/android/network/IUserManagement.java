@@ -1,5 +1,8 @@
 package edu.kit.informatik.pcc.android.network;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 public interface IUserManagement {
     void createAccount(String email, String password, IRequestCompletion<AuthenticationResult> completion);
     void login(String email, String password, IRequestCompletion<LoginResult> completion);
@@ -22,7 +25,7 @@ public interface IUserManagement {
     }
 
     class LoginResult {
-        public String authenticationToken;
-        public AuthenticationResult result;
+        @Nullable public String authenticationToken;
+        @NonNull public AuthenticationResult result;
     }
 }

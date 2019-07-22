@@ -71,6 +71,7 @@ public class PccApplication extends Application {
 
         VideoNetworkAdapter videoNetworkAdapter = new VideoNetworkAdapter();
         videoNetworkAdapter.setServerConfiguration(serverConfiguration);
+        videoUploadWrapper.setClientVideoUpload(videoNetworkAdapter);
 
         Client.setGlobal(client);
     }

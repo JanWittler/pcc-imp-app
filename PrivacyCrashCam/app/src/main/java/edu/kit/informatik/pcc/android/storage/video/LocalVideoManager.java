@@ -31,6 +31,11 @@ public class LocalVideoManager implements ILocalVideoManager, IVideoDetailsProvi
         this.videoEncryptor = videoEncryptor;
     }
 
+    /**
+     * Stores an encrypted version of the video and an encrypted and a readable version of the metadata on disk.
+     * @param video The video to store.
+     * @param metadata The metadata to store.
+     */
     @Override
     public void storeVideo(File video, File metadata) {
         assertCompletelySetup();

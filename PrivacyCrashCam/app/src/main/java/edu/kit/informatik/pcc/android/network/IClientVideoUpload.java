@@ -13,11 +13,8 @@ public interface IClientVideoUpload {
         //! Network not reachable
         NETWORK_FAILURE,
 
-        //! The MultiPartForm had not the right input for this kind of request.
+        //! The provided parameters or the request's form had not the right input for this kind of request.
         INPUT_FAILURE,
-
-        //! An error occurred editing the video.
-        EDITING_FAILURE,
 
         //! Token invalid or not existing
         UNAUTHENTICATED,

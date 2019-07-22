@@ -8,6 +8,9 @@ import edu.kit.informatik.pcc.android.storage.video.ILocalVideoManager;
 import edu.kit.informatik.pcc.android.storage.video.IVideoDetailsProvider;
 import edu.kit.informatik.pcc.core.data.IFileManager;
 
+/**
+ * A helper class to provide global access to provided interfaces.
+ */
 public class Client {
     private static Client global;
 

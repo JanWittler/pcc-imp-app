@@ -18,6 +18,10 @@ import edu.kit.informatik.pcc.android.network.IRequestCompletion;
 import edu.kit.informatik.pcc.android.network.IServerConfiguration;
 import jersey.repackaged.com.google.common.collect.Multimap;
 
+/**
+ * An abstract request performs some request using the provided <code>IServerConfiguration</code>
+ * @param <Result> The type of the value provided in the completion.
+ */
 public abstract class AbstractRequest<Result> extends AsyncTask<IServerConfiguration, Integer, Result> {
     private String path;
     private MultivaluedMap<String, Object> httpHeaders;

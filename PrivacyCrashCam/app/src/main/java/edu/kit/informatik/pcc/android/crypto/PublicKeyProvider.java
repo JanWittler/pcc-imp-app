@@ -13,6 +13,9 @@ import de.pcc.privacycrashcam.R;
 
 import edu.kit.informatik.pcc.core.crypto.IPublicKeyProvider;
 
+/**
+ * A wrapper class for accessing the public key stored in the project resources.
+ */
 public class PublicKeyProvider implements IPublicKeyProvider {
     private Context context;
 

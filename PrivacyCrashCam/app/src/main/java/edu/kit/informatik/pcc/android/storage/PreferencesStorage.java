@@ -3,6 +3,9 @@ package edu.kit.informatik.pcc.android.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * A class to store simple values in the applications shared preferences.
+ */
 public class PreferencesStorage implements ISimpleValueStorage {
     private SharedPreferences preferences;
 
