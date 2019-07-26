@@ -76,7 +76,7 @@ public class UserNetworkAdapter implements IUserManagement {
             }
             else if (response.getStatus() == 200) {
                 result.result = AuthenticationResult.SUCCESS;
-                result.authenticationToken = response.readEntity(String.class);
+                result.authenticationToken = response.getCookies().get("token").getValue();
             }
             else {
                 result.result = AuthenticationResult.FAILURE_OTHER;
