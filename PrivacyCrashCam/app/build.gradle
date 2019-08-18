@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation 'commons-io:commons-io:2.6'
+    compile 'commons-io:commons-io:2.6'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // android modules
