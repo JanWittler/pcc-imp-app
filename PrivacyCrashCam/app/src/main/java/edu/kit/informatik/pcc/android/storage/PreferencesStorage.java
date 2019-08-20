@@ -16,7 +16,7 @@ public class PreferencesStorage implements ISimpleValueStorage {
 
     @Override
     public void putString(String key, String value) {
-        preferences.edit().putString(key, value);
+        preferences.edit().putString(key, value).commit();
     }
 
     @Override
