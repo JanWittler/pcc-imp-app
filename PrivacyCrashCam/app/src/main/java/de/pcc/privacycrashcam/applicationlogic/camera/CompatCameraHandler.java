@@ -104,8 +104,10 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
 
 
         File someTempFile = Client.getGlobal().getTemporaryFileManager().file(UUID.randomUUID().toString());
+        someTempFile.delete();
+        someTempFile.mkdir();
         this.videoRingBuffer = new VideoRingBuffer(bufferCapacity,
-                someTempFile.getParentFile(), Video.SUFFIX);
+                someTempFile, Video.SUFFIX);
     }
 
     /**
@@ -247,7 +249,7 @@ public class CompatCameraHandler extends CameraHandler implements MediaRecorder.
         mediaRecorder.setProfile(camcorderProfile);
 
         // get new file and add it to buffer and media recorder
-        currentOutputFile = Client.getGlobal().getTemporaryFileManager().file(UUID.randomUUID().toString());
+        currentOutputFile = videoRingBuffer.newVideoFile();
         mediaRecorder.setOutputFile(currentOutputFile.getPath());
 
         mediaRecorder.setMaxDuration(VIDEO_CHUNK_LENGTH * 1000);

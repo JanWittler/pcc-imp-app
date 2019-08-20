@@ -145,7 +145,7 @@ public class VideosFragment extends Fragment {
                 mHolder = (VideoViewHolder) view.getTag();
             }
 
-            mHolder.title.setText(videos.get(position).getVideoId());
+            mHolder.title.setText(Integer.toString(videos.get(position).getVideoId()));
             mHolder.caption.setText(getDate(
                     videos.get(position).getMetadata().getDate(), "dd.MM.yyyy HH:mm:ss"));
 

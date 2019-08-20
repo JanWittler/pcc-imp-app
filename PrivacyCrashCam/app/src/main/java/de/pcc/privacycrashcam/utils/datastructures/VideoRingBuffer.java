@@ -5,10 +5,14 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import de.pcc.privacycrashcam.data.Video;
 import edu.kit.informatik.pcc.android.Client;
 
 /**
@@ -33,6 +37,7 @@ public class VideoRingBuffer {
     private HashMap<String, Boolean> fileSavedLookupTable;
     private Queue<File> queue;
     private int capacity;
+    private File directory;
     private FileObserver directoryObserver;
 
     /* #############################################################################################
@@ -48,6 +53,7 @@ public class VideoRingBuffer {
      */
     public VideoRingBuffer(int capacity, final File directory, final String suffix) {
         if (capacity <= 0) throw new IllegalArgumentException();
+        this.directory = directory;
         this.queue = new ArrayBlockingQueue<>(capacity);
         this.fileSavedLookupTable = new HashMap<>();
         this.capacity = capacity;
@@ -65,6 +71,12 @@ public class VideoRingBuffer {
             }
         };
         this.directoryObserver.startWatching();
+    }
+
+    public File newVideoFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.GERMANY).format(new Date());
+        return new File(directory.getPath() + File.separator + Video.PREFIX + timeStamp
+                + "." + Video.SUFFIX);
     }
 
     /* #############################################################################################
