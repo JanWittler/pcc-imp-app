@@ -37,8 +37,9 @@ public class VideoNetworkAdapter implements IClientVideoUpload {
         request.setMultiPart(multiPart);
 
         MultivaluedHashMap httpHeaders = new MultivaluedHashMap<String, Object>();
-        httpHeaders.add(authenticationToken, "token");
+        httpHeaders.add("token", authenticationToken);
         request.setHTTPHeaders(httpHeaders);
+        request.setCompletion(completion);
         request.execute(serverConfiguration);
     }
 

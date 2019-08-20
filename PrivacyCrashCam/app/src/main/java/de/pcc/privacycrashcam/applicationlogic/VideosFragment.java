@@ -222,8 +222,9 @@ public class VideosFragment extends Fragment {
                         default:
                             Toast.makeText(getContext(), getString(R.string.error_undefined),
                                     Toast.LENGTH_SHORT).show();
-
                     }
+                    toggleProgressBar(mHolder);
+                    isUploading = false;
                 }
 
                 @Override

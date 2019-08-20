@@ -3,6 +3,8 @@ package edu.kit.informatik.pcc.android.network.request;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
 import java.net.URI;
 
 import javax.ws.rs.client.Client;
@@ -39,7 +41,7 @@ public abstract class AbstractRequest<Result> extends AsyncTask<IServerConfigura
         IServerConfiguration serverConfiguration = serverConfigurations[0];
         String serverURL = serverConfiguration.scheme() + "://" + serverConfiguration.host() + ":" + serverConfiguration.port() + "/" + serverConfiguration.path();
         Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(serverURL).path(path);
+        WebTarget webTarget = client.target(serverURL).path(path).register(MultiPartFeature.class);
         Log.i(logTag(), "URI: " + webTarget.getUri().toASCIIString());
 
         Invocation.Builder builder = webTarget.request();
